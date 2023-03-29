@@ -22,6 +22,7 @@ namespace editor
         static Data Read(const char* const filePath);
 
     private:
+        static int Read7BitEncodedInt(std::istream& file);
         static std::string ReadString(std::istream& file);
         static Data ReadData(std::istream& file, const std::string* const metadata);
     };
