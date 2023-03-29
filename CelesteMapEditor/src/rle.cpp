@@ -1,6 +1,6 @@
 #include "rle.hpp"
 
-void editor::RLE::Encode(const char *const str, unsigned char* result)
+void editor::RLE::Encode(const char *const, unsigned char*)
 {
     // TODO: Implement RLE encoding function
 }

@@ -44,10 +44,10 @@ int editor::BinaryPacker::Read7BitEncodedInt(std::istream &file)
     int value = 0;
     bool parsed = false;
     for (int step = 0; !parsed; step++) {
-        char part = file.get();
+        unsigned char part = (unsigned char) file.get();
         parsed = (((int) part >> 7) == 0);
         int partCutter = part & 0x7F;
-        part = (char) partCutter;
+        part = (unsigned char) partCutter;
         value += (int) part << (step*7);
     }
 
@@ -84,51 +84,58 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
         filePos = file.tellg();
 
         unsigned char valueType = (unsigned char) file.get();
-
-        void* data;
+        DataPair data;
+        data.type = (valueType == STRING + 1 || valueType == STRING + 2) ? STRING : (DataType) valueType;
         switch (valueType)
         {
-            case 0:
-                data = new bool((bool)(char) file.get());
+            case BOOL:
+                data.value = new bool((bool)(unsigned char) file.get());
                 break;
 
-            case 1:
-                data = new int(file.get());
+            // Byte / unsigned char
+            case UINT8:
+                data.value = new int((unsigned char) file.get());
                 break;
 
-            case 2:
+            // Short
+            case INT16:
                 short s;
                 READ_DATA(file, s);
-                data = new int((int) s);
+                data.value = new int((int) s);
                 break;
 
-            case 3:
+            // Int
+            case INT32:
                 int i;
                 READ_DATA(file, i);
-                data = new int(i);
+                data.value = new int(i);
                 break;
 
-            case 4:
+            // Float
+            case FLOAT32:
                 float f;
                 READ_DATA(file, f);
-                data = new float(f);
+                data.value = new float(f);
                 break;
 
-            case 5:
+            // Metadata string
+            case STRING:
                 READ_DATA(file, s);
-                data = new std::string(metadata[s]);
+                data.value = new std::string(metadata[s]);
                 break;
 
-            case 6:
-                data = new std::string(ReadString(file));
+            // Raw string
+            case STRING + 1:
+                data.value = new std::string(ReadString(file));
                 break;
 
-            case 7:
+            // RLE-encoded string
+            case STRING + 2:
                 short count;
                 READ_DATA(file, count);
                 unsigned char* bytes = new unsigned char[count];
                 file.read((char*) bytes, count);
-                data = new std::string(RLE::Decode(bytes, count));
+                data.value = new std::string(RLE::Decode(bytes, count));
                 delete[] bytes;
                 break;
         }
@@ -139,10 +146,33 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
     short childCount;
     READ_DATA(file, childCount);
     filePos = file.tellg();
-    bool brk = filePos > 0x14C0;
 
     for (short i = 0; i < childCount; i++)
         result.Children.push_back(new Data(ReadData(file, metadata)));
 
     return result;
+}
+
+void editor::BinaryPacker::DataPair::GetValue(void *out)
+{
+    switch (type)
+    {
+        case BOOL:
+            *(bool*)out = *(bool*)value;
+            break;
+
+        case UINT8:
+        case INT16:
+        case INT32:
+            *(int*)out = *(int*)value;
+            break;
+
+        case FLOAT32:
+            *(float*)out = *(float*)value;
+            break;
+
+        case STRING:
+            *(std::string*)out = *(std::string*)value;
+            break;
+    }
 }

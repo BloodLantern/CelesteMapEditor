@@ -9,11 +9,30 @@ namespace editor
     class BinaryPacker
     {
     public:
+        enum DataType : unsigned char
+        {
+            BOOL,
+            UINT8,
+            INT16,
+            INT32,
+            FLOAT32,
+            STRING,
+            NONE = UCHAR_MAX
+        };
+
+        struct DataPair
+        {
+            void* value;
+            DataType type;
+
+            void GetValue(void* out);
+        };
+
         struct Data
         {
             std::string Package;
             std::string Name;
-            std::map<std::string, void*> Attributes;
+            std::map<std::string, DataPair> Attributes;
             std::vector<Data*> Children;
         };
 

@@ -1,0 +1,39 @@
+
+
+Mountain:
+    Idle:
+        Position: [ -0.449, 4.742, 8.228 ]
+        Target: [ 0.293, 3.582, 6.778 ]
+    Select:
+        Position: [ 1.438, 4.482, 8.614 ]
+        Target: [ 1.873, 3.419, 6.977 ]
+    Zoom:
+        Position: [ 1.530, 1.471, 6.982 ]
+        Target: [ 1.545, 1.541, 4.983 ]
+    Cursor: [ 1.319535, 2.07172, 5.113717]
+    # Available: 0, 1, 2
+    State: 0
+    MountainTextureDirectory: MonikaDSidesPack/CustomMountainThingo    
+
+CompleteScreen:
+    Atlas: "Ending_DSides"
+    Start: [ 0.0, 0.0 ]
+    Center: [ 0.0, 0.0 ]
+    Offset: [ 0.0, 0.0 ]
+    Title:
+        ASide: 'monikadsidespack_chaptercomplete_a' # A-side complete ("Chapter Complete")
+        BSide: 'monikadsidespack_chaptercomplete_b' # B-side complete ("B-Side Complete")
+        CSide: 'monikadsidespack_chaptercomplete_c' # C-side complete ("C-Side Complete")
+        FullClear: 'monikadsidespack_chaptercomplete_d' # A-side full clear ("Chapter Clear")
+    Layers:
+      - Type: "layer"
+        Images: [ "01" ]
+        Position: [ 0.0, 0.0 ]
+        Scroll: [ 0.0 ]
+      - Type: "ui"
+    MusicBySide:
+      - event:/music/menu/complete_bside # A-side
+      - event:/music/menu/complete_bside # B-side
+      - event:/music/menu/complete_bside # C-side
+      
+
