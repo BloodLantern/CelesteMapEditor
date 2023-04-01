@@ -3,12 +3,13 @@
 #include <vector>
 #include <Mountain/color.hpp>
 
-#include "level_data.hpp"
-#include "entity_data.hpp"
+#include "level.hpp"
+#include "entity.hpp"
+#include "binary_packer.hpp"
 
 namespace editor
 {
-    class MapData;
+    class Map;
 
     struct ModeProperties
     {
@@ -18,13 +19,13 @@ namespace editor
         int StartStrawberries;
         //EntityData StrawberriesByCheckpoint[][];
         //CheckpointData Checkpoints[];
-        MapData* Data;
+        Map* Data;
         //PlayerInventory Inventory;
         //AudioState AudioState;
         bool IgnoreLevelAudioLayerData;
     };
 
-    class MapData
+    class Map
     {
     public:
         //AreaKey Area;
@@ -33,16 +34,18 @@ namespace editor
         int DetectedStrawberries;
         bool DetectedRemixNotes;
         bool DetectedHeartGem;
-        std::vector<LevelData> Levels = std::vector<LevelData>();
+        std::vector<Level> Levels = std::vector<Level>();
         std::vector<Rectangle> Filler = std::vector<Rectangle>();
-        std::vector<EntityData> Strawberries = std::vector<EntityData>();
-        std::vector<EntityData> Goldenberries = std::vector<EntityData>();
+        std::vector<Entity> Strawberries = std::vector<Entity>();
+        std::vector<Entity> Goldenberries = std::vector<Entity>();
         mountain::Color BackgroundColor = mountain::ColorBlack;
         /*BinaryPacker.Element Foreground;
         BinaryPacker.Element Background;*/
         Rectangle Bounds;
+        BinaryPacker::Data Data;
 
-        MapData(const char* const filePath);
+        Map(const char* const filePath);
+        ~Map();
 
     private:
         void Load(const char* const filePath);

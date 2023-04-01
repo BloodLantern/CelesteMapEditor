@@ -1,12 +1,18 @@
-#include "map_data.hpp"
+#include "map.hpp"
 
 #include <iostream>
 
-#include "binary_packer.hpp"
-
-editor::MapData::MapData(const char* const filePath)
+editor::Map::Map(const char* const filePath)
 {
     Load(filePath);
+}
+
+editor::Map::~Map()
+{
+    for (size_t i = 0; i < Data.Children.size(); i++)
+        delete Data.Children[i];
+    for (std::map<std::string, editor::BinaryPacker::DataPair>::iterator it = Data.Attributes.begin(); it != Data.Attributes.end(); it++)
+        delete it->second.value;
 }
 
 void Print(editor::BinaryPacker::Data* data, int depth)
@@ -61,22 +67,16 @@ void Print(editor::BinaryPacker::Data* data, int depth)
     std::cout << std::endl;
 }
 
-void editor::MapData::Load(const char* const filePath)
+void editor::Map::Load(const char* const filePath)
 {
-    BinaryPacker::Data data;
     try
     {
-        data = BinaryPacker::Read(filePath);
+        Data = BinaryPacker::Read(filePath);
     }
     catch (const std::invalid_argument&)
     {
         return;
     }
 
-    Print(&data, 0);
-    
-    for (size_t i = 0; i < data.Children.size(); i++)
-        delete data.Children[i];
-    for (std::map<std::string, editor::BinaryPacker::DataPair>::iterator it = data.Attributes.begin(); it != data.Attributes.end(); it++)
-        delete it->second.value;
+    Print(&Data, 0);
 }

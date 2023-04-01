@@ -2,7 +2,7 @@
 
 namespace editor
 {
-    class EntityData
+    class Entity
     {
 
     };

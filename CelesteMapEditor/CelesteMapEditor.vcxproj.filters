@@ -21,19 +21,25 @@
     <ClCompile Include="src\binary_packer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\decal_data.cpp">
+    <ClCompile Include="src\decal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\entity_data.cpp">
+    <ClCompile Include="src\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\level_data.cpp">
+    <ClCompile Include="src\level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\map_data.cpp">
+    <ClCompile Include="src\map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\calc.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,16 +47,16 @@
     <ClInclude Include="include\binary_packer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\decal_data.hpp">
+    <ClInclude Include="include\decal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\entity_data.hpp">
+    <ClInclude Include="include\entity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\level_data.hpp">
+    <ClInclude Include="include\level.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\map_data.hpp">
+    <ClInclude Include="include\map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rle.hpp">

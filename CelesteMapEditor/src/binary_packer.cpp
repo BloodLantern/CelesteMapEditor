@@ -23,12 +23,7 @@ editor::BinaryPacker::Data editor::BinaryPacker::Read(const char* const filePath
     READ_DATA(file, metadataLength);
     std::string* metadata = new std::string[metadataLength];
     for (int i = 0; i < metadataLength; i++)
-    {
         metadata[i] = ReadString(file);
-        for (int j = 0; j < metadata[i].size(); j++)
-            std::cout << metadata[i][j];
-        std::cout << std::endl;
-    }
 
     Data result = ReadData(file, metadata);
 
@@ -73,7 +68,6 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
     short nameOffset;
     READ_DATA(file, nameOffset);
     result.Name = metadata[nameOffset];
-    std::streampos filePos = file.tellg();
 
     unsigned char valueCount = (unsigned char) file.get();
     for (unsigned char index = 0; index < valueCount; index++)
@@ -81,7 +75,6 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
         short keyOffset;
         READ_DATA(file, keyOffset);
         std::string key = metadata[keyOffset];
-        filePos = file.tellg();
 
         unsigned char valueType = (unsigned char) file.get();
         DataPair data;
@@ -145,8 +138,6 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
 
     short childCount;
     READ_DATA(file, childCount);
-    filePos = file.tellg();
-
     for (short i = 0; i < childCount; i++)
         result.Children.push_back(new Data(ReadData(file, metadata)));
 

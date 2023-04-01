@@ -2,7 +2,7 @@
 
 namespace editor
 {
-    class DecalData
+    class Decal
     {
 
     };

@@ -3,18 +3,13 @@
 #include <vector>
 #include <Maths/vector2.hpp>
 
-#include "entity_data.hpp"
-#include "decal_data.hpp"
-
-struct Rectangle
-{
-    Vector2 position;
-    Vector2 size;
-};
+#include "entity.hpp"
+#include "decal.hpp"
+#include "calc.hpp"
 
 namespace editor
 {
-    class LevelData
+    class Level
     {
     public:
         const char* Name;
@@ -25,11 +20,11 @@ namespace editor
         bool HasCheckpoint;
         bool DisableDownTransition;
         Rectangle Bounds;
-        std::vector<EntityData> Entities;
-        std::vector<EntityData> Triggers;
+        std::vector<Entity> Entities;
+        std::vector<Entity> Triggers;
         std::vector<Vector2> Spawns;
-        std::vector<DecalData> FgDecals;
-        std::vector<DecalData> BgDecals;
+        std::vector<Decal> FgDecals;
+        std::vector<Decal> BgDecals;
         const char* Solids;
         const char* Bg;
         const char* FgTiles;
