@@ -71,12 +71,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include</ExternalIncludePath>
+    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include;externals\include\Maths</ExternalIncludePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include</ExternalIncludePath>
+    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include;externals\include\Maths</ExternalIncludePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include</ExternalIncludePath>
@@ -130,6 +132,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>mountaind.lib;toolboxd.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>externals\libs</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,13 +152,17 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>mountain.lib;toolbox.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>externals\libs</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\calc.hpp" />
+    <ClCompile Include="include\editor.hpp" />
     <ClCompile Include="src\binary_packer.cpp" />
     <ClCompile Include="src\calc.cpp" />
     <ClCompile Include="src\decal.cpp" />
+    <ClCompile Include="src\editor.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\level.cpp" />
     <ClCompile Include="src\main.cpp" />

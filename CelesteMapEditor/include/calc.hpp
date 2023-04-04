@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Maths/vector2.hpp>
+#include <vector2.hpp>
 
 struct Rectangle
 {
