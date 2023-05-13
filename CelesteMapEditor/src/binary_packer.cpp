@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "rle.hpp"
+#include <Mountain/run_length_encoding.hpp>
 
 #define READ_DATA(fileStream, address) fileStream.read((char*) &address, sizeof(address))
 
@@ -126,9 +126,9 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
             case STRING + 2:
                 short count;
                 READ_DATA(file, count);
-                unsigned char* bytes = new unsigned char[count];
+                char* bytes = new char[count];
                 file.read((char*) bytes, count);
-                data.value = new std::string(RLE::Decode(bytes, count));
+                data.value = new std::string(mountain::RunLengthEncoding::Decode(std::string(bytes)));
                 delete[] bytes;
                 break;
         }

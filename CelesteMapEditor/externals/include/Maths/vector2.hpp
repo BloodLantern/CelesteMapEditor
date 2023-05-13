@@ -14,6 +14,9 @@ class Vector2
 public:
 	float x, y;
 
+	static constexpr Vector2 UnitX() { return Vector2(1.0f, 0.0f); }
+	static constexpr Vector2 UnitY() { return Vector2(0.0f, 1.0f); }
+
 	constexpr Vector2()	: x(0), y(0) {}
 	/// @brief Constructs a Vector2 with both its components set to 'xy'.
 	constexpr Vector2(const float xy) : x(xy), y(xy) {}
@@ -93,7 +96,7 @@ public:
 	[[nodiscard]]
 	float& operator[](const size_t i);
 	explicit operator Vector2i() const;
-    explicit operator Vector3() const;
+    operator Vector3() const;
 	operator Matrix() const;
 
     // Automatically generates all comparison operators
@@ -124,5 +127,12 @@ Vector2& operator*=(Vector2& a, const Vector2 b);
 Vector2& operator*=(Vector2& v, const float factor);
 Vector2& operator/=(Vector2& a, const Vector2 b);
 Vector2& operator/=(Vector2& v, const float factor);
+
+bool operator==(const Vector2& v, const float f);
+bool operator!=(const Vector2& v, const float f);
+bool operator<(const Vector2& v, const float f);
+bool operator>(const Vector2& v, const float f);
+bool operator<=(const Vector2& v, const float f);
+bool operator>=(const Vector2& v, const float f);
 
 std::ostream& operator<<(std::ostream& out, const Vector2 v);
