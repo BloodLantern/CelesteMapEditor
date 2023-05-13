@@ -111,9 +111,9 @@ Vector2i operator*(const Vector2i a, const Vector2i b);
 [[nodiscard]]
 Vector2i operator*(const Vector2i v, const int factor);
 [[nodiscard]]
-Vector2 operator/(const Vector2i a, const Vector2i b);
+Vector2i operator/(const Vector2i a, const Vector2i b);
 [[nodiscard]]
-Vector2 operator/(const Vector2i v, const float factor);
+Vector2i operator/(const Vector2i v, const int factor);
 
 Vector2i& operator+=(Vector2i& a, const Vector2i b);
 Vector2i& operator+=(Vector2i& v, const int factor);
@@ -121,6 +121,8 @@ Vector2i& operator-=(Vector2i& a, const Vector2i b);
 Vector2i& operator-=(Vector2i& v, const int factor);
 Vector2i& operator*=(Vector2i& a, const Vector2i b);
 Vector2i& operator*=(Vector2i& v, const int factor);
+Vector2i& operator/=(Vector2i& a, const Vector2i b);
+Vector2i& operator/=(Vector2i& v, const int factor);
 
 bool operator==(const Vector2i& v, const int i);
 bool operator!=(const Vector2i& v, const int i);

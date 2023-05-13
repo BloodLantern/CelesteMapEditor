@@ -39,6 +39,12 @@
     <ClCompile Include="src\calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\editor.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\binary_packer.hpp">
