@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace editor
+namespace celeste
 {
     class BinaryPacker
     {
@@ -17,7 +17,7 @@ namespace editor
             INT32,
             FLOAT32,
             STRING,
-            NONE = UCHAR_MAX
+            NONE = std::numeric_limits<unsigned char>::max()
         };
 
         struct DataPair
@@ -38,7 +38,7 @@ namespace editor
 
         BinaryPacker() = delete;
 
-        static Data Read(const char* const filePath);
+        static Data Read(const std::string& filePath);
 
     private:
         static int Read7BitEncodedInt(std::istream& file);

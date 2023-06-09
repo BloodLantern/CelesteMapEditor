@@ -6,7 +6,10 @@
 
 class Vector2;
 class Vector2i;
-class Matrix;
+class Vector4;
+template<size_t M>
+class Vector;
+class Matrix3x3;
 
 /// @brief The Vector3 class represents either a three-dimensional vector or a point.
 class Vector3
@@ -84,8 +87,10 @@ public:
 	[[nodiscard]]
 	float& operator[](const size_t i);
     explicit operator Vector2() const;
-    explicit operator Vector2i() const;
-    operator Matrix() const;
+	explicit operator Vector2i() const;
+	operator Vector4() const;
+    operator Vector<3>() const;
+    explicit operator Matrix3x3() const;
 
     // Automatically generates all comparison operators
 	[[nodiscard]]
@@ -103,6 +108,8 @@ Vector3 operator*(const Vector3& a, const Vector3& b);
 [[nodiscard]]
 Vector3 operator*(const Vector3& v, const float factor);
 [[nodiscard]]
+Vector3 operator*(const Matrix3x3& m, const Vector3& v);
+[[nodiscard]]
 Vector3 operator/(const Vector3& a, const Vector3& b);
 [[nodiscard]]
 Vector3 operator/(const Vector3& v, const float factor);
@@ -113,6 +120,7 @@ Vector3& operator-=(Vector3& a, const Vector3& b);
 Vector3& operator-=(Vector3& v, const float factor);
 Vector3& operator*=(Vector3& a, const Vector3& b);
 Vector3& operator*=(Vector3& v, const float factor);
+Vector3& operator*=(const Matrix3x3& m, Vector3& v);
 Vector3& operator/=(Vector3& a, const Vector3& b);
 Vector3& operator/=(Vector3& v, const float factor);
 
@@ -124,3 +132,5 @@ bool operator<=(const Vector3& v, const float f);
 bool operator>=(const Vector3& v, const float f);
 
 std::ostream& operator<<(std::ostream& out, const Vector3& v);
+
+using vec3 = Vector3;

@@ -4,6 +4,6 @@
 
 struct Rectangle
 {
-    Vector2 position;
-    Vector2 size;
+    vec2 position;
+    vec2 size;
 };

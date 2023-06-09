@@ -3,51 +3,38 @@
 #include <vector>
 #include <Mountain/color.hpp>
 
-#include "level.hpp"
-#include "entity.hpp"
+#include "level_data.hpp"
+#include "entity_data.hpp"
 #include "binary_packer.hpp"
+#include "mode_properties.hpp"
+#include "area_key.hpp"
+#include "area_data.hpp"
 
-namespace editor
+namespace celeste
 {
-    class Map;
-
-    struct ModeProperties
-    {
-        const char* PoemID;
-        const char* Path;
-        int TotalStrawberries;
-        int StartStrawberries;
-        //EntityData StrawberriesByCheckpoint[][];
-        //CheckpointData Checkpoints[];
-        Map* Data;
-        //PlayerInventory Inventory;
-        //AudioState AudioState;
-        bool IgnoreLevelAudioLayerData;
-    };
-
     class Map
     {
     public:
-        //AreaKey Area;
-        //AreaData Data;
-        ModeProperties ModeData;
-        int DetectedStrawberries;
-        bool DetectedRemixNotes;
-        bool DetectedHeartGem;
-        std::vector<Level> Levels = std::vector<Level>();
-        std::vector<Rectangle> Filler = std::vector<Rectangle>();
-        std::vector<Entity> Strawberries = std::vector<Entity>();
-        std::vector<Entity> Goldenberries = std::vector<Entity>();
-        mountain::Color BackgroundColor = mountain::ColorBlack;
-        /*BinaryPacker.Element Foreground;
-        BinaryPacker.Element Background;*/
-        Rectangle Bounds;
-        BinaryPacker::Data Data;
+        AreaKey area;
+        AreaData data;
+        ModeProperties modeData;
+        int detectedStrawberries;
+        bool detectedRemixNotes;
+        bool detectedHeartGem;
+        std::vector<LevelData> levels;
+        std::vector<Rectangle> filler;
+        std::vector<EntityData> strawberries;
+        std::vector<EntityData> goldenberries;
+        mountain::Color backgroundColor = mountain::Color::Black;
+        BinaryPacker::Data foreground;
+        BinaryPacker::Data background;
+        Rectangle bounds;
+        BinaryPacker::Data data;
 
-        Map(const char* const filePath);
+        Map(const std::string& filePath);
         ~Map();
 
     private:
-        void Load(const char* const filePath);
+        void Load(const std::string& filePath);
     };
 }

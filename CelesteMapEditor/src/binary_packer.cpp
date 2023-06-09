@@ -7,7 +7,7 @@
 
 #define READ_DATA(fileStream, address) fileStream.read((char*) &address, sizeof(address))
 
-editor::BinaryPacker::Data editor::BinaryPacker::Read(const char* const filePath)
+celeste::BinaryPacker::Data celeste::BinaryPacker::Read(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::binary | std::ios::in);
 
@@ -34,7 +34,7 @@ editor::BinaryPacker::Data editor::BinaryPacker::Read(const char* const filePath
     return result;
 }
 
-int editor::BinaryPacker::Read7BitEncodedInt(std::istream &file)
+int celeste::BinaryPacker::Read7BitEncodedInt(std::istream &file)
 {
     int value = 0;
     bool parsed = false;
@@ -49,7 +49,7 @@ int editor::BinaryPacker::Read7BitEncodedInt(std::istream &file)
     return value;
 }
 
-std::string editor::BinaryPacker::ReadString(std::istream &file)
+std::string celeste::BinaryPacker::ReadString(std::istream &file)
 {
     int length = Read7BitEncodedInt(file);
     if (length == 0)
@@ -61,7 +61,7 @@ std::string editor::BinaryPacker::ReadString(std::istream &file)
     return result;
 }
 
-editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, const std::string* const metadata)
+celeste::BinaryPacker::Data celeste::BinaryPacker::ReadData(std::istream& file, const std::string* const metadata)
 {
     Data result;
 
@@ -144,7 +144,7 @@ editor::BinaryPacker::Data editor::BinaryPacker::ReadData(std::istream& file, co
     return result;
 }
 
-void editor::BinaryPacker::DataPair::GetValue(void *out)
+void celeste::BinaryPacker::DataPair::GetValue(void *out)
 {
     switch (type)
     {

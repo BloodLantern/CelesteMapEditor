@@ -7,7 +7,11 @@
 
 class Vector2;
 class Vector3;
+template<size_t M>
 class Vector;
+class Matrix2x2;
+class Matrix3x3;
+template<size_t M, size_t N>
 class Matrix;
 
 /// @brief The Matrix4x4 class represents a two-dimensional array mainly used for mathematical operations.
@@ -69,71 +73,29 @@ public:
     [[nodiscard]]
     float Determinant() const;
     /// @brief Sets this matrix to the identity matrix.
-    Matrix4x4& LoadIdentity(this Matrix4x4& self);
+    Matrix4x4& LoadIdentity();
     /// @brief Switches the matrix by its diagonal elements.
-    Matrix4x4& Transpose(this Matrix4x4& self);
-    /// @brief Adds the given matrix to the right of this one.
-    Matrix Augmented(this Matrix4x4& self, const Matrix4x4& other);
-    Matrix4x4& GaussJordan(this Matrix4x4& self);
-    Matrix4x4& Inverse(this Matrix4x4& self);
+    Matrix4x4& Transpose();
+    Matrix4x4& Inverse();
 
     /// @brief Switches the given matrix by its diagonal elements.
     [[nodiscard]]
     static Matrix4x4 Transpose(const Matrix4x4& matrix);
-    /// @brief Adds the 'm2' to the right of 'm1'.
+    /// @brief Computes the cofactor of the given matrix with a given row and column.
     [[nodiscard]]
-    static Matrix Augmented(const Matrix4x4& m1, const Matrix4x4& m2);
-    /// @brief Computes the Gauss-Jordan pivot.
+    static float Cofactor(const Matrix4x4& matrix, size_t row, size_t column);
+    /// @brief Computes the cofactor matrix of the given matrix.
     [[nodiscard]]
-    static Matrix4x4 GaussJordan(const Matrix4x4& matrix);
+    static Matrix4x4 Cofactor(const Matrix4x4& matrix);
     /// @brief Computes the inverse of the given matrix using the Gauss-Jordan pivot.
     [[nodiscard]]
     static Matrix4x4 Inverse(const Matrix4x4& matrix);
     /// @brief Creates a 3D translation matrix from the given angle for each of the x, y, and z axis.
     [[nodiscard]]
-    static Matrix4x4 TranslationMatrix3D(const Vector3& translation);
-    /// @brief Creates a 3D rotation matrix from the given angle and axis.
-	/// @param angle The angle in radians.
+    static Matrix4x4 Translation2D(const Vector2& translation);
+    /// @brief Creates a 3D translation matrix from the given angle for each of the x, y, and z axis.
     [[nodiscard]]
-    static Matrix4x4 RotationMatrix3D(const float angle, const Vector3& axis);
-    /// @brief Creates a 3D rotation matrix around the X axis from the given angle.
-    /// @param angle The angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DX(const float angle);
-    /// @brief Creates a 3D rotation matrix around the X axis from the given angle.
-    /// @param cos The cosine of the angle in radians.
-    /// @param sin The sine of the angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DX(const float cos, const float sin);
-    /// @brief Creates a 3D rotation matrix around the Y axis from the given angle.
-    /// @param angle The angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DY(const float angle);
-    /// @brief Creates a 3D rotation matrix around the Y axis from the given angle.
-    /// @param cos The cosine of the angle in radians.
-    /// @param sin The sine of the angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DY(const float cos, const float sin);
-    /// @brief Creates a 3D rotation matrix around the Z axis from the given angle.
-    /// @param angle The angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DZ(const float angle);
-    /// @brief Creates a 3D rotation matrix around the Z axis from the given angle.
-    /// @param cos The cosine of the angle in radians.
-    /// @param sin The sine of the angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3DZ(const float cos, const float sin);
-    /// @brief Creates a 3D rotation matrix from the given angle for each of the x, y, and z axis.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3D(const Vector3& rotation);
-    /// @brief Creates a 3D rotation matrix from the given cosine, sine and axis.
-	/// @param cos The cosine of the angle in radians.
-	/// @param sin The sine of the angle in radians.
-    [[nodiscard]]
-    static Matrix4x4 RotationMatrix3D(const float cos, const float sin, const Vector3& axis);
-    /// @brief Creates a 3D scaling matrix from the given Vector3.
-    [[nodiscard]]
-    static Matrix4x4 ScalingMatrix3D(const Vector3& scale);
+    static Matrix4x4 Translation3D(const Vector3& translation);
     /// @brief Creates a Translation-Rotation-Scaling (TRS) matrix from the given translation, rotation and scaling.
     [[nodiscard]]
     static Matrix4x4 TRS(const Vector3& translation, const Vector3& rotation, const Vector3& scale);
@@ -145,17 +107,18 @@ public:
     [[nodiscard]]
     static Matrix4x4 TRS(const Vector3& translation, const Matrix4x4& rotation, const Vector3& scale);
     static void ViewMatrix(const Vector3& eye, const Vector3& center, const Vector3& up, Matrix4x4& result);
-    static void ProjectionMatrix(const float fovY, const float aspectRatio, const float zNear, const float zFar, Matrix4x4& result);
+    static void PerspectiveProjectionMatrix(const float fov, const float aspectRatio, const float near, const float far, Matrix4x4& result);
+    static void OrthographicProjectionMatrix(const float left, const float right, const float bottom, const float top, const float near, const float far, Matrix4x4& result);
 
     [[nodiscard]]
     constexpr const Vector4& operator[](const size_t row) const;
     [[nodiscard]]
     constexpr Vector4& operator[](const size_t row);
-    explicit operator Vector2() const;
-    explicit operator Vector3() const;
     explicit operator Vector4() const;
-    explicit operator Vector() const;
-    operator Matrix() const;
+    explicit operator Vector<4>() const;
+    explicit operator Matrix2x2() const;
+    explicit operator Matrix3x3() const;
+    explicit operator Matrix<4, 4>() const;
 
     // Automatically generates all comparison operators
 	[[nodiscard]]
@@ -182,3 +145,5 @@ Matrix4x4& operator*=(Matrix4x4& m, const float scalar);
 Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2);
 
 std::ostream& operator<<(std::ostream& out, const Matrix4x4& m);
+
+using mat4 = Matrix4x4;

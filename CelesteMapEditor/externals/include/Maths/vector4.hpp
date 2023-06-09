@@ -6,8 +6,9 @@
 
 class Vector2;
 class Vector3;
+template<size_t M>
+class Vector;
 class Matrix4x4;
-class Matrix;
 
 /// @brief The Vector4 class represents either a four-dimensional vector or a point.
 class Vector4
@@ -61,7 +62,8 @@ public:
 	float& operator[](const size_t i);
     explicit operator Vector2() const;
     explicit operator Vector3() const;
-    operator Matrix() const;
+    operator Vector<4>() const;
+    explicit operator Matrix4x4() const;
 
     // Automatically generates all comparison operators
 	[[nodiscard]]
@@ -79,7 +81,7 @@ Vector4 operator*(const Vector4& a, const Vector4& b);
 [[nodiscard]]
 Vector4 operator*(const Vector4& v, const float factor);
 [[nodiscard]]
-Vector4 operator*(const Vector4& v, const Matrix4x4& m);
+Vector4 operator*(const Matrix4x4& m, const Vector4& v);
 [[nodiscard]]
 Vector4 operator/(const Vector4& a, const Vector4& b);
 [[nodiscard]]
@@ -91,7 +93,7 @@ Vector4& operator-=(Vector4& a, const Vector4& b);
 Vector4& operator-=(Vector4& v, const float factor);
 Vector4& operator*=(Vector4& a, const Vector4& b);
 Vector4& operator*=(Vector4& v, const float factor);
-Vector4& operator*=(Vector4& v, const Matrix4x4& m);
+Vector4& operator*=(const Matrix4x4& m, Vector4& v);
 Vector4& operator/=(Vector4& a, const Vector4& b);
 Vector4& operator/=(Vector4& v, const float factor);
 
@@ -103,3 +105,5 @@ bool operator<=(const Vector4& v, const float f);
 bool operator>=(const Vector4& v, const float f);
 
 std::ostream& operator<<(std::ostream& out, const Vector4& v);
+
+using vec4 = Vector4;

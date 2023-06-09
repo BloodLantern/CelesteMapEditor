@@ -155,23 +155,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\area_key.cpp" />
     <ClCompile Include="include\calc.hpp" />
-    <ClCompile Include="include\editor.hpp" />
     <ClCompile Include="src\binary_packer.cpp" />
-    <ClCompile Include="src\calc.cpp" />
-    <ClCompile Include="src\decal.cpp" />
-    <ClCompile Include="src\editor.cpp" />
-    <ClCompile Include="src\entity.cpp" />
-    <ClCompile Include="src\level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\map.cpp" />
+    <ClCompile Include="src\player_inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\area_data.hpp" />
+    <ClInclude Include="include\area_key.hpp" />
+    <ClInclude Include="include\area_mode.hpp" />
     <ClInclude Include="include\binary_packer.hpp" />
+    <ClInclude Include="include\checkpoint_data.hpp" />
+    <ClInclude Include="include\core_modes.hpp" />
     <ClInclude Include="include\decal.hpp" />
     <ClInclude Include="include\entity.hpp" />
+    <ClInclude Include="include\intro_types.hpp" />
     <ClInclude Include="include\level.hpp" />
     <ClInclude Include="include\map.hpp" />
+    <ClInclude Include="include\map_data.hpp" />
+    <ClInclude Include="include\mode_properties.hpp" />
+    <ClInclude Include="include\player_inventory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

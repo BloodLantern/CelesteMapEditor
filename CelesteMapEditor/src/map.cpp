@@ -2,20 +2,20 @@
 
 #include <iostream>
 
-editor::Map::Map(const char* const filePath)
+celeste::Map::Map(const std::string& filePath)
 {
     Load(filePath);
 }
 
-editor::Map::~Map()
+celeste::Map::~Map()
 {
-    for (size_t i = 0; i < Data.Children.size(); i++)
-        delete Data.Children[i];
-    for (std::map<std::string, editor::BinaryPacker::DataPair>::iterator it = Data.Attributes.begin(); it != Data.Attributes.end(); it++)
-        delete it->second.value;
+    for (size_t i = 0; i < data.Children.size(); i++)
+        delete data.Children[i];
+    for (auto& pair : data.Attributes)
+        delete pair.second.value;
 }
 
-void Print(editor::BinaryPacker::Data* data, int depth)
+void Print(celeste::BinaryPacker::Data* data, int depth)
 {
     std::string tabs;
     for (int i = 0; i < depth; i++)
@@ -25,34 +25,34 @@ void Print(editor::BinaryPacker::Data* data, int depth)
     std::cout << tabs << "Name: " << data->Name << std::endl;
 
     std::cout << tabs << "Attributes (" << data->Attributes.size() << "):" << std::endl;
-    for (std::map<std::string, editor::BinaryPacker::DataPair>::iterator it = data->Attributes.begin(); it != data->Attributes.end(); it++)
+    for (auto& dataPair : data->Attributes)
     {
-        editor::BinaryPacker::DataPair& pair = it->second;
-        std::cout << tabs << '\t' << it->first << ": ";
+        celeste::BinaryPacker::DataPair& pair = dataPair.second;
+        std::cout << tabs << '\t' << dataPair.first << ": ";
 
         switch (pair.type)
         {
-            case editor::BinaryPacker::BOOL:
+            case celeste::BinaryPacker::BOOL:
                 bool bValue;
                 pair.GetValue(&bValue);
                 std::cout << std::boolalpha << bValue << std::endl;
                 break;
 
-            case editor::BinaryPacker::UINT8:
-            case editor::BinaryPacker::INT16:
-            case editor::BinaryPacker::INT32:
+            case celeste::BinaryPacker::UINT8:
+            case celeste::BinaryPacker::INT16:
+            case celeste::BinaryPacker::INT32:
                 int iValue;
                 pair.GetValue(&iValue);
                 std::cout << iValue << std::endl;
                 break;
 
-            case editor::BinaryPacker::FLOAT32:
+            case celeste::BinaryPacker::FLOAT32:
                 float fValue;
                 pair.GetValue(&fValue);
                 std::cout << fValue << std::endl;
                 break;
 
-            case editor::BinaryPacker::STRING:
+            case celeste::BinaryPacker::STRING:
                 std::string sValue;
                 pair.GetValue(&sValue);
                 std::cout << sValue << std::endl;
@@ -67,16 +67,16 @@ void Print(editor::BinaryPacker::Data* data, int depth)
     std::cout << std::endl;
 }
 
-void editor::Map::Load(const char* const filePath)
+void celeste::Map::Load(const std::string& filePath)
 {
     try
     {
-        Data = BinaryPacker::Read(filePath);
+        data = BinaryPacker::Read(filePath);
     }
     catch (const std::invalid_argument&)
     {
         return;
     }
 
-    Print(&Data, 0);
+    Print(&data, 0);
 }
