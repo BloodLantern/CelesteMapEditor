@@ -72,12 +72,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include;externals\include\Maths</ExternalIncludePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;include\celeste;include\editor;include\utils</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);externals\libs</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);externals\include;externals\include\Maths</ExternalIncludePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;include\celeste;include\editor;include\utils</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);externals\libs</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -128,11 +128,13 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalModuleDependencies>
+      </AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);mountaind.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);toolboxd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,38 +147,47 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalModuleDependencies>
+      </AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);mountain.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);toolbox.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\area_key.cpp" />
-    <ClCompile Include="include\calc.hpp" />
-    <ClCompile Include="src\binary_packer.cpp" />
+    <ClCompile Include="src\celeste\area_key.cpp" />
+    <ClCompile Include="include\utils\calc.hpp" />
+    <ClCompile Include="src\celeste\binary_packer.cpp" />
+    <ClCompile Include="src\editor\color.cpp" />
+    <ClCompile Include="src\editor\logger.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\map.cpp" />
-    <ClCompile Include="src\player_inventory.cpp" />
+    <ClCompile Include="src\celeste\map.cpp" />
+    <ClCompile Include="src\celeste\player_inventory.cpp" />
+    <ClCompile Include="src\utils\run_length_encoding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\area_data.hpp" />
-    <ClInclude Include="include\area_key.hpp" />
-    <ClInclude Include="include\area_mode.hpp" />
-    <ClInclude Include="include\binary_packer.hpp" />
-    <ClInclude Include="include\checkpoint_data.hpp" />
-    <ClInclude Include="include\core_modes.hpp" />
-    <ClInclude Include="include\decal.hpp" />
-    <ClInclude Include="include\entity.hpp" />
-    <ClInclude Include="include\intro_types.hpp" />
-    <ClInclude Include="include\level.hpp" />
-    <ClInclude Include="include\map.hpp" />
-    <ClInclude Include="include\map_data.hpp" />
-    <ClInclude Include="include\mode_properties.hpp" />
-    <ClInclude Include="include\player_inventory.hpp" />
+    <ClInclude Include="include\celeste\area_data.hpp" />
+    <ClInclude Include="include\celeste\area_key.hpp" />
+    <ClInclude Include="include\celeste\area_mode.hpp" />
+    <ClInclude Include="include\celeste\binary_packer.hpp" />
+    <ClInclude Include="include\celeste\checkpoint_data.hpp" />
+    <ClInclude Include="include\editor\color.hpp" />
+    <ClInclude Include="include\celeste\core_modes.hpp" />
+    <ClInclude Include="include\celeste\decal_data.hpp" />
+    <ClInclude Include="include\celeste\entity_data.hpp" />
+    <ClInclude Include="include\celeste\intro_types.hpp" />
+    <ClInclude Include="include\celeste\level_data.hpp" />
+    <ClInclude Include="include\editor\logger.hpp" />
+    <ClInclude Include="include\celeste\map.hpp" />
+    <ClInclude Include="include\celeste\mode_properties.hpp" />
+    <ClInclude Include="include\celeste\player_inventory.hpp" />
+    <ClInclude Include="include\utils\run_length_encoding.hpp" />
+    <ClInclude Include="include\utils\tsqueue.hpp" />
+    <ClInclude Include="include\celeste\wind_pattern.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

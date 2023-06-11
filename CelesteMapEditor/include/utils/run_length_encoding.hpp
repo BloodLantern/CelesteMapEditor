@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace mountain
+namespace utils
 {
     class RunLengthEncoding
     {

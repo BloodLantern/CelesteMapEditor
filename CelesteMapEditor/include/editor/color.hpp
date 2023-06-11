@@ -1,6 +1,8 @@
 #pragma once
 
-namespace mountain
+#include <vector4.hpp>
+
+namespace editor
 {
     struct ColorHSV;
     struct Colorf;
@@ -23,6 +25,7 @@ namespace mountain
 
         unsigned char r, g, b, a = 0xFF;
 
+        constexpr Color() = default;
         constexpr Color(const unsigned int rgba)
             : r((unsigned char) (rgba >> 24)), g((unsigned char) (rgba >> 16)), b((unsigned char) (rgba >> 8)), a((unsigned char) rgba) {}
         constexpr Color(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a = 0xFF)
@@ -37,12 +40,28 @@ namespace mountain
     ///        It uses values from 0 to 1. The default alpha value is 1.
     struct Colorf
     {
+        static const Colorf White;
+        static const Colorf Gray;
+        static const Colorf Black;
+
+        static const Colorf Red;
+        static const Colorf Green;
+        static const Colorf Blue;
+
+        static const Colorf Yellow;
+        static const Colorf Cyan;
+        static const Colorf Magenta;
+
         float r, g, b, a = 1.f;
 
+        constexpr Colorf() = default;
+        constexpr Colorf(const float rgba)
+            : r(rgba), g(rgba), b(rgba), a(rgba) {}
         constexpr Colorf(const float r, const float g, const float b, const float a = 1.f)
             : r(r), g(g), b(b), a(a) {}
 
         operator Color() const;
+        explicit operator Vector4() const;
     };
 
     Color operator+(const Color c1, const Color c2);
@@ -54,6 +73,7 @@ namespace mountain
     {
         unsigned char h, s, v, a = 0xFF;
 
+        constexpr ColorHSV() = default;
         constexpr ColorHSV(const unsigned int hsva)
             : h((unsigned char) (hsva >> 24)), s((unsigned char) (hsva >> 16)), v((unsigned char) (hsva >> 8)), a((unsigned char) hsva) {}
         constexpr ColorHSV(const unsigned char h, const unsigned char s, const unsigned char v, const unsigned char a = 0xFF)

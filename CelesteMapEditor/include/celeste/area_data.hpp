@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <Mountain/color.hpp>
 
+#include "color.hpp"
 #include "core_modes.hpp"
 #include "mode_properties.hpp"
 #include "intro_types.hpp"
@@ -17,9 +17,9 @@ namespace celeste
         std::string completeScreenName;
         ModeProperties* mode;
         int cassetteCheckpointIndex = -1;
-        mountain::Color titleBaseColor = mountain::Color::White;
-        mountain::Color titleAccentColor = mountain::Color::Gray;
-        mountain::Color titleTextColor = mountain::Color::White;
+        editor::Color titleBaseColor = editor::Color::White;
+        editor::Color titleAccentColor = editor::Color::Gray;
+        editor::Color titleTextColor = editor::Color::White;
         IntroTypes introType;
         std::string colorGrade;
         std::string wipe;
@@ -30,10 +30,10 @@ namespace celeste
         std::string spike = "default";
         std::string crumbleBlock = "default";
         std::string woodPlatform = "default";
-        mountain::Color cassetteNoteColor = mountain::Color::White;
-        /*mountain::Color* cobwebColor = mountain::Color[1]
+        editor::Color cassetteNoteColor = editor::Color::White;
+        /*editor::Color* cobwebColor = editor::Color[1]
         {
-            mountain::Color(0x696A6AFF);
+            editor::Color(0x696A6AFF);
         };*/
         std::string CassetteSong = "event:/music/cassette/01_forsaken_city";
         CoreMode coreMode;

@@ -10,9 +10,8 @@
 
 namespace celeste
 {
-    class LevelData
+    struct LevelData
     {
-    public:
         std::string name;
         bool dummy;
         int strawberries;
@@ -20,7 +19,7 @@ namespace celeste
         bool hasHeartGem;
         bool hasCheckpoint;
         bool disableDownTransition;
-        Rectangle bounds;
+        utils::Rectangle bounds;
         std::vector<EntityData> entities;
         std::vector<EntityData> triggers;
         std::vector<vec2> spawns;

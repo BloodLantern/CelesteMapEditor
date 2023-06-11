@@ -6,19 +6,17 @@
 #include <condition_variable>
 #include <utility>
 
-#include <tsqueue.hpp>
+#include "tsqueue.hpp"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define DEBUG_LOG(str, args) mountain::Logger::LogInfoToVS(std::filesystem::relative(__FILE__).string() + "(" TOSTRING(__LINE__) "): " str, args)
+#define DEBUG_LOG(str, args) Logger::LogInfoToVS(std::filesystem::relative(__FILE__).string() + "(" TOSTRING(__LINE__) "): " str, args)
 #define LOG_LEVEL_BINARY_OP(left, right, operator) (static_cast<Logger::LogLevel>(static_cast<unsigned char>(left) operator right))
 
-namespace mtn
+namespace editor
 {
     class Logger
     {
-        friend class Game;
-        
     public:
         // You cannot instantiate this class
         Logger() = delete;
@@ -87,6 +85,7 @@ namespace mtn
         static void CloseFile();
 
         static void Synchronize();
+        static void Stop();
 
     private:
         struct LogEntry
@@ -106,8 +105,6 @@ namespace mtn
         static std::ofstream mFile;
         static std::condition_variable mCondVar;
         static std::thread thread;
-
-        static void Stop();
 
         static void Run();
         static void Log(const LogEntry& entry);

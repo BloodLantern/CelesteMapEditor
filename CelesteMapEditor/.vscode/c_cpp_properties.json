@@ -5,7 +5,10 @@
             "includePath": [
                 "${default}",
                 "${workspaceFolder}/externals/include",
-                "${workspaceFolder}/externals/include/Maths"
+                "${workspaceFolder}/externals/include/Maths",
+                "${workspaceFolder}/include/celeste",
+                "${workspaceFolder}/include/editor",
+                "${workspaceFolder}/include/utils"
             ],
             "defines": [
                 "_DEBUG",

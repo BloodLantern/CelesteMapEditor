@@ -13,9 +13,10 @@ namespace celeste
 
 		int id;
 		AreaMode mode;
+		std::string campaign;
 
 		AreaKey() = default;
-		AreaKey(const int id, const AreaMode mode = AreaMode::Normal);
+		AreaKey(const int id, const AreaMode mode = AreaMode::Normal, const std::string campaign = "Celeste");
 
 		operator std::string();
 	};
