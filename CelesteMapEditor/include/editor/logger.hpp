@@ -10,8 +10,8 @@
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define DEBUG_LOG(str, args) Logger::LogInfoToVS(std::filesystem::relative(__FILE__).string() + "(" TOSTRING(__LINE__) "): " str, args)
-#define LOG_LEVEL_BINARY_OP(left, right, operator) (static_cast<Logger::LogLevel>(static_cast<unsigned char>(left) operator right))
+#define DEBUG_LOG(str, args) editor::Logger::LogInfoToVS(std::filesystem::relative(__FILE__).string() + "(" TOSTRING(__LINE__) "): " str, args)
+#define LOG_LEVEL_BINARY_OP(left, right, operator) (static_cast<editor::Logger::LogLevel>(static_cast<unsigned char>(left) operator right))
 
 namespace editor
 {

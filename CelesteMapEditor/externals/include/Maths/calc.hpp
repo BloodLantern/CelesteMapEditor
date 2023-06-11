@@ -23,7 +23,6 @@ namespace calc
     /// @param value The value to change.
     /// @param target The target value.
     /// @param step The step size.
-    [[nodiscard]]
     extern void Approach(float& value, const float target, const float step);
 
     /// @brief Lerp between two positions in a 2-dimensional space.

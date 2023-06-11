@@ -3,6 +3,7 @@
 #include <vector>
 #include <filesystem>
 
+#include "utils.hpp"
 #include "color.hpp"
 #include "level_data.hpp"
 #include "entity_data.hpp"
@@ -23,7 +24,7 @@ namespace celeste
         bool detectedRemixNotes;
         bool detectedHeartGem;
         std::vector<LevelData> levels;
-        std::vector<utils::Rectangle> filler;
+        std::vector<utils::Rectangle> fillers;
         std::vector<EntityData> strawberries;
         std::vector<EntityData> goldenberries;
         editor::Color backgroundColor = editor::Color::Black;

@@ -1,8 +1,5 @@
 #include "binary_packer.hpp"
 
-#include <fstream>
-#include <iostream>
-
 #include "run_length_encoding.hpp"
 
 #include "logger.hpp"
@@ -54,7 +51,7 @@ int celeste::BinaryPacker::Read7BitEncodedInt(std::istream &file)
     return value;
 }
 
-void celeste::BinaryPacker::ReadString(std::istream &file, std::string& result)
+void celeste::BinaryPacker::ReadString(std::ifstream &file, std::string& result)
 {
     int length = Read7BitEncodedInt(file);
     if (length == 0)
@@ -65,7 +62,7 @@ void celeste::BinaryPacker::ReadString(std::istream &file, std::string& result)
         result[i] = (char) file.get();
 }
 
-void celeste::BinaryPacker::SkipString(std::istream &file)
+void celeste::BinaryPacker::SkipString(std::ifstream &file)
 {
     int length = Read7BitEncodedInt(file);
     if (length == 0)
@@ -74,7 +71,7 @@ void celeste::BinaryPacker::SkipString(std::istream &file)
     file.seekg(length, std::ios::cur);
 }
 
-void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* const metadata, Data& result)
+void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* const metadata, Data& result)
 {
     short nameOffset;
     file.read((char*) &nameOffset, sizeof(nameOffset));
@@ -88,17 +85,16 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
         std::string key = metadata[keyOffset];
 
         unsigned char valueType = (unsigned char) file.get();
-        DataPair data;
-        data.type = (valueType == DataType::String + 1 || valueType == DataType::String + 2) ? DataType::String : (DataType) valueType;
+        DataValue data;
         switch (valueType)
         {
             case DataType::Bool:
-                data.value = new bool((bool) file.get());
+                data.value = std::make_unique<void>((bool) file.get());
                 break;
 
             // Byte / unsigned char
             case DataType::UInt8:
-                data.value = new unsigned char((unsigned char) file.get());
+                data.value = std::make_unique<void>((unsigned char) file.get());
                 break;
 
             // Short
@@ -106,7 +102,7 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
             {
                 short s;
                 file.read((char*) &s, sizeof(s));
-                data.value = new short((short) s);
+                data.value = std::make_unique<void>(s);
                 break;
             }
 
@@ -115,7 +111,7 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
             {
                 int i;
                 file.read((char*) &i, sizeof(i));
-                data.value = new int(i);
+                data.value = std::make_unique<void>(i);
                 break;
             }
 
@@ -124,7 +120,7 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
             {
                 float f;
                 file.read((char*) &f, sizeof(f));
-                data.value = new float(f);
+                data.value = std::make_unique<void>(f);
                 break;
             }
 
@@ -133,16 +129,16 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
             {
                 short s;
                 file.read((char*) &s, sizeof(s));
-                data.value = new std::string(metadata[s]);
+                data.value = std::make_unique<void>(metadata[s]);
                 break;
             }
 
             // Raw string
             case DataType::String + 1:
             {
-                std::string* str = new std::string;
-                ReadString(file, *str);
-                data.value = str;
+                std::string str;
+                ReadString(file, str);
+                data.value = std::make_unique<void>(str);
                 break;
             }
 
@@ -153,7 +149,7 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
                 file.read((char*) &count, sizeof(count));
                 char* bytes = new char[count];
                 file.read((char*) bytes, count);
-                data.value = new std::string(utils::RunLengthEncoding::Decode(std::string(bytes)));
+                data.value = std::make_unique<void>(utils::RunLengthEncoding::Decode(std::string(bytes)));
                 delete[] bytes;
                 break;
             }
@@ -172,40 +168,14 @@ void celeste::BinaryPacker::ReadData(std::istream& file, const std::string* cons
     }
 }
 
-void celeste::BinaryPacker::DataPair::GetValue(void *out)
-{
-    switch (type)
-    {
-        case DataType::Bool:
-            *(bool*) out = *(bool*) value;
-            break;
-
-        case DataType::UInt8:
-            *(unsigned char*) out = *(unsigned char*) value;
-            break;
-
-        case DataType::Int16:
-            *(short*) out = *(short*) value;
-            break;
-
-        case DataType::Int32:
-            *(int*) out = *(int*) value;
-            break;
-
-        case DataType::Float32:
-            *(float*) out = *(float*) value;
-            break;
-
-        case DataType::String:
-            *(std::string*) out = *(std::string*) value;
-            break;
-    }
-}
-
 celeste::BinaryPacker::Data::~Data()
 {
-    for (auto& pair : attributes)
-        delete pair.second.value;
     for (Data* child : children)
         delete child;
+}
+
+celeste::BinaryPacker::DataValue &celeste::BinaryPacker::DataValue::operator=(DataValue &other)
+{
+    value = std::move(other.value);
+    return *this;
 }

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <filesystem>
+#include <fstream>
 #include <string>
 
 namespace celeste
@@ -21,22 +22,40 @@ namespace celeste
             None = std::numeric_limits<unsigned char>::max()
         };
 
-        struct DataPair
+        struct DataValue
         {
-            void* value = nullptr;
-            DataType type;
+            std::unique_ptr<void> value;
 
-            void GetValue(void* out);
+            template<typename T>
+            inline T Get() const { return *GetPtr<T>(); }
+            template<typename T>
+            inline T* GetPtr() const { return reinterpret_cast<T*>(value.get()); }
+
+            DataValue& operator=(DataValue& other);
         };
 
-        struct Data
+        class Data
         {
+        public:
             std::string package;
             std::string name;
-            std::unordered_map<std::string, DataPair> attributes;
+            std::unordered_map<std::string, DataValue> attributes;
             std::vector<Data*> children;
 
             ~Data();
+
+            inline bool HasAttribute(const std::string& attributeName) const
+            {
+                return attributes.contains(attributeName);
+            }
+
+            template<typename T>
+            inline T GetAttribute(const std::string& attributeName, const T& defaultValue) const
+            {
+                if (attributes.empty() || !attributes.contains(attributeName))
+                    return defaultValue;
+                return attributes.at(attributeName).Get<T>();
+            }
         };
 
         BinaryPacker() = delete;
@@ -45,8 +64,8 @@ namespace celeste
 
     private:
         static int Read7BitEncodedInt(std::istream& file);
-        static void ReadString(std::istream& file, std::string& result);
-        static void SkipString(std::istream& file);
-        static void ReadData(std::istream& file, const std::string* const metadata, Data& result);
+        static void ReadString(std::ifstream& file, std::string& result);
+        static void SkipString(std::ifstream& file);
+        static void ReadData(std::ifstream& file, const std::string* const metadata, Data& result);
     };
 }

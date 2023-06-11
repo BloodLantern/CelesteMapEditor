@@ -13,8 +13,8 @@ namespace celeste
         std::string path;
         int totalStrawberries;
         int startStrawberries;
-        //EntityData strawberriesByCheckpoint[][];
-        CheckpointData* checkpoints;
+        std::vector<std::vector<EntityData>> strawberriesByCheckpoint;
+        std::vector<CheckpointData> checkpoints;
         Map* data;
         PlayerInventory inventory;
         //AudioState audioState;

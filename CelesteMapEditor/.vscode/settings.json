@@ -69,6 +69,12 @@
         "condition_variable": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "deque": "cpp",
+        "functional": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "*.rh": "cpp"
     }
 }

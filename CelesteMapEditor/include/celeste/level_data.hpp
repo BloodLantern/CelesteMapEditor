@@ -6,7 +6,8 @@
 #include "entity_data.hpp"
 #include "decal_data.hpp"
 #include "wind_pattern.hpp"
-#include "calc.hpp"
+#include "utils.hpp"
+#include "binary_packer.hpp"
 
 namespace celeste
 {
@@ -44,6 +45,11 @@ namespace celeste
         bool musicWhispers;
         bool delayAltMusic;
         int enforceDashNumber;
-        int editorColorIndex;
+        int debugColorIndex;
+
+        LevelData(const BinaryPacker::Data& data);
+
+    private:
+        void CreateEntityData(const BinaryPacker::Data& entity, EntityData& result);
     };
 }

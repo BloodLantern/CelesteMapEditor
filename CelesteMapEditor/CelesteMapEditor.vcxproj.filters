@@ -24,7 +24,7 @@
     <ClCompile Include="src\celeste\map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\utils\calc.hpp">
+    <ClCompile Include="include\utils\utils.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\celeste\area_key.cpp">

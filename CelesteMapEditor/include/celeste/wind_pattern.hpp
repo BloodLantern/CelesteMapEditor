@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace celeste
 {
     enum class WindPattern : unsigned char
@@ -20,4 +22,6 @@ namespace celeste
         Up,
         Space,
     };
+
+    WindPattern GetWindPattern(const std::string& windPattern);
 }
