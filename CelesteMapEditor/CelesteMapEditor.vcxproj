@@ -162,7 +162,6 @@
     <ClCompile Include="src\celeste\area_key.cpp" />
     <ClCompile Include="include\utils\utils.hpp" />
     <ClCompile Include="src\celeste\binary_packer.cpp" />
-    <ClCompile Include="src\celeste\entity_data.cpp" />
     <ClCompile Include="src\celeste\level_data.cpp" />
     <ClCompile Include="src\celeste\wind_pattern.cpp" />
     <ClCompile Include="src\editor\color.cpp" />
@@ -171,6 +170,7 @@
     <ClCompile Include="src\celeste\map.cpp" />
     <ClCompile Include="src\celeste\player_inventory.cpp" />
     <ClCompile Include="src\utils\run_length_encoding.cpp" />
+    <ClCompile Include="src\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\celeste\area_data.hpp" />

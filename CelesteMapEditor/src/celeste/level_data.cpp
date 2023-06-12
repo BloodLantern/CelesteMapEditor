@@ -148,7 +148,7 @@ void celeste::LevelData::CreateEntityData(const BinaryPacker::Data &entity, Enti
 
     const size_t nodesSize = entity.children.size();
     if (nodesSize != 0)
-        result.nodes = std::make_unique<vec2[]>(nodesSize);
+        result.nodes.resize(nodesSize);
 
     if (!entity.attributes.empty())
         for (auto& pair : entity.attributes)
@@ -168,7 +168,7 @@ void celeste::LevelData::CreateEntityData(const BinaryPacker::Data &entity, Enti
             else if (pair.first == "originY")
                 result.origin.y = pair.second.Get<float>();
             else
-                result.values.emplace(pair.first, std::move(pair.second.value));
+                result.values.emplace(pair.first, pair.second.value);
         }
 
     if (nodesSize != 0)

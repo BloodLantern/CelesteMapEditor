@@ -4,6 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <string>
 
 namespace celeste
@@ -24,14 +25,12 @@ namespace celeste
 
         struct DataValue
         {
-            std::unique_ptr<void> value;
+            std::shared_ptr<void> value;
 
             template<typename T>
             inline T Get() const { return *GetPtr<T>(); }
             template<typename T>
             inline T* GetPtr() const { return reinterpret_cast<T*>(value.get()); }
-
-            DataValue& operator=(DataValue& other);
         };
 
         class Data

@@ -89,12 +89,12 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
         switch (valueType)
         {
             case DataType::Bool:
-                data.value = std::make_unique<void>((bool) file.get());
+                data.value = std::make_shared<bool>((bool) file.get());
                 break;
 
             // Byte / unsigned char
             case DataType::UInt8:
-                data.value = std::make_unique<void>((unsigned char) file.get());
+                data.value = std::make_shared<unsigned char>((unsigned char) file.get());
                 break;
 
             // Short
@@ -102,7 +102,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
             {
                 short s;
                 file.read((char*) &s, sizeof(s));
-                data.value = std::make_unique<void>(s);
+                data.value = std::make_shared<short>(s);
                 break;
             }
 
@@ -111,7 +111,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
             {
                 int i;
                 file.read((char*) &i, sizeof(i));
-                data.value = std::make_unique<void>(i);
+                data.value = std::make_shared<int>(i);
                 break;
             }
 
@@ -120,7 +120,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
             {
                 float f;
                 file.read((char*) &f, sizeof(f));
-                data.value = std::make_unique<void>(f);
+                data.value = std::make_shared<float>(f);
                 break;
             }
 
@@ -129,7 +129,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
             {
                 short s;
                 file.read((char*) &s, sizeof(s));
-                data.value = std::make_unique<void>(metadata[s]);
+                data.value = std::make_shared<std::string>(metadata[s]);
                 break;
             }
 
@@ -138,7 +138,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
             {
                 std::string str;
                 ReadString(file, str);
-                data.value = std::make_unique<void>(str);
+                data.value = std::make_shared<std::string>(str);
                 break;
             }
 
@@ -149,7 +149,7 @@ void celeste::BinaryPacker::ReadData(std::ifstream& file, const std::string* con
                 file.read((char*) &count, sizeof(count));
                 char* bytes = new char[count];
                 file.read((char*) bytes, count);
-                data.value = std::make_unique<void>(utils::RunLengthEncoding::Decode(std::string(bytes)));
+                data.value = std::make_shared<std::string>(utils::RunLengthEncoding::Decode(std::string(bytes)));
                 delete[] bytes;
                 break;
             }
@@ -172,10 +172,4 @@ celeste::BinaryPacker::Data::~Data()
 {
     for (Data* child : children)
         delete child;
-}
-
-celeste::BinaryPacker::DataValue &celeste::BinaryPacker::DataValue::operator=(DataValue &other)
-{
-    value = std::move(other.value);
-    return *this;
 }

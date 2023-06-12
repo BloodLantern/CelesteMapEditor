@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
+#include <vector>
+#include <memory>
 
 #include <vector2.hpp>
 #include <vector2i.hpp>
@@ -20,8 +22,8 @@ namespace celeste
         vec2 position;
         vec2 origin;
         vec2i size;
-        std::unique_ptr<vec2[]> nodes;
-        std::unordered_map<std::string, std::unique_ptr<void>> values;
+        std::vector<vec2> nodes;
+        std::unordered_map<std::string, std::shared_ptr<void>> values;
 
         template<typename T>
         T GetAttribute(const std::string& attributeName, const T& defaultValue) const
@@ -37,7 +39,5 @@ namespace celeste
             std::istringstream(*reinterpret_cast<std::string*>(values.at(attributeName).get())) >> result;
             return result;
         }
-
-        EntityData& operator=(EntityData&& other);
     };
 }

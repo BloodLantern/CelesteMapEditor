@@ -55,7 +55,14 @@ void celeste::Map::Load(const std::filesystem::path& path)
         {
             if (!dataPair->children.empty())
                 for (const BinaryPacker::Data* const filler : dataPair->children)
-                    fillers.push_back(utils::Rectangle(filler->attributes.at("x").Get<int>(), filler->attributes.at("y").Get<int>(), filler->attributes.at("w").Get<int>(), filler->attributes.at("h").Get<int>()));
+                    fillers.push_back(
+                        utils::Rectangle(
+                            filler->attributes.at("x").Get<int>(),
+                            filler->attributes.at("y").Get<int>(),
+                            filler->attributes.at("w").Get<int>(),
+                            filler->attributes.at("h").Get<int>()
+                        )
+                    );
         }
         else if (dataPair->name == "Style")
         {
