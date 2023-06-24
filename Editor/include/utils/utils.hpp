@@ -13,9 +13,9 @@ namespace utils
         Rectangle(const vec2i position, const vec2i size);
         Rectangle(const int x, const int y, const int width, const int height);
 
-        inline int Left() const { return position.x; }
-        inline int Top() const { return position.y; }
-        inline int Right() const { return Left() + size.x; }
-        inline int Bottom() const { return Top() + size.y; }
+        constexpr int Left() const { return position.x; }
+        constexpr int Top() const { return position.y; }
+        constexpr int Right() const { return Left() + size.x; }
+        constexpr int Bottom() const { return Top() + size.y; }
     };
 }

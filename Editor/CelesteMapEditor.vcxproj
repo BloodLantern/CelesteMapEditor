@@ -24,6 +24,7 @@
     <ProjectGuid>{8739439b-5657-4953-a6df-8c8743d575fe}</ProjectGuid>
     <RootNamespace>CelesteMapEditor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Editor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,13 +41,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -165,8 +166,9 @@
     <ClCompile Include="src\celeste\level_data.cpp" />
     <ClCompile Include="src\celeste\wind_pattern.cpp" />
     <ClCompile Include="src\editor\color.cpp" />
+    <ClCompile Include="src\editor\editor.cpp" />
     <ClCompile Include="src\editor\logger.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\interop.cpp" />
     <ClCompile Include="src\celeste\map.cpp" />
     <ClCompile Include="src\celeste\player_inventory.cpp" />
     <ClCompile Include="src\utils\run_length_encoding.cpp" />
@@ -184,6 +186,7 @@
     <ClInclude Include="include\celeste\entity_data.hpp" />
     <ClInclude Include="include\celeste\intro_types.hpp" />
     <ClInclude Include="include\celeste\level_data.hpp" />
+    <ClInclude Include="include\editor\editor.hpp" />
     <ClInclude Include="include\editor\logger.hpp" />
     <ClInclude Include="include\celeste\map.hpp" />
     <ClInclude Include="include\celeste\mode_properties.hpp" />
