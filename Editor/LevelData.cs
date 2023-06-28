@@ -49,10 +49,10 @@ namespace Editor
                 switch (attribute.Key)
                 {
                     case "alt_music":
-                        AltMusic = (string) attribute.Value;
+                        AltMusic = attribute.Value as string;
                         continue;
                     case "ambience":
-                        Ambience = (string) attribute.Value;
+                        Ambience = attribute.Value as string;
                         continue;
                     case "ambienceProgress":
                         string s1 = attribute.Value.ToString();
@@ -92,30 +92,30 @@ namespace Editor
                         }
                         continue;
                     case "music":
-                        Music = (string) attribute.Value;
+                        Music = attribute.Value as string;
                         continue;
                     case "musicLayer1":
-                        MusicLayers[0] = (bool) attribute.Value ? 1f : 0.0f;
+                        MusicLayers[0] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer2":
-                        MusicLayers[1] = (bool) attribute.Value ? 1f : 0.0f;
+                        MusicLayers[1] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer3":
-                        MusicLayers[2] = (bool) attribute.Value ? 1f : 0.0f;
+                        MusicLayers[2] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer4":
-                        MusicLayers[3] = (bool) attribute.Value ? 1f : 0.0f;
+                        MusicLayers[3] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicProgress":
-                        string s2 = attribute.Value.ToString();
-                        if (string.IsNullOrEmpty(s2) || !int.TryParse(s2, out MusicProgress))
+                        string musicProgress = attribute.Value as string;
+                        if (string.IsNullOrEmpty(musicProgress) || !int.TryParse(musicProgress, out MusicProgress))
                         {
                             MusicProgress = -1;
                             continue;
                         }
                         continue;
                     case "name":
-                        Name = attribute.Value.ToString().Substring(4);
+                        Name = attribute.Value as string;
                         continue;
                     case "space":
                         Space = (bool) attribute.Value;
@@ -130,7 +130,7 @@ namespace Editor
                         Bounds.Width = (int) attribute.Value;
                         continue;
                     case "windPattern":
-                        WindPattern = (WindPattern) Enum.Parse(typeof(WindPattern), (string) attribute.Value);
+                        WindPattern = (WindPattern) Enum.Parse(typeof(WindPattern), attribute.Value as string);
                         continue;
                     case "x":
                         Bounds.X = (int) attribute.Value;

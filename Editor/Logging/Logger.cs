@@ -21,7 +21,10 @@ namespace Editor.Logging
             string file = Path.Combine(LogsDirectory, "latest.log");
 
             Directory.CreateDirectory(LogsDirectory);
-            logFiles.Add(File.CreateText(file));
+
+            StreamWriter stream = File.CreateText(file);
+            stream.AutoFlush = true;
+            logFiles.Add(stream);
         }
 
         public static void AddDefaultLoggingFile()
@@ -52,8 +55,10 @@ namespace Editor.Logging
                 }
             }
 
-            logFiles.Add(File.AppendText(filePath));
-            Log("Starting logging #" + logCount + " to file: " + filePath);
+            StreamWriter stream = File.AppendText(filePath);
+            stream.AutoFlush = true;
+            logFiles.Add(stream);
+            Log($"Starting logging #{logCount} to file: {filePath}");
         }
 
         public static void ClearLoggingFiles()
@@ -71,28 +76,27 @@ namespace Editor.Logging
             DateTime now = DateTime.Now;
             foreach (StreamWriter logFile in logFiles)
             {
-                logFile.Write(
-                    "[" + (now.Hour < 10 ? "0" + now.Hour : now.Hour)
+                string toWrite = "[" + (now.Hour < 10 ? "0" + now.Hour : now.Hour)
                     + ":" + (now.Minute < 10 ? "0" + now.Minute : now.Minute)
-                    + ":"+ (now.Second < 10 ? "0" + now.Second : now.Second)
-                );
+                    + ":" + (now.Second < 10 ? "0" + now.Second : now.Second);
+
                 switch (logLevel)
                 {
                     case LogLevel.Info:
-                        logFile.Write("] [INFO] ");
+                        toWrite += "] [INFO] ";
                         break;
                     case LogLevel.Warning:
-                        logFile.Write("] [WARN] ");
+                        toWrite += "] [WARN] ";
                         break;
                     case LogLevel.Error:
-                        logFile.Write("] [ERROR] ");
+                        toWrite += "] [ERROR] ";
                         break;
                     case LogLevel.Fatal:
-                        logFile.Write("] [FATAL] ");
+                        toWrite += "] [FATAL] ";
                         break;
                 }
-                logFile.WriteLine(message);
-                logFile.FlushAsync();
+
+                logFile.WriteLine(toWrite + message);
             }
         }
     }

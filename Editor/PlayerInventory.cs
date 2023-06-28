@@ -18,5 +18,35 @@
         public PlayerInventory()
         {
         }
+
+        public static PlayerInventory Parse(string value)
+        {
+            switch (value)
+            {
+                case "Prologue":
+                    return Prologue;
+
+                case "Default":
+                    return Default;
+
+                case "OldSite":
+                    return OldSite;
+
+                case "CH6End":
+                    return CH6End;
+
+                case "TheSummit":
+                    return TheSummit;
+
+                case "Core":
+                    return Core;
+
+                case "Farewell":
+                    return Farewell;
+
+                default:
+                    return Default;
+            }
+        }
     }
 }

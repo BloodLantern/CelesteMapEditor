@@ -10,7 +10,6 @@ namespace Editor
     {
         public AreaKey Area = AreaKey.None;
         public MapMetadata Metadata;
-        public ModeProperties ModeData;
         public List<LevelData> Levels = new();
         public List<Rectangle> Fillers = new();
         public Color BackgroundColor = Color.Black;
@@ -42,7 +41,7 @@ namespace Editor
         /// </summary>
         public bool Load()
         {
-            Logger.Log("Loading map: " + FilePath);
+            Logger.Log($"Loading map: {FilePath}");
             DateTime start = DateTime.Now;
 
             if (!File.Exists(FilePath))
@@ -51,40 +50,50 @@ namespace Editor
                 return false;
             }
 
+            Area.TryLoadFromFileName(Path.GetFileNameWithoutExtension(FilePath));
+
             BinaryPacker.Element element = BinaryPacker.FromBinary(FilePath);
 
             foreach (BinaryPacker.Element data in element.Children)
             {
-                if (data.Name == "levels")
+                switch (data.Name)
                 {
-                    Levels = new List<LevelData>();
-                    foreach (BinaryPacker.Element level in data.Children)
-                        Levels.Add(new(level));
-                }
-                else if (data.Name == "Filler")
-                {
-                    Fillers = new List<Rectangle>();
-                    if (data.Children != null)
-                    {
-                        foreach (BinaryPacker.Element filler in data.Children)
-                            Fillers.Add(new Rectangle((int) filler.Attributes["x"], (int) filler.Attributes["y"], (int) filler.Attributes["w"], (int) filler.Attributes["h"]));
-                    }
-                }
-                else if (data.Name == "Style")
-                {
-                    if (data.HasAttr("color"))
-                        BackgroundColor = Calc.HexToColor(data.Attr("color"));
+                    case "levels":
+                        Levels = new List<LevelData>();
+                        foreach (BinaryPacker.Element level in data.Children)
+                            Levels.Add(new(level));
+                        break;
 
-                    if (data.Children != null)
-                    {
-                        foreach (BinaryPacker.Element styleground in data.Children)
+                    case "Filler":
+                        Fillers = new List<Rectangle>();
+                        if (data.Children != null)
                         {
-                            if (styleground.Name == "Backgrounds")
-                                Background = styleground;
-                            else if (styleground.Name == "Foregrounds")
-                                Foreground = styleground;
+                            foreach (BinaryPacker.Element filler in data.Children)
+                                Fillers.Add(new Rectangle((int) filler.Attributes["x"], (int) filler.Attributes["y"], (int) filler.Attributes["w"], (int) filler.Attributes["h"]));
                         }
-                    }
+                        break;
+
+                    case "Style":
+                        if (data.HasAttr("color"))
+                            BackgroundColor = Calc.HexToColor(data.Attr("color"));
+
+                        if (data.Children != null)
+                        {
+                            foreach (BinaryPacker.Element styleground in data.Children)
+                            {
+                                if (styleground.Name == "Backgrounds")
+                                    Background = styleground;
+                                else if (styleground.Name == "Foregrounds")
+                                    Foreground = styleground;
+                            }
+                        }
+                        break;
+
+                    case "meta":
+                        // If we hit this case we are loading a community map as all the base Celeste maps have hardcoded metadatas
+                        Metadata = new(data);
+                        Area.Campaign = "Uncategorized";
+                        break;
                 }
             }
 

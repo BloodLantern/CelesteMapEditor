@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Editor
@@ -17,12 +18,16 @@ namespace Editor
 
         private void LoadMap(in string filePath)
         {
+            UnloadMap();
+
             MapData map = Session.CurrentMap = new(filePath);
 
             if (!map.Load())
                 return;
 
-            Text = BaseTitle + " - " + (map.Area == AreaKey.None ? "Unknown map" : map.Area.ToString());
+            Text = BaseTitle + " - " + Path.GetFileName(filePath);
+            if (map.Area != AreaKey.None)
+                Text += " - " + map.Area;
 
             ListViewItem room;
             foreach (LevelData level in map.Levels)
@@ -33,6 +38,13 @@ namespace Editor
                 };
                 RoomList.Items.Add(room);
             }
+        }
+
+        private void UnloadMap()
+        {
+            Session.CurrentMap = null;
+
+            RoomList.Items.Clear();
         }
 
         private void OnDragEnter(object sender, DragEventArgs e)
