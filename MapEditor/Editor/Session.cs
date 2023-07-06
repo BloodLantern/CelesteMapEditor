@@ -1,5 +1,4 @@
 ﻿using Editor.Celeste;
-using Editor.Graphics;
 using Editor.Logging;
 using Newtonsoft.Json;
 using SixLabors.Fonts;
@@ -20,7 +19,7 @@ namespace Editor
 
         private const string DebugTextFontName = "consola.ttf";
 
-        public MapData CurrentMap;
+        public Map CurrentMap;
         public Config Config;
 
         public string CelesteDirectory;

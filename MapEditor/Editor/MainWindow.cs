@@ -1,5 +1,6 @@
 ﻿using Editor.Celeste;
 using Editor.Logging;
+using SixLabors.ImageSharp;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -21,18 +22,26 @@ namespace Editor
 
             InitializeRecentFileList();
 
-            MapViewer = new(Session, mapViewerPictureBox);
-            MapViewer.Render();
+            if (Session.Config.AutoLoadLastEditedMap)
+                LoadMap(Session.Config.LastEditedFile);
+
+            Timer mapViewerUpdater = new();
+            mapViewerUpdater.Tick += UpdateMapViewer;
+            mapViewerUpdater.Interval = 1000 / Session.Config.MapViewerRefreshRate;
+            mapViewerUpdater.Start();
         }
 
         private void LoadMap(string filePath)
         {
             UnloadMap();
 
-            MapData map = Session.CurrentMap = new(filePath);
+            MapData map = new(filePath);
 
             if (!map.Load())
                 return;
+
+            Session.CurrentMap = new Map(map);
+            MapViewer = new(Session, mapViewerPictureBox);
 
             UpdateRecentFileList(filePath);
 
@@ -66,6 +75,14 @@ namespace Editor
             Session.CurrentMap = null;
 
             RoomList.Items.Clear();
+        }
+
+        private void UpdateMapViewer(object sender, EventArgs e)
+        {
+            if (MapViewer == null)
+                return;
+
+            MapViewer.Update(MouseButtons, new Point(MousePosition.X, MousePosition.Y));
         }
 
         private void InitializeRecentFileList()
@@ -151,13 +168,6 @@ namespace Editor
 
             if (dialog.ShowDialog() == DialogResult.OK)
                 LoadMap(dialog.FileName);
-        }
-
-        private void MapViewerPictureBox_Click(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-                MapViewer.UpdatePosition(e.Location);
-            MapViewer.Render();
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)

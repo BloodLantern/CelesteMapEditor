@@ -11,6 +11,9 @@ namespace Editor.Celeste
         public int ID;
         public string Name;
         public LevelData Level;
+        /// <summary>
+        /// This position is an offset from the level position.
+        /// </summary>
         public Vector2 Position;
         public Vector2 Origin;
         public Size Size;

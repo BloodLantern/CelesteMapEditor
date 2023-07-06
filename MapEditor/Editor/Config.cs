@@ -9,9 +9,16 @@ namespace Editor
     public class Config
     {
         public const string ConfigFile = "config.xml";
-        private const int MaxLastEditedFiles = 5;
 
+        public int MaxLastEditedFiles = 5;
         public List<string> LastEditedFiles = new();
+        public string LastEditedFile => LastEditedFiles[0];
+
+        public int MapViewerRefreshRate = 60;
+
+        public bool ShowDebugInfo = false;
+
+        public bool AutoLoadLastEditedMap = true;
 
         public Config()
         {

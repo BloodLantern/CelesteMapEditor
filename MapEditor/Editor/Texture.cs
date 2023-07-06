@@ -1,4 +1,5 @@
-﻿using Editor.Utils;
+﻿using Editor.Celeste;
+using Editor.Utils;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
@@ -6,16 +7,22 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
 
-namespace Editor.Graphics
+namespace Editor
 {
     public class Texture
     {
+        public const int ByteArraySize = 0x80000;
+        public const int ByteArrayCheckSize = ByteArraySize - 0x20;
+
+        private static byte[] buffer;
+        private static byte[] buffer2;
+
         private Image<Rgba32> image;
         public Color Color;
 
         public Image<Rgba32> Image
         {
-            get => image?.Clone(i => i.Crop(Rectangle.FromLTRB(ClipRect.Left + DrawOffset.X, ClipRect.Top + DrawOffset.Y, ClipRect.Right, ClipRect.Bottom)));
+            get => image?.Clone(o => o.Crop(ClipRect));
         }
 
         public string Name { get; private set; }
@@ -26,22 +33,22 @@ namespace Editor.Graphics
 
         public Point DrawOffset { get; private set; }
 
-        public Texture(string celesteContentDirectory, string name, ref byte[] buffer, ref byte[] buffer2)
+        public Texture(string name)
         {
             Name = name;
-            image = Load(celesteContentDirectory, ref buffer, ref buffer2);
+            image = Load();
             if (image != null)
                 Size = image.Size;
             ClipRect = new Rectangle(Point.Empty, Size);
         }
 
-        public Texture(string celesteContentDirectory, string name, Size size, Color color, ref byte[] buffer, ref byte[] buffer2)
+        public Texture(string name, Size size, Color color)
         {
             Name = name;
             Size = size;
             ClipRect = new Rectangle(Point.Empty, Size);
             Color = color;
-            image = Load(celesteContentDirectory, ref buffer, ref buffer2);
+            image = Load();
         }
 
         public Texture(
@@ -65,9 +72,7 @@ namespace Editor.Graphics
         /// Most of the code in this function comes directly from Celeste so
         /// some variables might have an inaccurate name.
         /// </summary>
-        /// <param name="buffer">Byte buffer to store the image data.</param>
-        /// <param name="buffer2">Byte buffer to store the image file data.</param>
-        private Image<Rgba32> Load(string celesteContentDirectory, ref byte[] buffer, ref byte[] buffer2)
+        private Image<Rgba32> Load()
         {
             Unload();
 
@@ -82,7 +87,7 @@ namespace Editor.Graphics
             else
             {
                 using FileStream fileStream = File.OpenRead(Path.Combine(Session.CurrentSession.CelesteContentDirectory, Name));
-                fileStream.Read(buffer2, 0, Atlas.ByteArraySize);
+                fileStream.Read(buffer2, 0, ByteArraySize);
 
                 int width = BitConverter.ToInt32(buffer2, 0);
                 int height = BitConverter.ToInt32(buffer2, 4);
@@ -134,12 +139,12 @@ namespace Editor.Graphics
                         }
                     }
                     bufferIndex += blockSize;
-                    if (bytesIndex > Atlas.ByteArrayCheckSize)
+                    if (bytesIndex > ByteArrayCheckSize)
                     {
-                        int offset = Atlas.ByteArraySize - bytesIndex;
+                        int offset = ByteArraySize - bytesIndex;
                         for (int index5 = 0; index5 < offset; ++index5)
                             buffer2[index5] = buffer2[bytesIndex + index5];
-                        fileStream.Read(buffer2, offset, Atlas.ByteArraySize - offset);
+                        fileStream.Read(buffer2, offset, ByteArraySize - offset);
                         bytesIndex = 0;
                     }
                 }
@@ -153,15 +158,27 @@ namespace Editor.Graphics
 
         public Rectangle GetRelativeRect(int x, int y, int width, int height)
         {
-            int num1 = ClipRect.X - DrawOffset.X + x;
-            int num2 = ClipRect.Y - DrawOffset.Y + y;
+            int relativeX = ClipRect.X - DrawOffset.X + x;
+            int relativeY = ClipRect.Y - DrawOffset.Y + y;
 
-            int resultX = MathHelper.Clamp(num1, ClipRect.Left, ClipRect.Right);
-            int resultY = MathHelper.Clamp(num2, ClipRect.Top, ClipRect.Bottom);
-            int resultW = Math.Max(0, Math.Min(num1 + width, ClipRect.Right) - resultX);
-            int resultH = Math.Max(0, Math.Min(num2 + height, ClipRect.Bottom) - resultY);
+            int resultX = Calc.Clamp(relativeX, ClipRect.Left, ClipRect.Right);
+            int resultY = Calc.Clamp(relativeY, ClipRect.Top, ClipRect.Bottom);
+            int resultW = Math.Max(0, Math.Min(relativeX + width, ClipRect.Right) - resultX);
+            int resultH = Math.Max(0, Math.Min(relativeY + height, ClipRect.Bottom) - resultY);
 
             return new Rectangle(resultX, resultY, resultW, resultH);
+        }
+
+        public static void AllocateBuffers()
+        {
+            buffer = new byte[0x04000000];
+            buffer2 = new byte[ByteArraySize];
+        }
+
+        public static void DeallocateBuffers()
+        {
+            buffer = null;
+            buffer2 = null;
         }
     }
 }

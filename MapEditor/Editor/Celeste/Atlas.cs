@@ -5,13 +5,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace Editor.Graphics
+namespace Editor.Celeste
 {
     public class Atlas
     {
-        public const int ByteArraySize = 0x80000;
-        public const int ByteArrayCheckSize = ByteArraySize - 0x20;
-
         private static Atlas gameplay = new();
         /// <summary>
         /// The vanilla gameplay Atlas.
@@ -22,18 +19,17 @@ namespace Editor.Graphics
 
         public static void LoadAtlases(string celesteContentDirectory)
         {
-            byte[] buffer = new byte[0x04_00_00_00];
-            byte[] buffer2 = new byte[ByteArraySize];
-
             Logger.Log("Loading atlases");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            LoadAtlas(ref gameplay, celesteContentDirectory, Path.Combine(celesteContentDirectory, "Graphics", "Atlases", "Gameplay"), ref buffer, ref buffer2);
+            Texture.AllocateBuffers();
+            LoadAtlas(ref gameplay, Path.Combine(celesteContentDirectory, "Graphics", "Atlases", "Gameplay"));
+            Texture.DeallocateBuffers();
 
             Logger.Log($"Finished loading atlases. Took {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private static void LoadAtlas(ref Atlas atlas, string celesteContentDirectory, string path, ref byte[] buffer, ref byte[] buffer2)
+        private static void LoadAtlas(ref Atlas atlas, string path)
         {
             using FileStream fileStream = File.OpenRead(path + ".meta");
             BinaryReader reader = new(fileStream);
@@ -46,7 +42,7 @@ namespace Editor.Graphics
             for (int i = 0; i < atlasCount; i++)
             {
                 string dataFileName = reader.ReadString();
-                Texture parentTexture = new(celesteContentDirectory, Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, dataFileName + ".data"), ref buffer, ref buffer2);
+                Texture parentTexture = new(Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, dataFileName + ".data"));
 
                 short childCount = reader.ReadInt16();
                 for (int j = 0; j < childCount; j++)

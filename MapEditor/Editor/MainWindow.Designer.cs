@@ -100,7 +100,6 @@ namespace Editor
             mapViewerPictureBox.Size = new System.Drawing.Size(1225, 762);
             mapViewerPictureBox.TabIndex = 4;
             mapViewerPictureBox.TabStop = false;
-            mapViewerPictureBox.MouseDown += MapViewerPictureBox_Click;
             // 
             // fileToolStripMenuItem
             // 
