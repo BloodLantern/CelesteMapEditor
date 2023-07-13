@@ -17,13 +17,13 @@ namespace Editor.Celeste
 
         public readonly Dictionary<string, Texture> Textures = new(StringComparer.OrdinalIgnoreCase);
 
-        public static void LoadAtlases(string celesteContentDirectory)
+        public static void LoadAtlases(string celesteGraphicsDirectory)
         {
             Logger.Log("Loading atlases");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             Texture.AllocateBuffers();
-            LoadAtlas(ref gameplay, Path.Combine(celesteContentDirectory, "Graphics", "Atlases", "Gameplay"));
+            LoadAtlas(ref gameplay, Path.Combine(celesteGraphicsDirectory, "Atlases", "Gameplay"));
             Texture.DeallocateBuffers();
 
             Logger.Log($"Finished loading atlases. Took {stopwatch.ElapsedMilliseconds}ms");

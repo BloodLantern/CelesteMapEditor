@@ -14,20 +14,25 @@ namespace Editor
         public Session Session;
         public MapViewer MapViewer;
 
+        private Timer mapViewerUpdater;
+
         public MainWindow()
         {
             InitializeComponent();
 
             Session = new();
+            // If an error happened during Session initialization, exit
+            if (Session.CurrentSession == null)
+                ExitEditor();
 
             InitializeRecentFileList();
 
             if (Session.Config.AutoLoadLastEditedMap)
                 LoadMap(Session.Config.LastEditedFile);
 
-            Timer mapViewerUpdater = new();
+            mapViewerUpdater = new();
             mapViewerUpdater.Tick += UpdateMapViewer;
-            mapViewerUpdater.Interval = 1000 / Session.Config.MapViewerRefreshRate;
+            mapViewerUpdater.Interval = Calc.Round(1000f / Session.Config.MapViewerRefreshRate);
             mapViewerUpdater.Start();
         }
 
@@ -82,7 +87,9 @@ namespace Editor
             if (MapViewer == null)
                 return;
 
-            MapViewer.Update(MouseButtons, new Point(MousePosition.X, MousePosition.Y));
+            System.Drawing.Point relativeMousePos = mapViewerPictureBox.PointToClient(MousePosition);
+
+            MapViewer.Update(MouseButtons, new Point(relativeMousePos.X, relativeMousePos.Y));
         }
 
         private void InitializeRecentFileList()
@@ -112,6 +119,7 @@ namespace Editor
 
         private void ExitEditor()
         {
+            mapViewerUpdater.Stop();
             Session.Exit();
             Logger.ClearLoggingFiles();
             Application.Exit();

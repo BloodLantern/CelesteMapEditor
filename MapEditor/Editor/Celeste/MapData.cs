@@ -12,7 +12,7 @@ namespace Editor.Celeste
     public class MapData
     {
         public AreaKey Area = AreaKey.None;
-        public MapMetadata Metadata;
+        public AreaData Metadata;
         public List<LevelData> Levels = new();
         public List<Rectangle> Fillers = new();
         public Color BackgroundColor = Color.Black;

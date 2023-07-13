@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
+using System.Numerics;
 
 namespace Editor
 {
@@ -17,17 +18,16 @@ namespace Editor
         private static byte[] buffer;
         private static byte[] buffer2;
 
-        private Image<Rgba32> image;
+        private readonly Image<Rgba32> fullImage;
         public Color Color;
 
-        public Image<Rgba32> Image
-        {
-            get => image?.Clone(o => o.Crop(ClipRect));
-        }
+        public Image<Rgba32> Image { get; private set; }
 
         public string Name { get; private set; }
 
         public Size Size { get; private set; }
+        public int Width => Size.Width;
+        public int Height => Size.Height;
 
         public Rectangle ClipRect { get; private set; }
 
@@ -36,10 +36,11 @@ namespace Editor
         public Texture(string name)
         {
             Name = name;
-            image = Load();
-            if (image != null)
-                Size = image.Size;
+            fullImage = Load();
+            if (fullImage != null)
+                Size = fullImage.Size;
             ClipRect = new Rectangle(Point.Empty, Size);
+            SetupFinalImage();
         }
 
         public Texture(string name, Size size, Color color)
@@ -48,7 +49,8 @@ namespace Editor
             Size = size;
             ClipRect = new Rectangle(Point.Empty, Size);
             Color = color;
-            image = Load();
+            fullImage = Load();
+            SetupFinalImage();
         }
 
         public Texture(
@@ -57,15 +59,34 @@ namespace Editor
             Point drawOffset,
             Size size)
         {
-            image = parent.image;
+            fullImage = parent.fullImage;
             ClipRect = parent.GetRelativeRect(clipRect);
             DrawOffset = drawOffset;
             Size = size;
+            SetupFinalImage();
+        }
+
+        /// <summary>
+        /// Tile constructor.
+        /// </summary>
+        /// <param name="tileset">The tileset texture.</param>
+        /// <param name="x">The X offset in pixels.</param>
+        /// <param name="y">The Y offset in pixels.</param>
+        public Texture(
+            Texture tileset,
+            int x,
+            int y)
+        {
+            fullImage = tileset.fullImage;
+            ClipRect = tileset.GetRelativeRect(x, y, Tileset.TileSize, Tileset.TileSize);
+            DrawOffset = new Point(-Math.Min(x - tileset.DrawOffset.X, 0), -Math.Min(y - tileset.DrawOffset.Y, 0));
+            Size = new Size(Tileset.TileSize);
+            SetupFinalImage();
         }
 
         public void Unload()
         {
-            image?.Mutate(i => i.Crop(1, 1).Clear(Color.Black));
+            fullImage?.Mutate(i => i.Crop(1, 1).Clear(Color.Black));
         }
 
         /// <summary>
@@ -180,5 +201,7 @@ namespace Editor
             buffer = null;
             buffer2 = null;
         }
+
+        private void SetupFinalImage() => Image = fullImage?.Clone(o => o.Crop(ClipRect));
     }
 }

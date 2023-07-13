@@ -69,6 +69,8 @@ namespace Editor
             checkForUpdateToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
+            toolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem2 = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize) mapViewerPictureBox).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -275,7 +277,7 @@ namespace Editor
             // 
             // roomToolStripMenuItem
             // 
-            roomToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addToolStripMenuItem, editToolStripMenuItem1, toolStripSeparator2, deleteToolStripMenuItem });
+            roomToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addToolStripMenuItem, toolStripMenuItem1, toolStripMenuItem2, editToolStripMenuItem1, toolStripSeparator2, deleteToolStripMenuItem });
             roomToolStripMenuItem.Name = "roomToolStripMenuItem";
             roomToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
             roomToolStripMenuItem.Text = "&Room";
@@ -283,24 +285,24 @@ namespace Editor
             // addToolStripMenuItem
             // 
             addToolStripMenuItem.Name = "addToolStripMenuItem";
-            addToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
-            addToolStripMenuItem.Text = "&Add";
+            addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            addToolStripMenuItem.Text = "&Add room";
             // 
             // editToolStripMenuItem1
             // 
             editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            editToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
+            editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             editToolStripMenuItem1.Text = "&Edit";
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(104, 6);
+            toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             deleteToolStripMenuItem.Text = "&Delete";
             // 
             // toolsToolStripMenuItem
@@ -344,6 +346,18 @@ namespace Editor
             menuStrip1.Size = new System.Drawing.Size(1475, 24);
             menuStrip1.TabIndex = 3;
             menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            toolStripMenuItem1.Text = "Add &filler";
+            // 
+            // toolStripMenuItem2
+            // 
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            toolStripMenuItem2.Text = "Add filler room";
             // 
             // MainWindow
             // 
@@ -409,6 +423,8 @@ namespace Editor
         private ToolStripMenuItem aboutToolStripMenuItem;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem openRecentToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem toolStripMenuItem2;
     }
 }
 

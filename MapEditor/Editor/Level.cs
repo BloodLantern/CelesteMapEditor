@@ -12,9 +12,11 @@ namespace Editor
     {
         public LevelData LevelData { get; private set; }
         public readonly List<Entity> Entities = new();
+        public TileGrid ForegroundTiles { get; private set; }
+        public TileGrid BackgroundTiles { get; private set; }
 
         public Rectangle Bounds => LevelData.Bounds;
-        public Vector2 Position => LevelData.Position;
+        public Point Position => LevelData.Position;
 
         public Level(LevelData data)
         {
@@ -22,6 +24,9 @@ namespace Editor
 
             foreach (EntityData entityData in LevelData.Entities)
                 Entities.Add(new(entityData, this));
+
+            ForegroundTiles = Autotiler.ForegroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.ForegroundTiles);
+            BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
         }
 
         /// <summary>
@@ -57,6 +62,9 @@ namespace Editor
                 entity.Render(cameraBounds, image);
                 entityCount++;
             }
+
+            int solidCount = ForegroundTiles.Render(cameraBounds, image, Position);
+
             return entityCount;
         }
     }

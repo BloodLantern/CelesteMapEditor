@@ -7,7 +7,7 @@ namespace Editor.Celeste
     /// <summary>
     /// The metadata of a chapter side.
     /// </summary>
-    public class MapMetadata
+    public class AreaData
     {
         public string Name;
         public string Icon;
@@ -29,11 +29,11 @@ namespace Editor.Celeste
         public CoreMode CoreMode;
         public string SpritesXmlPath;
         /// <summary>
-        /// Whether the player is allowed to hold Theo while in a bubble.
+        /// Whether the player is allowed to hold something while in a bubble (or feather).
         /// </summary>
-        public bool TheoInBooster;
+        public bool HoldableInBubble;
 
-        public MapMetadata(BinaryPacker.Element data)
+        public AreaData(BinaryPacker.Element data)
         {
             foreach (KeyValuePair<string, object> pair in data.Attributes)
             {

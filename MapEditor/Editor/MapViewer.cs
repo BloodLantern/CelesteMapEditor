@@ -77,6 +77,12 @@ namespace Editor
                 return;
             }
 
+            if (ClickStartPosition.Value.X < 0
+                || ClickStartPosition.Value.Y < 0
+                || ClickStartPosition.Value.X >= PictureBox.Width
+                || ClickStartPosition.Value.Y >= PictureBox.Height)
+                return;
+
             dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);
 
             CameraBounds = new RectangleF(((PointF) CameraStartPosition).X + dragDelta.X, ((PointF) CameraStartPosition).Y + dragDelta.Y,

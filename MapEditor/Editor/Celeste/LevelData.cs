@@ -1,5 +1,4 @@
-﻿using Editor.Utils;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,8 +21,8 @@ namespace Editor.Celeste
         public List<Vector2> Spawns;
         public List<DecalData> FgDecals;
         public List<DecalData> BgDecals;
-        public string Solids = "";
-        public string Bg = "";
+        public string ForegroundTiles = "";
+        public string BackgroundTiles = "";
         public string FgTiles = "";
         public string BgTiles = "";
         public string ObjTiles = "";
@@ -206,9 +205,9 @@ namespace Editor.Celeste
                             );
                 }
                 else if (child.Name == "solids")
-                    Solids = child.Attr("innerText");
+                    ForegroundTiles = child.Attr("innerText");
                 else if (child.Name == "bg")
-                    Bg = child.Attr("innerText");
+                    BackgroundTiles = child.Attr("innerText");
                 else if (child.Name == "fgtiles")
                     FgTiles = child.Attr("innerText");
                 else if (child.Name == "bgtiles")
@@ -264,15 +263,15 @@ namespace Editor.Celeste
 
         public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int) Math.Ceiling(Bounds.Width / 8.0), (int) Math.Ceiling(Bounds.Height / 8.0));
 
-        public Vector2 Position
+        public Point Position
         {
             get => new(Bounds.X, Bounds.Y);
             set
             {
                 for (int index = 0; index < Spawns.Count; ++index)
                     Spawns[index] -= Position;
-                Bounds.X = (int) value.X;
-                Bounds.Y = (int) value.Y;
+                Bounds.X = value.X;
+                Bounds.Y = value.Y;
                 for (int index = 0; index < Spawns.Count; ++index)
                     Spawns[index] += Position;
             }
