@@ -26,16 +26,13 @@ namespace Editor
             return str;
         }
 
-        public static System.Drawing.Bitmap ToBitmap<TPixel>(this Image<TPixel> image)
-            where TPixel : unmanaged, IPixel<TPixel>
+        public static System.Drawing.Bitmap ToBitmap(this Image<Rgba32> image)
         {
-            using MemoryStream memoryStream = new();
-            IImageEncoder imageEncoder = image.GetConfiguration().ImageFormatsManager.GetEncoder(PngFormat.Instance);
-            image.Save(memoryStream, imageEncoder);
-
-            memoryStream.Seek(0, SeekOrigin.Begin);
-
-            return new System.Drawing.Bitmap(memoryStream);
+            using (MemoryStream memoryStream = new())
+            {
+                image.SaveAsBmp(memoryStream);
+                return new System.Drawing.Bitmap(memoryStream);
+            };
         }
 
         public static int Clamp(int value, int min, int max)

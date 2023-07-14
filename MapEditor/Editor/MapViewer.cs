@@ -1,20 +1,17 @@
-﻿using Editor.Celeste;
+﻿using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using System.Windows.Forms;
-using SixLabors.Fonts;
-using System.Net.NetworkInformation;
-using System.Numerics;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Editor
 {
-    public class MapViewer
+    public class MapViewer : Control
     {
         public Session Session;
-        public PictureBox PictureBox;
+        public Image<Rgba32> CurrentImage;
         public RectangleF CameraBounds;
 
         public Point? ClickStartPosition;
@@ -24,23 +21,59 @@ namespace Editor
 
         private readonly TextOptions debugTextOptions;
         private static readonly Color debugTextBackgroundColor = Color.ParseHex("#10101050");
+        private long lastDrawImageTime = 0;
 
-
-        public MapViewer(Session session, PictureBox pictureBox)
+        public MapViewer(Session session)
         {
+            DoubleBuffered = true;
+
             Session = session;
-            PictureBox = pictureBox;
-            CameraBounds = new RectangleF(-pictureBox.Width / 2, -pictureBox.Height / 2, pictureBox.Width, pictureBox.Height);
 
             debugTextOptions = new(Session.DebugTextFont);
         }
 
+        /// <summary>
+        /// Updates the map viewer.
+        /// </summary>
+        /// <param name="mouseButtons">The current pressed mouse buttons.</param>
+        /// <param name="mousePosition">The current mouse position.</param>
+        /// <returns>Whether the map viewer should be rendered.</returns>
+        public bool Update(MouseButtons mouseButtons, Point mousePosition)
+        {
+            if ((mouseButtons & MouseButtons.Right) == 0)
+            {
+                ClickStartPosition = null;
+                CameraStartPosition = null;
+                return false;
+            }
+
+            if (!Dragging)
+            {
+                ClickStartPosition = mousePosition;
+                CameraStartPosition = new PointF(CameraBounds.X, CameraBounds.Y);
+                return false;
+            }
+
+            if (ClickStartPosition.Value.X < 0
+                || ClickStartPosition.Value.Y < 0
+                || ClickStartPosition.Value.X >= CurrentImage.Width
+                || ClickStartPosition.Value.Y >= CurrentImage.Height)
+                return false;
+
+            dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);
+
+            CameraBounds = new RectangleF(((PointF) CameraStartPosition).X + dragDelta.X, ((PointF) CameraStartPosition).Y + dragDelta.Y,
+                Width, Height);
+
+            return true;
+        }
+        
         public void Render()
         {
             if (Session.CurrentMap == null)
                 return;
 
-            Image<Rgba32> result = new(PictureBox.Width, PictureBox.Height, Color.DarkSlateGray);
+            Image<Rgba32> result = new(Width, Height, Color.DarkSlateGray);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             (int, int) rendered = Session.CurrentMap.Render(CameraBounds, result);
@@ -48,47 +81,32 @@ namespace Editor
 
             if (Session.Config.ShowDebugInfo)
                 result.Mutate(
-                    i => i.Fill(debugTextBackgroundColor, new RectangleF(0, 0, 500, 100))
+                    i => i.Fill(debugTextBackgroundColor, new RectangleF(0, 0, 500, 105))
                     .DrawText($"Camera bounds: {CameraBounds}", Session.DebugTextFont, Color.White, new PointF(0, 0))
                     .DrawText($"Rendered levels: {rendered.Item1}", Session.DebugTextFont, Color.White, new PointF(0, 15))
                     .DrawText($"Rendered entities: {rendered.Item2}", Session.DebugTextFont, Color.White, new PointF(0, 30))
-                    .DrawText($"Time to render: {time}", Session.DebugTextFont, Color.White, new PointF(0, 45))
-                    .DrawText($"Approximate FPS: {1f / (time / 1000f)}", Session.DebugTextFont, Color.White, new PointF(0, 60))
-                    .DrawText($"Target FPS: {Session.Config.MapViewerRefreshRate}", Session.DebugTextFont, Color.White, new PointF(0, 75))
+                    .DrawText($"Time to render to image: {time}", Session.DebugTextFont, Color.White, new PointF(0, 45))
+                    .DrawText($"Time to render to window: {lastDrawImageTime}", Session.DebugTextFont, Color.White, new PointF(0, 60))
+                    .DrawText($"Approximate FPS: {1f / ((time + lastDrawImageTime) / 1000f)}", Session.DebugTextFont, Color.White, new PointF(0, 75))
+                    .DrawText($"Target FPS: {Session.Config.MapViewerRefreshRate}", Session.DebugTextFont, Color.White, new PointF(0, 90))
                 );
 
-            PictureBox.Image = result.ToBitmap();
-            PictureBox.Refresh();
+            CurrentImage = result;
+
+            Invalidate();
+            Update();
         }
 
-        public void Update(MouseButtons mouseButtons, Point mousePosition)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            if ((mouseButtons & MouseButtons.Right) == 0)
-            {
-                ClickStartPosition = null;
-                CameraStartPosition = null;
-                return;
-            }
+            base.OnPaint(e);
 
-            if (!Dragging)
-            {
-                ClickStartPosition = mousePosition;
-                CameraStartPosition = new PointF(CameraBounds.X, CameraBounds.Y);
-                return;
-            }
+            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 
-            if (ClickStartPosition.Value.X < 0
-                || ClickStartPosition.Value.Y < 0
-                || ClickStartPosition.Value.X >= PictureBox.Width
-                || ClickStartPosition.Value.Y >= PictureBox.Height)
-                return;
-
-            dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);
-
-            CameraBounds = new RectangleF(((PointF) CameraStartPosition).X + dragDelta.X, ((PointF) CameraStartPosition).Y + dragDelta.Y,
-                CameraBounds.Width, CameraBounds.Height);
-
-            Render();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            e.Graphics.DrawImageUnscaled(CurrentImage.ToBitmap(), System.Drawing.Point.Empty);
+            lastDrawImageTime = stopwatch.ElapsedMilliseconds;
         }
     }
 }

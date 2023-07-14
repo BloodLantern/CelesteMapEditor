@@ -24,6 +24,7 @@ namespace Editor.Celeste
 
             public Texture GetFromPosition(char[,] around)
             {
+                // TODO: Do autotiling
                 return Calc.Random.Choose(Center.Textures);
             }
 

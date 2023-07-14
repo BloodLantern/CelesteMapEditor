@@ -33,7 +33,6 @@ namespace Editor
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             RoomList = new ListView();
             roomName = new ColumnHeader();
-            mapViewerPictureBox = new PictureBox();
             fileToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
             openToolStripMenuItem = new ToolStripMenuItem();
@@ -71,7 +70,6 @@ namespace Editor
             menuStrip1 = new MenuStrip();
             toolStripMenuItem1 = new ToolStripMenuItem();
             toolStripMenuItem2 = new ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize) mapViewerPictureBox).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -93,15 +91,15 @@ namespace Editor
             roomName.Text = "Name";
             roomName.Width = 209;
             // 
-            // mapViewerPictureBox
+            // MapViewer
             // 
-            mapViewerPictureBox.Dock = DockStyle.Fill;
-            mapViewerPictureBox.Location = new System.Drawing.Point(250, 24);
-            mapViewerPictureBox.Margin = new Padding(4, 3, 4, 3);
-            mapViewerPictureBox.Name = "mapViewerPictureBox";
-            mapViewerPictureBox.Size = new System.Drawing.Size(1225, 762);
-            mapViewerPictureBox.TabIndex = 4;
-            mapViewerPictureBox.TabStop = false;
+            MapViewer.Dock = DockStyle.Fill;
+            MapViewer.Location = new System.Drawing.Point(250, 24);
+            MapViewer.Margin = new Padding(4, 3, 4, 3);
+            MapViewer.Name = "MapViewer";
+            MapViewer.Size = new System.Drawing.Size(1225, 762);
+            MapViewer.TabIndex = 4;
+            MapViewer.TabStop = false;
             // 
             // fileToolStripMenuItem
             // 
@@ -365,7 +363,7 @@ namespace Editor
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1475, 786);
-            Controls.Add(mapViewerPictureBox);
+            Controls.Add(MapViewer);
             Controls.Add(RoomList);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -376,7 +374,6 @@ namespace Editor
             FormClosed += OnFormClosed;
             DragDrop += OnDragDrop;
             DragEnter += OnDragEnter;
-            ((System.ComponentModel.ISupportInitialize) mapViewerPictureBox).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -387,7 +384,6 @@ namespace Editor
 
         private ListView RoomList;
         private ColumnHeader roomName;
-        private PictureBox mapViewerPictureBox;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem newToolStripMenuItem;
         private ToolStripMenuItem openToolStripMenuItem;

@@ -14,16 +14,19 @@ namespace Editor
         public Session Session;
         public MapViewer MapViewer;
 
-        private Timer mapViewerUpdater;
+        private readonly Timer mapViewerUpdater;
 
         public MainWindow()
         {
-            InitializeComponent();
-
             Session = new();
+
             // If an error happened during Session initialization, exit
             if (Session.CurrentSession == null)
                 ExitEditor();
+
+            MapViewer = new(Session);
+            InitializeComponent();
+            MapViewer.CameraBounds = new RectangleF(-MapViewer.Width / 2, -MapViewer.Height / 2, MapViewer.Width, MapViewer.Height);
 
             InitializeRecentFileList();
 
@@ -46,7 +49,6 @@ namespace Editor
                 return;
 
             Session.CurrentMap = new Map(map);
-            MapViewer = new(Session, mapViewerPictureBox);
 
             UpdateRecentFileList(filePath);
 
@@ -84,12 +86,8 @@ namespace Editor
 
         private void UpdateMapViewer(object sender, EventArgs e)
         {
-            if (MapViewer == null)
-                return;
-
-            System.Drawing.Point relativeMousePos = mapViewerPictureBox.PointToClient(MousePosition);
-
-            MapViewer.Update(MouseButtons, new Point(relativeMousePos.X, relativeMousePos.Y));
+            if (MapViewer.Update(MouseButtons, new Point(MousePosition.X, MousePosition.Y)))
+                MapViewer.Render();
         }
 
         private void InitializeRecentFileList()
@@ -117,12 +115,23 @@ namespace Editor
                 openRecentToolStripMenuItem.Enabled = true;
         }
 
-        private void ExitEditor()
+        private void Shutdown()
         {
             mapViewerUpdater.Stop();
             Session.Exit();
             Logger.ClearLoggingFiles();
+        }
+
+        private void ExitEditor()
+        {
+            Shutdown();
             Application.Exit();
+        }
+
+        private void RestartEditor()
+        {
+            Shutdown();
+            Application.Restart();
         }
 
         private void OnDragEnter(object sender, DragEventArgs e)
@@ -141,27 +150,14 @@ namespace Editor
                 e.Effect = DragDropEffects.Move;
         }
 
-        private void OnDragDrop(object sender, DragEventArgs e)
-        {
-            // We already made sure in OnDragEnter that there were only a single file and that it was not a directory
-            LoadMap(((string[]) e.Data.GetData(DataFormats.FileDrop))[0]);
-        }
+        // We already made sure in OnDragEnter that there were only a single file and that it was not a directory
+        private void OnDragDrop(object sender, DragEventArgs e) => LoadMap(((string[]) e.Data.GetData(DataFormats.FileDrop))[0]);
 
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ExitEditor();
-        }
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e) => ExitEditor();
 
-        private void RestartToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Restart();
-            ExitEditor();
-        }
+        private void RestartToolStripMenuItem_Click(object sender, EventArgs e) => RestartEditor();
 
-        private void MetadataToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            new MetadataWindow().Show();
-        }
+        private void MetadataToolStripMenuItem_Click(object sender, EventArgs e) => new MetadataWindow().Show();
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -178,14 +174,8 @@ namespace Editor
                 LoadMap(dialog.FileName);
         }
 
-        private void OnFormClosed(object sender, FormClosedEventArgs e)
-        {
-            ExitEditor();
-        }
+        private void OnFormClosed(object sender, FormClosedEventArgs e) => ExitEditor();
 
-        private void OnRecentFileClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            LoadMap(e.ClickedItem.Text);
-        }
+        private void OnRecentFileClicked(object sender, ToolStripItemClickedEventArgs e) => LoadMap(e.ClickedItem.Text);
     }
 }

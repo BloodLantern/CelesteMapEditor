@@ -1,6 +1,7 @@
 using Editor;
 using Editor.Logging;
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace MapEditor
