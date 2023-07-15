@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Diagnostics;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace Editor
@@ -16,10 +17,9 @@ namespace Editor
 
         public Point? ClickStartPosition;
         public PointF? CameraStartPosition;
-        public PointF dragDelta;
+        public Vector2 dragDelta;
         public bool Dragging => ClickStartPosition != null && CameraStartPosition != null;
 
-        private readonly TextOptions debugTextOptions;
         private static readonly Color debugTextBackgroundColor = Color.ParseHex("#10101050");
         private long lastDrawImageTime = 0;
 
@@ -28,8 +28,6 @@ namespace Editor
             DoubleBuffered = true;
 
             Session = session;
-
-            debugTextOptions = new(Session.DebugTextFont);
         }
 
         /// <summary>
@@ -56,8 +54,8 @@ namespace Editor
 
             if (ClickStartPosition.Value.X < 0
                 || ClickStartPosition.Value.Y < 0
-                || ClickStartPosition.Value.X >= CurrentImage.Width
-                || ClickStartPosition.Value.Y >= CurrentImage.Height)
+                || ClickStartPosition.Value.X >= Width
+                || ClickStartPosition.Value.Y >= Height)
                 return false;
 
             dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);

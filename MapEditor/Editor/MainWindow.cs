@@ -86,7 +86,8 @@ namespace Editor
 
         private void UpdateMapViewer(object sender, EventArgs e)
         {
-            if (MapViewer.Update(MouseButtons, new Point(MousePosition.X, MousePosition.Y)))
+            System.Drawing.Point mousePosition = MapViewer.PointToClient(MousePosition);
+            if (MapViewer.Update(MouseButtons, new Point(mousePosition.X, mousePosition.Y)))
                 MapViewer.Render();
         }
 
