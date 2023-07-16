@@ -1,8 +1,10 @@
-﻿using SixLabors.ImageSharp;
+﻿using Editor.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms.VisualStyles;
 using System.Xml;
 
 namespace Editor.Celeste
@@ -22,10 +24,41 @@ namespace Editor.Celeste
 
             public TerrainType(char id) => ID = id;
 
-            public Texture GetFromPosition(char[,] around)
+            public Texture GetTileFromMask(byte[] mask)
             {
-                // TODO: Do autotiling
-                return Calc.Random.Choose(Center.Textures);
+                Tile result = null;
+
+                for (int i = 0; i < mask.Length; i++)
+                {
+                    // The tile is neither padded nor centered if its mask has at least one empty tile
+                    if (mask[i] is 0 or 2)
+                    {
+                        for (int j = 0; j < Masked.Count; j++)
+                        {
+                            bool same = true;
+                            for (int k = 0; k < 3 * 3;  k++)
+                            {
+                                byte currentMask = Masked.ElementAt(j).Mask[k];
+                                if (currentMask == 2 || mask[k] == 2)
+                                    continue;
+
+                                if (currentMask != mask[k])
+                                {
+                                    same = false;
+                                    break;
+                                }
+                            }
+
+                            if (same)
+                                result = Masked.ElementAt(j).Tile;
+                        }
+                        break;
+                    }
+                }
+
+                result ??= Center;
+
+                return Calc.Random.Choose(result.Textures);
             }
 
             public bool Links(char c)
@@ -38,8 +71,8 @@ namespace Editor.Celeste
 
         private class MaskedTile
         {
-            public byte[] Mask = new byte[9];
-            public Tile Tile = new();
+            public byte[] Mask;
+            public Tile Tile;
         }
 
         private class Tile
@@ -97,28 +130,29 @@ namespace Editor.Celeste
                 {
                     XmlElement tilesetXml = tilesetXmlObj as XmlElement;
                     string mask = tilesetXml.Attr("mask");
-                    Tile tiles;
+                    Tile tile;
 
                     if (mask == "center")
-                        tiles = data.Center;
+                        tile = data.Center;
                     else if (mask == "padding")
-                        tiles = data.Padded;
+                        tile = data.Padded;
                     else
                     {
-                        MaskedTile masked = new();
-                        tiles = masked.Tile;
+                        MaskedTile maskedTile = new()
+                        {
+                            Tile = new(),
+                            Mask = new byte[3 * 3]
+                        };
+                        tile = maskedTile.Tile;
 
                         int maskIndex = 0;
                         for (int i = 0; i < mask.Length; i++)
                         {
-                            if (mask[i] == '0')
-                                masked.Mask[maskIndex++] = 0;
-                            else if (mask[i] == '1')
-                                masked.Mask[maskIndex++] = 1;
-                            else if (mask[i] is 'x' or 'X')
-                                masked.Mask[maskIndex++] = 2;
+                            if (mask[i] is '0' or '1' or 'x' or 'X' or '*')
+                                maskedTile.Mask[maskIndex++] = GetMask(mask[i]);
                         }
-                        data.Masked.Add(masked);
+
+                        data.Masked.Add(maskedTile);
                     }
 
                     string tileOffsets = tilesetXml.Attr("tiles");
@@ -127,33 +161,18 @@ namespace Editor.Celeste
                         string[] tileOffsetArray = tileOffset.Split(',');
                         int tileX = int.Parse(tileOffsetArray[0]);
                         int tileY = int.Parse(tileOffsetArray[1]);
-                        tiles.Textures.Add(tileset[tileX, tileY]);
+                        tile.Textures.Add(tileset[tileX, tileY]);
                     }
 
                     if (tilesetXml.HasAttr("sprites"))
                     {
                         string sprites = tilesetXml.Attr("sprites");
                         foreach (string sprite in sprites.Split(','))
-                            tiles.OverlapSprites.Add(sprite);
-                        tiles.HasOverlays = true;
+                            tile.OverlapSprites.Add(sprite);
+                        tile.HasOverlays = true;
                     }
                 }
             }
-
-            data.Masked.Sort((a, b) =>
-            {
-                // Number of any ('x' or 'X') masks
-                int aAnyMasks = 0;
-                int bAnyMasks = 0;
-                for (int i = 0; i < 9; i++)
-                {
-                    if (a.Mask[i] == 2)
-                        aAnyMasks++;
-                    if (b.Mask[i] == 2)
-                        bAnyMasks++;
-                }
-                return aAnyMasks - bAnyMasks;
-            });
         }
 
         /// <summary>
@@ -189,19 +208,20 @@ namespace Editor.Celeste
                     if (IsEmpty(tile))
                         continue;
 
-                    char[,] around = new char[3, 3];
-                    for (int i = -1; i < 2; i++)
+                    byte[] mask = new byte[3 * 3];
+                    for (int i = 0; i < 3; i++)
                     {
-                        for (int j = -1; j < 2; j++)
+                        for (int j = 0; j < 3; j++)
                         {
-                            int tileX = Math.Clamp(x + i, 0, tiles.GetLength(0) - 1);
-                            int tileY = Math.Clamp(y + j, 0, tiles.GetLength(1) - 1);
+                            // I don't know why 'i' and 'j' should be reversed here but it works
+                            int tileX = Math.Clamp(x + j - 1, 0, tiles.GetLength(0) - 1);
+                            int tileY = Math.Clamp(y + i - 1, 0, tiles.GetLength(1) - 1);
 
-                            around[i + 1, j + 1] = tiles[tileX, tileY];
+                            mask[i * 3 + j] = GetMaskFromIds(tile, tiles[tileX, tileY]);
                         }
                     }
 
-                    result.Tiles[x, y] = lookup[tile].GetFromPosition(around);
+                    result.Tiles[x, y] = lookup[tile].GetTileFromMask(mask);
                 }
             }
 
@@ -209,6 +229,10 @@ namespace Editor.Celeste
         }
 
         private static bool IsEmpty(char id) => id is '0' or char.MinValue;
+
+        private byte GetMask(char mask) => GetMaskFromIds('1', mask);
+
+        private static byte GetMaskFromIds(char id, char maskId) => (byte) (maskId == '0' ? 0 : (id == maskId ? 1 : 2));
 
         public static void LoadAutotilers(string celesteGraphicsDirectory)
         {

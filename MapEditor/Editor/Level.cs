@@ -63,7 +63,7 @@ namespace Editor
                 entityCount++;
             }
 
-            int solidCount = ForegroundTiles.Render(cameraBounds, image, Position);
+            ForegroundTiles.Render(cameraBounds, image, Position);
 
             return entityCount;
         }

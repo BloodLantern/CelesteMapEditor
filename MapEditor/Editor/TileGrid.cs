@@ -17,6 +17,8 @@ namespace Editor
 
         public float Alpha = 1f;
 
+        public Image<Rgba32> Image { get; private set; } = null;
+
         /// <summary>
         /// Constructs a new TileGrid with a set size.
         /// </summary>
@@ -27,9 +29,17 @@ namespace Editor
             Tiles = new Texture[tilesX, tilesY];
         }
 
-        public int Render(RectangleF cameraBounds, Image<Rgba32> image, Point levelPosition)
+        public void Invalidate() => Image = null;
+
+        public void Render(RectangleF cameraBounds, Image<Rgba32> image, Point levelPosition)
         {
-            int count = 0;
+            if (Image != null)
+            {
+                image.Mutate(o => o.DrawImage(Image, levelPosition - (Size) Point.Round(cameraBounds.Position()), Alpha));
+                return;
+            }
+
+            Image = new(TilesX * Tileset.TileSize, TilesY * Tileset.TileSize);
             for (int x = 0; x < TilesX; x++)
             {
                 for (int y = 0; y < TilesY; y++)
@@ -38,19 +48,11 @@ namespace Editor
                     if (tile == null)
                         continue;
 
-                    Point absolutePosition = levelPosition + new Size(x * Tileset.TileSize, y * Tileset.TileSize);
-                    if (absolutePosition.X >= cameraBounds.Right
-                        || absolutePosition.Y >= cameraBounds.Bottom
-                        || absolutePosition.X + Tileset.TileSize <= cameraBounds.Left
-                        || absolutePosition.Y + Tileset.TileSize <= cameraBounds.Top)
-                        continue;
-
-                    image.Mutate(o => o.DrawImage(tile.Image, absolutePosition - (Size) Point.Round(cameraBounds.Position()), Alpha));
-                    count++;
+                    Image.Mutate(o => o.DrawImage(tile.Image, new Point(x * Tileset.TileSize, y * Tileset.TileSize), Alpha));
                 }
             }
 
-            return count;
+            Render(cameraBounds, image, levelPosition);
         }
 
         public void Clear()

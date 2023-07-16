@@ -61,7 +61,7 @@ namespace Editor
             {
                 room = new ListViewItem
                 {
-                    Text = level.Name
+                    Text = level.Name.StartsWith("lvl_") ? level.Name[4..] : level.Name
                 };
                 RoomList.Items.Add(room);
             }
@@ -86,6 +86,9 @@ namespace Editor
 
         private void UpdateMapViewer(object sender, EventArgs e)
         {
+            if (!ContainsFocus)
+                return;
+
             System.Drawing.Point mousePosition = MapViewer.PointToClient(MousePosition);
             if (MapViewer.Update(MouseButtons, new Point(mousePosition.X, mousePosition.Y)))
                 MapViewer.Render();
