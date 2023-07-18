@@ -46,6 +46,28 @@ namespace Editor
             return new Size(self.Width, self.Height);
         }
 
+        public static Point[] ToPointArray(this Rectangle self)
+        {
+            Point position = self.Position();
+            return new Point[] {
+                position,
+                position + new Size(self.Width, 0),
+                position + self.Size(),
+                position + new Size(0, self.Height)
+            };
+        }
+
+        public static PointF[] ToPointFArray(this Rectangle self)
+        {
+            PointF position = self.Position();
+            return new PointF[] {
+                position,
+                position + new SizeF(self.Width, 0),
+                position + self.Size(),
+                position + new SizeF(0, self.Height)
+            };
+        }
+
         public static PointF Position(this RectangleF self)
         {
             return new PointF(self.X, self.Y);

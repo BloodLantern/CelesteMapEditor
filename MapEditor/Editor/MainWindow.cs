@@ -18,6 +18,8 @@ namespace Editor
 
         public MainWindow()
         {
+            InitializeComponent();
+
             Session = new();
 
             // If an error happened during Session initialization, exit
@@ -25,8 +27,7 @@ namespace Editor
                 ExitEditor();
 
             MapViewer = new(Session);
-            InitializeComponent();
-            MapViewer.CameraBounds = new RectangleF(-MapViewer.Width / 2, -MapViewer.Height / 2, MapViewer.Width, MapViewer.Height);
+            Controls.Add(MapViewer);
 
             InitializeRecentFileList();
 
@@ -61,7 +62,8 @@ namespace Editor
             {
                 room = new ListViewItem
                 {
-                    Text = level.Name.StartsWith("lvl_") ? level.Name[4..] : level.Name
+                    Text = level.Name.StartsWith("lvl_") ? level.Name[4..] : level.Name,
+                    Tag = level
                 };
                 RoomList.Items.Add(room);
             }
@@ -69,7 +71,8 @@ namespace Editor
             {
                 room = new ListViewItem
                 {
-                    Text = $"FILLER{i}"
+                    Text = $"FILLER{i}",
+                    Tag = map.Fillers[i]
                 };
                 RoomList.Items.Add(room);
             }
@@ -161,7 +164,7 @@ namespace Editor
 
         private void RestartToolStripMenuItem_Click(object sender, EventArgs e) => RestartEditor();
 
-        private void MetadataToolStripMenuItem_Click(object sender, EventArgs e) => new MetadataWindow().Show();
+        private void MetadataToolStripMenuItem_Click(object sender, EventArgs e) => new MetadataWindow().Show(); // Temporary, for testing
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -181,5 +184,33 @@ namespace Editor
         private void OnFormClosed(object sender, FormClosedEventArgs e) => ExitEditor();
 
         private void OnRecentFileClicked(object sender, ToolStripItemClickedEventArgs e) => LoadMap(e.ClickedItem.Text);
+
+        private void RoomList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!Session.Config.RoomSelectionWarp
+                || RoomList.SelectedItems.Count != 1)
+                return;
+
+            object tag = RoomList.SelectedItems[0].Tag;
+            Rectangle bounds = Rectangle.Empty;
+            switch (tag)
+            {
+                // Level
+                case LevelData:
+                    bounds = ((LevelData) tag).Bounds;
+                    break;
+                // Filler
+                case Rectangle:
+                    bounds = (Rectangle) tag;
+                    break;
+            }
+
+            Size cameraSize = (Size) MapViewer.CameraBounds.Size();
+            Point levelCenter = bounds.Position() + bounds.Size() / 2;
+
+            MapViewer.CameraBounds = new Rectangle(levelCenter - cameraSize / 2, cameraSize);
+
+            MapViewer.Render();
+        }
     }
 }

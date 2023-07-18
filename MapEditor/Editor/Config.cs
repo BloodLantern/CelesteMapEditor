@@ -12,13 +12,13 @@ namespace Editor
 
         public int MaxLastEditedFiles = 5;
         public List<string> LastEditedFiles = new();
-        public string LastEditedFile => LastEditedFiles[0];
+        public string LastEditedFile => LastEditedFiles.Count > 0 ? LastEditedFiles[0] : null;
 
         public int MapViewerRefreshRate = 60;
 
         public bool ShowDebugInfo = false;
-
         public bool AutoLoadLastEditedMap = true;
+        public bool RoomSelectionWarp = true;
 
         public Config()
         {

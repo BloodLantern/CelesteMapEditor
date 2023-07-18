@@ -28,6 +28,14 @@ namespace Editor
             DoubleBuffered = true;
 
             Session = session;
+
+            Location = new System.Drawing.Point(250, 24);
+            Margin = new Padding(4, 3, 4, 3);
+            Name = "MapViewer";
+            Size = new System.Drawing.Size(1225, 762);
+            TabIndex = 4;
+            TabStop = false;
+            CameraBounds = new RectangleF(-Width / 2, -Height / 2, Width, Height);
         }
 
         /// <summary>
@@ -42,20 +50,19 @@ namespace Editor
             {
                 ClickStartPosition = null;
                 CameraStartPosition = null;
-                return false;
             }
 
             if (!Dragging)
             {
                 ClickStartPosition = mousePosition;
                 CameraStartPosition = new PointF(CameraBounds.X, CameraBounds.Y);
-                return false;
             }
 
-            if (ClickStartPosition.Value.X < 0
+            if (ClickStartPosition.HasValue
+                && (ClickStartPosition.Value.X < 0
                 || ClickStartPosition.Value.Y < 0
                 || ClickStartPosition.Value.X >= Width
-                || ClickStartPosition.Value.Y >= Height)
+                || ClickStartPosition.Value.Y >= Height))
                 return false;
 
             dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);
@@ -74,20 +81,22 @@ namespace Editor
             Image<Rgba32> result = new(Width, Height, Color.DarkSlateGray);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            (int, int) rendered = Session.CurrentMap.Render(CameraBounds, result);
+            Session.CurrentMap.Render(CameraBounds, result);
             long time = stopwatch.ElapsedMilliseconds;
 
             if (Session.Config.ShowDebugInfo)
+            {
+                int yPosition = 0;
                 result.Mutate(
-                    i => i.Fill(debugTextBackgroundColor, new RectangleF(0, 0, 500, 105))
-                    .DrawText($"Camera bounds: {CameraBounds}", Session.DebugTextFont, Color.White, new PointF(0, 0))
-                    .DrawText($"Rendered levels: {rendered.Item1}", Session.DebugTextFont, Color.White, new PointF(0, 15))
-                    .DrawText($"Rendered entities: {rendered.Item2}", Session.DebugTextFont, Color.White, new PointF(0, 30))
-                    .DrawText($"Time to render to image: {time}", Session.DebugTextFont, Color.White, new PointF(0, 45))
-                    .DrawText($"Time to render to window: {lastDrawImageTime}", Session.DebugTextFont, Color.White, new PointF(0, 60))
-                    .DrawText($"Approximate FPS: {1f / ((time + lastDrawImageTime) / 1000f)}", Session.DebugTextFont, Color.White, new PointF(0, 75))
-                    .DrawText($"Target FPS: {Session.Config.MapViewerRefreshRate}", Session.DebugTextFont, Color.White, new PointF(0, 90))
+                    i => i.Fill(debugTextBackgroundColor, new RectangleF(0, 0, 500, 120))
+                    .DrawText($"Camera bounds: {CameraBounds}", Session.DebugTextFont, Color.White, new PointF(0, yPosition))
+                    .DrawText($"Time to render to image: {time}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
+                    .DrawText($"Time to render to window: {lastDrawImageTime}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
+                    .DrawText($"Approximate FPS: {1f / ((time + lastDrawImageTime) / 1000f)}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
+                    .DrawText($"Target FPS: {Session.Config.MapViewerRefreshRate}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
+                    .DrawText($"Mouse position: {MousePosition}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
                 );
+            }
 
             CurrentImage = result;
 

@@ -59,6 +59,8 @@ namespace Editor
             metadataToolStripMenuItem = new ToolStripMenuItem();
             roomToolStripMenuItem = new ToolStripMenuItem();
             addToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem2 = new ToolStripMenuItem();
             editToolStripMenuItem1 = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             deleteToolStripMenuItem = new ToolStripMenuItem();
@@ -68,8 +70,6 @@ namespace Editor
             checkForUpdateToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
-            toolStripMenuItem1 = new ToolStripMenuItem();
-            toolStripMenuItem2 = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -85,21 +85,12 @@ namespace Editor
             RoomList.TabIndex = 2;
             RoomList.UseCompatibleStateImageBehavior = false;
             RoomList.View = View.Details;
+            RoomList.SelectedIndexChanged += RoomList_SelectedIndexChanged;
             // 
             // roomName
             // 
             roomName.Text = "Name";
             roomName.Width = 209;
-            // 
-            // MapViewer
-            // 
-            MapViewer.Dock = DockStyle.Fill;
-            MapViewer.Location = new System.Drawing.Point(250, 24);
-            MapViewer.Margin = new Padding(4, 3, 4, 3);
-            MapViewer.Name = "MapViewer";
-            MapViewer.Size = new System.Drawing.Size(1225, 762);
-            MapViewer.TabIndex = 4;
-            MapViewer.TabStop = false;
             // 
             // fileToolStripMenuItem
             // 
@@ -283,24 +274,36 @@ namespace Editor
             // addToolStripMenuItem
             // 
             addToolStripMenuItem.Name = "addToolStripMenuItem";
-            addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            addToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             addToolStripMenuItem.Text = "&Add room";
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new System.Drawing.Size(154, 22);
+            toolStripMenuItem1.Text = "Add &filler";
+            // 
+            // toolStripMenuItem2
+            // 
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new System.Drawing.Size(154, 22);
+            toolStripMenuItem2.Text = "Add filler room";
             // 
             // editToolStripMenuItem1
             // 
             editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            editToolStripMenuItem1.Size = new System.Drawing.Size(154, 22);
             editToolStripMenuItem1.Text = "&Edit";
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            toolStripSeparator2.Size = new System.Drawing.Size(151, 6);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             deleteToolStripMenuItem.Text = "&Delete";
             // 
             // toolsToolStripMenuItem
@@ -345,25 +348,12 @@ namespace Editor
             menuStrip1.TabIndex = 3;
             menuStrip1.Text = "menuStrip1";
             // 
-            // toolStripMenuItem1
-            // 
-            toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            toolStripMenuItem1.Text = "Add &filler";
-            // 
-            // toolStripMenuItem2
-            // 
-            toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
-            toolStripMenuItem2.Text = "Add filler room";
-            // 
             // MainWindow
             // 
             AllowDrop = true;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1475, 786);
-            Controls.Add(MapViewer);
             Controls.Add(RoomList);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;

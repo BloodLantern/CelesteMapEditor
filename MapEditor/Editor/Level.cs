@@ -39,7 +39,7 @@ namespace Editor
         /// </param>
         /// <param name="image">The image to render to.</param>
         /// <returns>The number of entities that were rendered.</returns>
-        public int Render(RectangleF cameraBounds, Image<Rgba32> image)
+        public void Render(RectangleF cameraBounds, Image<Rgba32> image)
         {
             PointF relativePosition = new(Position.X - cameraBounds.X, Position.Y - cameraBounds.Y);
 
@@ -50,7 +50,6 @@ namespace Editor
                     new PointF(relativePosition.X + Bounds.Width, relativePosition.Y + Bounds.Height),
                     new PointF(relativePosition.X, relativePosition.Y + Bounds.Height)));
 
-            int entityCount = 0;
             foreach (Entity entity in Entities)
             {
                 if (entity.AbsolutePosition.X >= cameraBounds.Right
@@ -60,12 +59,9 @@ namespace Editor
                     continue;
 
                 entity.Render(cameraBounds, image);
-                entityCount++;
             }
 
             ForegroundTiles.Render(cameraBounds, image, Position);
-
-            return entityCount;
         }
     }
 }
