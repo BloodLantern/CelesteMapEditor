@@ -21,7 +21,9 @@ namespace Editor
                 if (value <= 0)
                     return;
 
+                Vector2 oldSize = Size;
                 Size *= zoom / value;
+                Position -= (Size - oldSize) / 2;
                 zoom = value;
             }
         }
