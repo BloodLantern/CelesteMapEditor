@@ -1,12 +1,9 @@
-﻿using Editor.Celeste;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Editor.Celeste;
 using Editor.Utils;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
-using System.Numerics;
 
 namespace Editor
 {
@@ -18,16 +15,15 @@ namespace Editor
         private static byte[] buffer;
         private static byte[] buffer2;
 
-        private readonly Image<Rgba32> fullImage;
         public Color Color;
 
-        public Image<Rgba32> Image { get; private set; }
+        public Texture2D Image;
 
         public string Name { get; private set; }
 
-        public Size Size { get; private set; }
-        public int Width => Size.Width;
-        public int Height => Size.Height;
+        public Point Size { get; private set; }
+        public int Width => Size.X;
+        public int Height => Size.Y;
 
         public Rectangle ClipRect { get; private set; }
 
@@ -36,34 +32,31 @@ namespace Editor
         public Texture(string name)
         {
             Name = name;
-            fullImage = Load();
-            if (fullImage != null)
-                Size = fullImage.Size;
-            ClipRect = new Rectangle(Point.Empty, Size);
-            SetupFinalImage();
+            Load();
+            if (Image != null)
+                Size = Image.Bounds.Size;
+            ClipRect = new Rectangle(Point.Zero, Size);
         }
 
-        public Texture(string name, Size size, Color color)
+        public Texture(string name, Point size, Color color)
         {
             Name = name;
             Size = size;
-            ClipRect = new Rectangle(Point.Empty, Size);
+            ClipRect = new Rectangle(Point.Zero, Size);
             Color = color;
-            fullImage = Load();
-            SetupFinalImage();
+            Load();
         }
 
         public Texture(
             Texture parent,
             Rectangle clipRect,
             Point drawOffset,
-            Size size)
+            Point size)
         {
-            fullImage = parent.fullImage;
+            Image = parent.Image;
             ClipRect = parent.GetRelativeRect(clipRect);
             DrawOffset = drawOffset;
             Size = size;
-            SetupFinalImage();
         }
 
         /// <summary>
@@ -76,38 +69,49 @@ namespace Editor
             Texture tileset,
             int x,
             int y)
+            : this(tileset, x, y, Tileset.TileSize, Tileset.TileSize)
         {
-            fullImage = tileset.fullImage;
-            ClipRect = tileset.GetRelativeRect(x, y, Tileset.TileSize, Tileset.TileSize);
-            DrawOffset = new Point(-Math.Min(x - tileset.DrawOffset.X, 0), -Math.Min(y - tileset.DrawOffset.Y, 0));
-            Size = new Size(Tileset.TileSize);
-            SetupFinalImage();
         }
 
-        public void Unload()
+        /// <summary>
+        /// Subtexture constructor.
+        /// </summary>
+        /// <param name="parent">The parent texture.</param>
+        /// <param name="x">The X offset in pixels.</param>
+        /// <param name="y">The Y offset in pixels.</param>
+        public Texture(
+            Texture parent,
+            int x,
+            int y,
+            int width,
+            int height)
         {
-            fullImage?.Mutate(i => i.Crop(1, 1).Clear(Color.Black));
+            Image = parent.Image;
+            ClipRect = parent.GetRelativeRect(x, y, width, height);
+            DrawOffset = new Point(-Math.Min(x - parent.DrawOffset.X, 0), -Math.Min(y - parent.DrawOffset.Y, 0));
+            Size = new Point(width, height);
         }
+
+        public void Dispose() => Image.Dispose();
 
         /// <summary>
         /// Most of the code in this function comes directly from Celeste so
         /// some variables might have an inaccurate name.
         /// </summary>
-        private Image<Rgba32> Load()
+        private void Load()
         {
-            Unload();
-
             if (string.IsNullOrEmpty(Name))
             {
+                Image = new(MapEditor.Instance.GraphicsDevice, Size.X, Size.Y);
                 // Set the texture to be filled with 'color'
-                Rgba32[] data = new Rgba32[Size.Width * Size.Height];
+                Color[] data = new Color[Size.X * Size.Y];
                 for (int i = 0; i < data.Length; i++)
                     data[i] = Color;
-                return SixLabors.ImageSharp.Image.LoadPixelData(new ReadOnlySpan<Rgba32>(data), Size.Width, Size.Height);
+                Image.SetData(data);
             }
             else
             {
-                using FileStream fileStream = File.OpenRead(Path.Combine(Session.CurrentSession.CelesteContentDirectory, Name));
+                using FileStream fileStream = File.OpenRead(Path.Combine(Session.Current.CelesteContentDirectory, Name));
                 fileStream.Read(buffer2, 0, ByteArraySize);
 
                 int width = BitConverter.ToInt32(buffer2, 0);
@@ -170,8 +174,9 @@ namespace Editor
                     }
                 }
 
-                Size = new Size(width, height);
-                return SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(buffer, width, height);
+                Size = new Point(width, height);
+                Image = new(MapEditor.Instance.GraphicsDevice, width, height);
+                Image.SetData(buffer, 0, totalSize);
             }
         }
 
@@ -202,6 +207,20 @@ namespace Editor
             buffer2 = null;
         }
 
-        private void SetupFinalImage() => Image = fullImage?.Clone(o => o.Crop(ClipRect));
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset)
+            => Render(spriteBatch, camera, offset, Color.White);
+
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f, float rotation = 0f)
+            => spriteBatch.Draw(
+                Image,
+                camera.MapToWindow(offset),
+                ClipRect,
+                color,
+                rotation,
+                rotation == 0 ? Vector2.Zero : ClipRect.Size.ToVector2() / 2,
+                camera.Zoom * scale,
+                SpriteEffects.None,
+                0
+            );
     }
 }

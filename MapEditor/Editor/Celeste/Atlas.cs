@@ -1,9 +1,10 @@
-﻿using Editor.Logging;
-using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
+using Editor.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Celeste
 {
@@ -50,10 +51,10 @@ namespace Editor.Celeste
                     string texturePath = reader.ReadString().Replace('\\', '/');
 
                     Point clipPosition = new(reader.ReadInt16(), reader.ReadInt16());
-                    Size clipSize = new(reader.ReadInt16(), reader.ReadInt16());
+                    Point clipSize = new(reader.ReadInt16(), reader.ReadInt16());
 
                     Point offset = new(-reader.ReadInt16(), -reader.ReadInt16());
-                    Size textureSize = new(reader.ReadInt16(), reader.ReadInt16());
+                    Point textureSize = new(reader.ReadInt16(), reader.ReadInt16());
 
                     atlas.Textures[texturePath] = new Texture(parentTexture, new Rectangle(clipPosition, clipSize), offset, textureSize);
                 }

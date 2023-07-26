@@ -1,7 +1,8 @@
 ﻿using Editor.Celeste;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Editor
 {
@@ -15,10 +16,6 @@ namespace Editor
         public int TilesX => Tiles.GetLength(0);
         public int TilesY => Tiles.GetLength(1);
 
-        public float Alpha = 1f;
-
-        public Image<Rgba32> Image { get; private set; } = null;
-
         /// <summary>
         /// Constructs a new TileGrid with a set size.
         /// </summary>
@@ -29,30 +26,13 @@ namespace Editor
             Tiles = new Texture[tilesX, tilesY];
         }
 
-        public void Invalidate() => Image = null;
-
-        public void Render(RectangleF cameraBounds, Image<Rgba32> image, Point levelPosition)
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 levelPosition)
         {
-            if (Image != null)
-            {
-                image.Mutate(o => o.DrawImage(Image, levelPosition - (Size) Point.Round(cameraBounds.Position()), Alpha));
-                return;
-            }
-
-            Image = new(TilesX * Tileset.TileSize, TilesY * Tileset.TileSize);
             for (int x = 0; x < TilesX; x++)
             {
                 for (int y = 0; y < TilesY; y++)
-                {
-                    Texture tile = Tiles[x, y];
-                    if (tile == null)
-                        continue;
-
-                    Image.Mutate(o => o.DrawImage(tile.Image, new Point(x * Tileset.TileSize, y * Tileset.TileSize), Alpha));
-                }
+                    Tiles[x, y]?.Render(spriteBatch, camera, levelPosition + new Vector2(x * Tileset.TileSize, y * Tileset.TileSize));
             }
-
-            Render(cameraBounds, image, levelPosition);
         }
 
         public void Clear()

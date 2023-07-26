@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 
@@ -92,15 +92,15 @@ namespace Editor.Celeste
                         break;
 
                     case "TitleAccentColor":
-                        TitleAccentColor = Color.ParseHex(pair.Value as string);
+                        TitleAccentColor = Calc.HexToColor(pair.Value as string);
                         break;
 
                     case "TitleBaseColor":
-                        TitleBaseColor = Color.ParseHex(pair.Value as string);
+                        TitleBaseColor = Calc.HexToColor(pair.Value as string);
                         break;
 
                     case "TitleTextColor":
-                        TitleTextColor = Color.ParseHex(pair.Value as string);
+                        TitleTextColor = Calc.HexToColor(pair.Value as string);
                         break;
 
                     case "Wipe":

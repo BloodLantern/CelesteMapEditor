@@ -1,11 +1,10 @@
-﻿using Editor.Logging;
+﻿using Microsoft.Xna.Framework;
+using Editor.Logging;
 using Editor.Utils;
-using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Numerics;
 
 namespace Editor.Celeste
 {
@@ -82,13 +81,20 @@ namespace Editor.Celeste
                         if (data.Children != null)
                         {
                             foreach (BinaryPacker.Element filler in data.Children)
-                                Fillers.Add(new Rectangle((int) filler.Attributes["x"], (int) filler.Attributes["y"], (int) filler.Attributes["w"], (int) filler.Attributes["h"]));
+                                Fillers.Add(
+                                    new Rectangle(
+                                        (int) filler.Attributes["x"] * Tileset.TileSize,
+                                        (int) filler.Attributes["y"] * Tileset.TileSize,
+                                        (int) filler.Attributes["w"] * Tileset.TileSize,
+                                        (int) filler.Attributes["h"] * Tileset.TileSize
+                                    )
+                                );
                         }
                         break;
 
                     case "Style":
                         if (data.HasAttr("color"))
-                            BackgroundColor = Color.ParseHex(data.Attr("color"));
+                            BackgroundColor = Calc.HexToColor(data.Attr("color"));
 
                         if (data.Children != null)
                         {

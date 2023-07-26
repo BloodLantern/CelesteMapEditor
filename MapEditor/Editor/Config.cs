@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoGame.Extended.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
@@ -14,16 +15,25 @@ namespace Editor
         public List<string> LastEditedFiles = new();
         public string LastEditedFile => LastEditedFiles.Count > 0 ? LastEditedFiles[0] : null;
 
-        public int MapViewerRefreshRate = 60;
+        /// <summary>
+        /// Only effective if Vsync is off.
+        /// </summary>
+        public TimeSpan MapViewerRefreshRate = new(0, 0, 0, 0, 16);
+        public bool UseMapViewerRefreshRate = true;
+        public bool Vsync = false;
+        public bool DebugMode = false;
 
-        public bool ShowDebugInfo = false;
         public bool AutoLoadLastEditedMap = true;
         public bool RoomSelectionWarp = true;
+        public bool ShowHitboxes = false;
+
+        public float ZoomFactor = 1.25f;
+
+        public MouseButton CameraMoveButton = MouseButton.Middle;
+        public MouseButton SelectButton = MouseButton.Left;
 
         public Config()
         {
-            if (!File.Exists(ConfigFile))
-                FirstTimeSetup();
         }
 
         private void FirstTimeSetup()
@@ -66,6 +76,13 @@ namespace Editor
 
         public static Config Load()
         {
+            if (!File.Exists(ConfigFile))
+            {
+                Config config = new();
+                config.FirstTimeSetup();
+                return config;
+            }
+
             XmlSerializer serializer = new(typeof(Config));
             FileStream output = new(ConfigFile, FileMode.Open, FileAccess.Read);
             return (Config) serializer.Deserialize(output);

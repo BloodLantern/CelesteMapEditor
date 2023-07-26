@@ -1,9 +1,11 @@
 ﻿using Editor.Celeste;
 using Editor.Logging;
-using SixLabors.Fonts;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Xml.Serialization;
 
@@ -11,48 +13,58 @@ namespace Editor
 {
     public class Session
     {
-        public static Session CurrentSession { get; private set; }
+        public static Session Current { get; private set; }
 
         private static readonly string OlympusConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Olympus", "config.json");
         
-        private static readonly string DefaultFontDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-
-        private const string DebugTextFontName = "consola.ttf";
-        private const int DebugTextFontSize = 13;
-
-        public Map CurrentMap;
+        public MapEditor MapEditor;
         public Config Config;
 
         public string CelesteDirectory;
         public string CelesteContentDirectory;
         public string CelesteGraphicsDirectory;
 
-        public readonly Font DebugTextFont;
-        public readonly FontCollection FontCollection = new();
+        private bool debugContentLoaded = false;
+        public SpriteFont DebugFont;
 
-        public Session()
+        public Session(MapEditor mapEditor)
         {
-            if (CurrentSession != null)
+            if (Current != null)
                 throw new InvalidOperationException("The Session class can only be instantiated once.");
-            CurrentSession = this;
+            Current = this;
 
-            Config = File.Exists(Config.ConfigFile) ? Config.Load() : new();
+            MapEditor = mapEditor;
+
+            Config = Config.Load();
 
             if (!TryGetActiveCelesteDirectory(out CelesteDirectory))
             {
                 Logger.Log("Could not get the active Celeste directory using the Olympus config file. Stopping program.", LogLevel.Fatal);
-                CurrentSession = null;
+                Current = null;
                 return;
             }
 
             CelesteContentDirectory = Path.Combine(CelesteDirectory, "Content");
             CelesteGraphicsDirectory = Path.Combine(CelesteContentDirectory, "Graphics");
 
-            FontFamily fontFamily = FontCollection.Add(Path.Combine(DefaultFontDirectory, DebugTextFontName));
-            DebugTextFont = fontFamily.CreateFont(DebugTextFontSize, FontStyle.Regular);
-
             Atlas.LoadAtlases(CelesteGraphicsDirectory);
             Autotiler.LoadAutotilers(CelesteGraphicsDirectory);
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            if (Config.DebugMode)
+                LoadDebugContent(content);
+        }
+
+        public void LoadDebugContent(ContentManager content)
+        {
+            if (debugContentLoaded)
+                return;
+
+            DebugFont = content.Load<SpriteFont>("Fonts/DebugFont");
+
+            debugContentLoaded = true;
         }
 
         /// <summary>

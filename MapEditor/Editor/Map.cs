@@ -1,9 +1,7 @@
 ﻿using Editor.Celeste;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using MonoGame.Extended;
 
 namespace Editor
 {
@@ -21,28 +19,8 @@ namespace Editor
                 Levels.Add(new(levelData));
         }
 
-        /// <summary>
-        /// See <see cref="Level.Render(RectangleF, Image{Rgba32})"/>.
-        /// </summary>
-        /// <returns>
-        /// A tuple cotaining the number of levels and entities that were rendererd.
-        /// </returns>
-        public void Render(RectangleF cameraBounds, Image<Rgba32> image)
-        {
-            foreach (Level level in Levels)
-            {
-                if (!cameraBounds.IntersectsWith(level.Bounds))
-                    continue;
+        public List<Level> GetVisibleLevels(RectangleF cameraBounds) => Levels.FindAll(level => cameraBounds.Intersects(level.Bounds));
 
-                level.Render(cameraBounds, image);
-            }
-            foreach (Rectangle filler in Fillers)
-            {
-                if (!cameraBounds.IntersectsWith(filler))
-                    continue;
-
-                image.Mutate(o => o.DrawPolygon(Color.Brown, 1, filler.ToPointFArray()));
-            }
-        }
+        public List<Rectangle> GetVisibleFillers(RectangleF cameraBounds) => Fillers.FindAll(filler => cameraBounds.Intersects(filler));
     }
 }

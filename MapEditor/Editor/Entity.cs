@@ -1,10 +1,10 @@
-﻿using Editor.Celeste;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame;
+using Editor.Celeste;
 using System.Collections.Generic;
-using System.Numerics;
+using MonoGame.Extended;
+using ImGuiNET;
 
 namespace Editor
 {
@@ -12,39 +12,35 @@ namespace Editor
     {
         private static readonly Dictionary<string, Texture> textureLookupTable = new()
         {
-            /*{
-                "",
-                Atlas.Gameplay[""]
-            },*/
-        };
-        private static readonly Dictionary<string, Texture> spinnerTextureLookupTable = new()
-        {
             {
-                "Blue",
-                Atlas.Gameplay["danger/crystal/fg_blue00"]
+                "goldenBerry",
+                Atlas.Gameplay["collectables/goldberry/idle00"]
             },
             {
-                "Red",
-                Atlas.Gameplay["danger/crystal/fg_red00"]
+                "strawberry",
+                Atlas.Gameplay["collectables/strawberry/normal00"]
             },
             {
-                "Purple",
-                Atlas.Gameplay["danger/crystal/fg_purple00"]
-            },
-            {
-                "Rainbow",
-                Atlas.Gameplay["danger/crystal/fg_white00"]
+                "refill",
+                Atlas.Gameplay["objects/refill/idle00"]
             },
         };
-        private static readonly string spikesTextureBaseName = "danger/spikes/{type}_{direction}00";
 
         public EntityData EntityData { get; private set; }
         public Texture Texture;
 
         public string Name => EntityData.Name;
-        public Vector2 Position => EntityData.Position;
-        public Vector2 AbsolutePosition => Level.Position + EntityData.Position;
-        public Size Size => Texture != null && EntityData.Size == Size.Empty ? Texture.Size : EntityData.Size;
+        /// <summary>
+        /// The position relative to the level this Entity is in.
+        /// This needs to be virtual as some entities like <see cref="Entities.JumpThru"/>s
+        /// need to override this so that it is only <see cref="EntityData.Position"/>.
+        /// </summary>
+        public virtual Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
+        public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
+        public virtual Vector2 TextureAbsolutePosition => AbsolutePosition + (Texture != null ? Texture.DrawOffset.ToVector2() : Vector2.Zero);
+        public virtual Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
+
+        public RectangleF Bounds => new(AbsolutePosition, Size);
 
         public Level Level;
 
@@ -52,57 +48,37 @@ namespace Editor
         {
             EntityData = data;
             Level = level;
-
-            string shortName = Name;
-
-            if (shortName.StartsWith("spikes"))
-                shortName = "spikes";
-
-            Texture = shortName switch
-            {
-                "spinner" => GetSpinnerTexture(),
-                "spikes" => GetSpikesTexture(),
-                _ => /*textureLookupTable[Name]*/null,
-            };
         }
 
-        public void Render(RectangleF cameraBounds, Image<Rgba32> image)
+        public virtual void UpdateTexture()
         {
-            PointF relativePosition = new(AbsolutePosition.X - cameraBounds.X, AbsolutePosition.Y - cameraBounds.Y);
-
-            if (Session.CurrentSession.Config.ShowDebugInfo)
-                image.Mutate(o => o.DrawPolygon(Color.Red, 2,
-                    new PointF(relativePosition.X, relativePosition.Y),
-                    new PointF(relativePosition.X + (Texture != null ? Texture.DrawOffset.X : 0) + Size.Width, relativePosition.Y),
-                    new PointF(relativePosition.X + (Texture != null ? Texture.DrawOffset.X : 0) + Size.Width, relativePosition.Y + (Texture != null ? Texture.DrawOffset.Y : 0) + Size.Height),
-                    new PointF(relativePosition.X, relativePosition.Y + (Texture != null ? Texture.DrawOffset.Y : 0) + Size.Height)));
-
-            if (Texture == null
-                || relativePosition.X + Texture.DrawOffset.X + Texture.ClipRect.Width <= 0
-                || relativePosition.Y + Texture.DrawOffset.Y + Texture.ClipRect.Height <= 0
-                || relativePosition.X + Texture.DrawOffset.X >= cameraBounds.Width
-                || relativePosition.Y + Texture.DrawOffset.Y >= cameraBounds.Height)
-                return;
-
-            image.Mutate(o => o.DrawImage(Texture.Image, Texture.DrawOffset + (Size) (Point) relativePosition, 1f));
+            if (Atlas.Gameplay.Textures.ContainsKey(Name))
+                Texture = Atlas.Gameplay[Name];
+            else if (textureLookupTable.ContainsKey(Name))
+                Texture = textureLookupTable[Name];
         }
 
-        private Texture GetSpinnerTexture()
+        public virtual void Render(SpriteBatch spriteBatch, Camera camera)
         {
-            if (EntityData.Bool("dust"))
-            {
-                // Dustbunny
-                return null;
-            }
-
-            return spinnerTextureLookupTable[EntityData.Attr("color", "Blue")];
+            if (Texture != null)
+                Texture.Render(spriteBatch, camera, TextureAbsolutePosition);
+            else
+                RenderDebug(spriteBatch, camera);
         }
 
-        private Texture GetSpikesTexture()
-        {
-            string direction = Name.Substring(6);
+        public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
+            => spriteBatch.DrawRectangle(
+                new RectangleF(
+                    camera.MapToWindow(AbsolutePosition),
+                    ((Texture != null ? Texture.DrawOffset.ToVector2() * 2 : Vector2.Zero) + Size.ToVector2()) * camera.Zoom
+                ),
+                Color.Red
+            );
 
-            return Atlas.Gameplay[spikesTextureBaseName.Replace("{type}", EntityData.Attr("type", "default")).Replace("{direction}", direction.ToLower())];
+        public virtual void DebugInfo()
+        {
+            ImGui.Text($"Name: '{Name}'");
+            ImGui.Text($"Bounds: {Bounds}");
         }
     }
 }

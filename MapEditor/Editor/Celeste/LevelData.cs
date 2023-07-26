@@ -1,8 +1,7 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Numerics;
 
 namespace Editor.Celeste
 {
@@ -18,7 +17,7 @@ namespace Editor.Celeste
         public Rectangle Bounds;
         public List<EntityData> Entities;
         public List<EntityData> Triggers;
-        public List<Vector2> Spawns;
+        public List<Vector2> PlayerSpawns;
         public List<DecalData> FgDecals;
         public List<DecalData> BgDecals;
         public string ForegroundTiles = "";
@@ -144,7 +143,7 @@ namespace Editor.Celeste
                 }
             }
 
-            Spawns = new List<Vector2>();
+            PlayerSpawns = new List<Vector2>();
             Entities = new List<EntityData>();
             Triggers = new List<EntityData>();
             BgDecals = new List<DecalData>();
@@ -158,7 +157,7 @@ namespace Editor.Celeste
                         foreach (BinaryPacker.Element entity in child.Children)
                         {
                             if (entity.Name == "player")
-                                Spawns.Add(new Vector2(Bounds.X + Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Bounds.Y + Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
+                                PlayerSpawns.Add(new Vector2(Bounds.X + Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Bounds.Y + Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
                             else if (entity.Name is "strawberry" or "snowberry")
                                 Strawberries++;
                             else if (entity.Name == "shard")
@@ -216,7 +215,7 @@ namespace Editor.Celeste
                     ObjTiles = child.Attr("innerText");
             }
 
-            Dummy = Spawns.Count == 0;
+            Dummy = PlayerSpawns.Count == 0;
         }
 
         private EntityData CreateEntityData(BinaryPacker.Element entity)
@@ -233,9 +232,9 @@ namespace Editor.Celeste
                     else if (attribute.Key == "y")
                         result.Position.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "width")
-                        result.Size.Width = (int) attribute.Value;
+                        result.Size.X = (int) attribute.Value;
                     else if (attribute.Key == "height")
-                        result.Size.Height = (int) attribute.Value;
+                        result.Size.Y = (int) attribute.Value;
                     else if (attribute.Key == "originX")
                         result.Origin.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "originY")
@@ -268,12 +267,12 @@ namespace Editor.Celeste
             get => new(Bounds.X, Bounds.Y);
             set
             {
-                for (int index = 0; index < Spawns.Count; ++index)
-                    Spawns[index] -= Position;
+                for (int index = 0; index < PlayerSpawns.Count; ++index)
+                    PlayerSpawns[index] -= Position.ToVector2();
                 Bounds.X = value.X;
                 Bounds.Y = value.Y;
-                for (int index = 0; index < Spawns.Count; ++index)
-                    Spawns[index] += Position;
+                for (int index = 0; index < PlayerSpawns.Count; ++index)
+                    PlayerSpawns[index] += Position.ToVector2();
             }
         }
     }

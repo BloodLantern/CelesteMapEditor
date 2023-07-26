@@ -1,8 +1,9 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+﻿using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Xml;
 
 namespace Editor
@@ -10,24 +11,8 @@ namespace Editor
     public static class Calc
     {
         public static Random Random = new();
-
-        public static string ReadNullTerminatedString(this BinaryReader stream)
-        {
-            string str = "";
-            char ch;
-            while ((ch = stream.ReadChar()) != char.MinValue)
-                str += ch.ToString();
-            return str;
-        }
-
-        public static System.Drawing.Bitmap ToBitmap(this Image<Rgba32> image)
-        {
-            using (MemoryStream memoryStream = new())
-            {
-                image.SaveAsBmp(memoryStream);
-                return new System.Drawing.Bitmap(memoryStream);
-            };
-        }
+        public const float DefaultFrameDuration = 1f / 60f;
+        private const string Hex = "0123456789ABCDEF";
 
         public static int Clamp(int value, int min, int max)
         {
@@ -36,61 +21,49 @@ namespace Editor
             return value;
         }
 
-        public static Point Position(this Rectangle self)
-        {
-            return new Point(self.X, self.Y);
-        }
-
-        public static Size Size(this Rectangle self)
-        {
-            return new Size(self.Width, self.Height);
-        }
-
-        public static Point[] ToPointArray(this Rectangle self)
-        {
-            Point position = self.Position();
-            return new Point[] {
-                position,
-                position + new Size(self.Width, 0),
-                position + self.Size(),
-                position + new Size(0, self.Height)
-            };
-        }
-
-        public static PointF[] ToPointFArray(this Rectangle self)
-        {
-            PointF position = self.Position();
-            return new PointF[] {
-                position,
-                position + new SizeF(self.Width, 0),
-                position + self.Size(),
-                position + new SizeF(0, self.Height)
-            };
-        }
-
-        public static PointF Position(this RectangleF self)
-        {
-            return new PointF(self.X, self.Y);
-        }
-
-        public static SizeF Size(this RectangleF self)
-        {
-            return new SizeF(self.Width, self.Height);
-        }
-
-        public static int Round(float value)
-        {
-            return (int) MathF.Round(value);
-        }
-
         public static XmlDocument LoadContentXML(string filename)
         {
             XmlDocument xmlDocument = new();
-            using (StreamReader inStream = new(Path.Combine(Session.CurrentSession.CelesteContentDirectory, filename)))
+            using (StreamReader inStream = new(Path.Combine(Session.Current.CelesteContentDirectory, filename)))
                 xmlDocument.Load(inStream);
             return xmlDocument;
         }
 
-        public static T Choose<T>(this Random random, List<T> choices) => choices[random.Next(choices.Count)];
+        public static T GiveMe<T>(int index, T a, T b)
+        {
+            if (index == 0)
+                return a;
+            if (index != 1)
+                throw new Exception("Index was out of range");
+            return b;
+        }
+
+        public static byte HexToByte(char c) => (byte) Hex.IndexOf(char.ToUpper(c));
+
+        public static Color HexToColor(string hex)
+        {
+            int prefixLength = 0;
+            if (hex.Length >= 1 && hex[0] == '#')
+                prefixLength = 1;
+
+            if (hex.Length - prefixLength >= 6)
+            {
+                float r = (HexToByte(hex[prefixLength]) * 16 + HexToByte(hex[prefixLength + 1])) / (float) byte.MaxValue;
+                float g = (HexToByte(hex[prefixLength + 2]) * 16 + HexToByte(hex[prefixLength + 3])) / (float) byte.MaxValue;
+                float b = (HexToByte(hex[prefixLength + 4]) * 16 + HexToByte(hex[prefixLength + 5])) / (float) byte.MaxValue;
+
+                return new Color(r, g, b);
+            }
+
+            return int.TryParse(hex[prefixLength..], out int result) ? HexToColor(result) : Color.White;
+        }
+
+        public static Color HexToColor(int hex) => new()
+        {
+            A = byte.MaxValue,
+            R = (byte) (hex >> 16),
+            G = (byte) (hex >> 8),
+            B = (byte) hex
+        };
     }
 }

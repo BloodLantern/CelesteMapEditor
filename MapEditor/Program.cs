@@ -1,27 +1,10 @@
-using Editor;
+﻿using Editor;
 using Editor.Logging;
-using System;
-using System.Diagnostics;
-using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 
-namespace MapEditor
-{
-    internal static class Program
-    {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Logger.AddDefaultLoggingFiles();
+Logger.AddDefaultLoggingFiles();
 
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new MainWindow());
+using Game game = new MapEditor();
+game.Run();
 
-            Logger.ClearLoggingFiles();
-        }
-    }
-}
+Logger.ClearLoggingFiles();

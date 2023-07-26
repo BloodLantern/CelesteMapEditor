@@ -14,7 +14,6 @@ namespace Editor.Logging
         {
             AddLatestLoggingFile();
             AddDefaultLoggingFile();
-            //logFiles.Add(Console.Out as StreamWriter);
         }
 
         public static void AddLatestLoggingFile()

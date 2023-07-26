@@ -1,119 +1,233 @@
-﻿using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using System.Diagnostics;
-using System.Numerics;
-using System.Windows.Forms;
+﻿using Editor.Celeste;
+using Editor.Utils;
+using ImGuiNET;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Input;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Editor
 {
-    public class MapViewer : Control
+    public class MapViewer
     {
+        private const float ZoomAnimationDuration = 0.25f;
         public Session Session;
-        public Image<Rgba32> CurrentImage;
-        public RectangleF CameraBounds;
+        public MapEditor MapEditor;
+        public Map CurrentMap;
+        public Camera Camera;
 
-        public Point? ClickStartPosition;
-        public PointF? CameraStartPosition;
-        public Vector2 dragDelta;
-        public bool Dragging => ClickStartPosition != null && CameraStartPosition != null;
+        private Point2? cameraStartPosition;
+        private Point? clickStartPosition;
+        private bool Dragging => cameraStartPosition.HasValue && clickStartPosition.HasValue;
+        private Vector2 dragDelta;
 
-        private static readonly Color debugTextBackgroundColor = Color.ParseHex("#10101050");
-        private long lastDrawImageTime = 0;
+        private List<Level> visibleLevels;
+        private List<Rectangle> visibleFillers;
+        private readonly List<Entity> visibleEntities = new();
+        private readonly List<Vector2> visiblePlayerSpawns = new();
 
-        public MapViewer(Session session)
+        public static readonly Point PlayerSpawnSize = new(13, 17);
+        private static readonly Point PlayerSpawnOffset = new(-PlayerSpawnSize.X / 2, -PlayerSpawnSize.Y);
+        private readonly Texture playerSpawnSprite;
+
+        private Entity selectedEntity;
+
+        public MapViewer(MapEditor mapEditor, Vector2 size)
         {
-            DoubleBuffered = true;
+            MapEditor = mapEditor;
+            Session = mapEditor.Session;
+            Camera = new(-size / 2, size);
 
-            Session = session;
-
-            Location = new System.Drawing.Point(250, 24);
-            Margin = new Padding(4, 3, 4, 3);
-            Name = "MapViewer";
-            Size = new System.Drawing.Size(1225, 762);
-            TabIndex = 4;
-            TabStop = false;
-            CameraBounds = new RectangleF(-Width / 2, -Height / 2, Width, Height);
+            playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
 
-        /// <summary>
-        /// Updates the map viewer.
-        /// </summary>
-        /// <param name="mouseButtons">The current pressed mouse buttons.</param>
-        /// <param name="mousePosition">The current mouse position.</param>
-        /// <returns>Whether the map viewer should be rendered.</returns>
-        public bool Update(MouseButtons mouseButtons, Point mousePosition)
+        public void Update(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
-            if ((mouseButtons & MouseButtons.Right) == 0)
+            visibleLevels = CurrentMap.GetVisibleLevels(Camera.Bounds);
+            visibleFillers = CurrentMap.GetVisibleFillers(Camera.Bounds);
+            visibleEntities.Clear();
+            visiblePlayerSpawns.Clear();
+            foreach (Level level in visibleLevels)
             {
-                ClickStartPosition = null;
-                CameraStartPosition = null;
+                visibleEntities.AddRange(level.GetVisibleEntities(Camera.Bounds));
+                visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(Camera.Bounds));
             }
 
-            if (!Dragging)
-            {
-                ClickStartPosition = mousePosition;
-                CameraStartPosition = new PointF(CameraBounds.X, CameraBounds.Y);
-            }
-
-            if (ClickStartPosition.HasValue
-                && (ClickStartPosition.Value.X < 0
-                || ClickStartPosition.Value.Y < 0
-                || ClickStartPosition.Value.X >= Width
-                || ClickStartPosition.Value.Y >= Height))
-                return false;
-
-            dragDelta = new(ClickStartPosition.Value.X - mousePosition.X, ClickStartPosition.Value.Y - mousePosition.Y);
-
-            CameraBounds = new RectangleF(((PointF) CameraStartPosition).X + dragDelta.X, ((PointF) CameraStartPosition).Y + dragDelta.Y,
-                Width, Height);
-
-            return true;
-        }
-        
-        public void Render()
-        {
-            if (Session.CurrentMap == null)
+            ImGuiIOPtr imGuiIO = ImGui.GetIO();
+            if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
                 return;
 
-            Image<Rgba32> result = new(Width, Height, Color.DarkSlateGray);
+            HandleInputs(time, mouse, keyboard);
+        }
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            Session.CurrentMap.Render(CameraBounds, result);
-            long time = stopwatch.ElapsedMilliseconds;
-
-            if (Session.Config.ShowDebugInfo)
+        private void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        {
+            if (mouse.IsButtonUp(Session.Config.CameraMoveButton))
             {
-                int yPosition = 0;
-                result.Mutate(
-                    i => i.Fill(debugTextBackgroundColor, new RectangleF(0, 0, 500, 120))
-                    .DrawText($"Camera bounds: {CameraBounds}", Session.DebugTextFont, Color.White, new PointF(0, yPosition))
-                    .DrawText($"Time to render to image: {time}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
-                    .DrawText($"Time to render to window: {lastDrawImageTime}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
-                    .DrawText($"Approximate FPS: {1f / ((time + lastDrawImageTime) / 1000f)}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
-                    .DrawText($"Target FPS: {Session.Config.MapViewerRefreshRate}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
-                    .DrawText($"Mouse position: {MousePosition}", Session.DebugTextFont, Color.White, new PointF(0, yPosition += 15))
-                );
+                cameraStartPosition = null;
+                clickStartPosition = null;
+            }
+            else if (!Dragging)
+            {
+                cameraStartPosition = Camera.Position;
+                clickStartPosition = mouse.Position;
+            }
+            
+            // If the click started inside the window
+            if (clickStartPosition.HasValue && new RectangleF(Point.Zero, MapEditor.WindowSize).Contains(clickStartPosition.Value))
+            {
+                if (Dragging)
+                    dragDelta = (mouse.Position - clickStartPosition.Value).ToVector2() / Camera.Zoom;
+
+                if (cameraStartPosition.HasValue)
+                    Camera.Position = cameraStartPosition.Value - dragDelta;
             }
 
-            CurrentImage = result;
+            if (mouse.WasButtonJustDown(Session.Config.SelectButton))
+                selectedEntity = GetEntityAt(Camera.WindowToMap(mouse.Position).ToVector2());
 
-            Invalidate();
-            Update();
+            if (mouse.DeltaScrollWheelValue != 0)
+            {
+                if (currentZoomRoutineId.HasValue && Coroutine.IsRunning(currentZoomRoutineId.Value))
+                    Coroutine.Stop(currentZoomRoutineId.Value);
+
+                currentZoomRoutineId = Coroutine.Start(
+                    ZoomRoutine(time, mouse, MathF.Pow(Session.Config.ZoomFactor, -mouse.DeltaScrollWheelValue / 120))
+                );
+            }
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        private Guid? currentZoomRoutineId;
+        private float currentZoomTarget = Camera.DefaultZoom;
+        private IEnumerator ZoomRoutine(GameTime time, MouseStateExtended mouse, float factor)
         {
-            base.OnPaint(e);
-
-            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            e.Graphics.DrawImageUnscaled(CurrentImage.ToBitmap(), System.Drawing.Point.Empty);
-            lastDrawImageTime = stopwatch.ElapsedMilliseconds;
+            float oldZoom = Camera.Zoom;
+            currentZoomTarget *= factor;
+            for (float timer = 0f; timer < ZoomAnimationDuration; timer += time.GetElapsedSeconds())
+            {
+                Vector2 oldMouseMapPosition = Camera.WindowToMap(mouse.Position.ToVector2());
+                Camera.Zoom = MathHelper.Lerp(oldZoom, currentZoomTarget, Ease.QuadOut(Math.Min(timer, ZoomAnimationDuration) / ZoomAnimationDuration));
+                Camera.Position += oldMouseMapPosition - Camera.WindowToMap(mouse.Position.ToVector2());
+                yield return null;
+            }
         }
+
+        public Level GetLevelAt(Vector2 mapPosition)
+        {
+            foreach (Level level in visibleLevels)
+            {
+                if (level.Bounds.Contains(mapPosition))
+                    return level;
+            }
+            return null;
+        }
+
+        public Entity GetEntityAt(Vector2 mapPosition)
+        {
+            foreach (Entity entity in visibleEntities)
+            {
+                if (entity.Bounds.Contains(mapPosition))
+                    return entity;
+            }
+            return null;
+        }
+
+        public void Render(SpriteBatch spriteBatch)
+        {
+            if (Session.Config.DebugMode)
+            {
+                foreach (Level level in visibleLevels)
+                    level.RenderDebug(spriteBatch, Camera);
+
+                foreach (Rectangle filler in visibleFillers)
+                    RenderDebugFiller(spriteBatch, Camera, filler);
+
+                foreach (Vector2 playerSpawn in visiblePlayerSpawns)
+                    RenderDebugPlayerSpawn(spriteBatch, Camera, playerSpawn);
+            }
+
+            foreach (Vector2 playerSpawn in visiblePlayerSpawns)
+                RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
+
+            foreach (Entity entity in visibleEntities)
+                entity.Render(spriteBatch, Camera);
+
+            foreach (Level level in visibleLevels)
+                level.Render(spriteBatch, Camera);
+
+            // Draw filler tiles
+        }
+
+        public void RenderPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
+            => playerSpawnSprite.Render(spriteBatch, camera, position + PlayerSpawnOffset.ToVector2());
+
+        public void RenderDebugPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
+            => spriteBatch.DrawRectangle(new RectangleF(camera.MapToWindow(position + PlayerSpawnOffset.ToVector2()), PlayerSpawnSize.Mul(camera.Zoom)), Color.DarkGreen);
+
+        public void RenderDebugFiller(SpriteBatch spriteBatch, Camera camera, Rectangle filler)
+            => spriteBatch.DrawRectangle(new RectangleF(Camera.MapToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)), Color.Brown);
+
+        public void RenderDebug()
+        {
+            MouseStateExtended mouseState = MouseExtended.GetState();
+            Point mousePosition = mouseState.Position;
+            Point mouseMapPosition = Camera.WindowToMap(mousePosition);
+            Entity hoveredEntity = GetEntityAt(mouseMapPosition.ToVector2());
+            Level hoveredLevel = GetLevelAt(mouseMapPosition.ToVector2());
+
+            ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
+            ImGui.Checkbox("Debug mode", ref Session.Config.DebugMode);
+            ImGui.Text($"Mouse window position: {mousePosition}");
+            ImGui.Text($"Mouse map position: {mouseMapPosition}");
+            ImGui.Text("Mouse level position: " + (hoveredLevel != null ? (mouseMapPosition - hoveredLevel.Position).ToString() : "N/A"));
+            ImGui.Text($"Camera bounds: {Camera.Bounds}");
+            if (ImGui.Button("Reset"))
+                Camera.Zoom = Camera.DefaultZoom;
+            ImGui.SameLine();
+            ImGui.Text($"Camera zoom factor: {Camera.Zoom}");
+
+            if (selectedEntity != null)
+            {
+                ImGui.Text($"Selected entity name: {selectedEntity.Name}");
+                ImGui.Text($"Selected entity level position: {selectedEntity.Position}");
+                ImGui.Text($"Selected entity absolute position: {selectedEntity.AbsolutePosition}");
+                ImGui.Text($"Selected entity relative position: {selectedEntity.AbsolutePosition - Camera.Position}");
+                ImGui.Text($"Selected entity origin: {selectedEntity.EntityData.Origin}");
+                ImGui.Text($"Selected entity size: {selectedEntity.Size}");
+            }
+
+            ImGui.Text($"Visible levels: {visibleLevels.Count}");
+            ImGui.Text($"Visible fillers: {visibleFillers.Count}");
+            ImGui.Text($"Visible entities: {visibleEntities.Count}");
+            if (ImGui.TreeNode($"Visible entities list"))
+            {
+                for (int i = 0; i < visibleEntities.Count; i++)
+                {
+                    Entity entity = visibleEntities[i];
+                    if (ImGui.TreeNode($"{i}. {entity}"))
+                    {
+                        entity.DebugInfo();
+
+                        ImGui.TreePop();
+                    }
+                }
+
+                ImGui.TreePop();
+            }
+
+            ImGui.End();
+        }
+
+        public static Point ToTilePosition(Point position) => position.Div(Tileset.TileSize);
+
+        public static Vector2 ToTilePosition(Vector2 position) => position / Tileset.TileSize;
+
+        public static Point ToPixelPosition(Point position) => position.Mul(Tileset.TileSize);
+
+        public static Vector2 ToPixelPosition(Vector2 position) => position * Tileset.TileSize;
     }
 }

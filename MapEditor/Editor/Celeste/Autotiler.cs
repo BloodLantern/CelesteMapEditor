@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms.VisualStyles;
 using System.Xml;
 
 namespace Editor.Celeste
@@ -187,7 +186,7 @@ namespace Editor.Celeste
             int tilesY,
             string data)
         {
-            Regex lineSeparator = LineSeparatorRegex();
+            Regex lineSeparator = new("\\n|\\r|\\r\\n|\\n\\r");
 
             TileGrid result = new(tilesX, tilesY);
 
@@ -240,8 +239,5 @@ namespace Editor.Celeste
             BackgroundTiles = new(Path.Combine(celesteGraphicsDirectory, "BackgroundTiles.xml"));
             AnimatedTiles = new(Path.Combine(celesteGraphicsDirectory, "AnimatedTiles.xml"));
         }
-
-        [GeneratedRegex("\\n|\\r|\\r\\n|\\n\\r")]
-        private static partial Regex LineSeparatorRegex();
     }
 }

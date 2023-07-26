@@ -1,10 +1,11 @@
-﻿using Editor.Celeste;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame;
+using Editor.Celeste;
 using System.Collections.Generic;
-using System.Numerics;
+using MonoGame.Extended;
+using Editor.Entities;
+using Editor.Utils;
 
 namespace Editor
 {
@@ -15,6 +16,7 @@ namespace Editor
         public TileGrid ForegroundTiles { get; private set; }
         public TileGrid BackgroundTiles { get; private set; }
 
+        public List<Vector2> PlayerSpawns => LevelData.PlayerSpawns;
         public Rectangle Bounds => LevelData.Bounds;
         public Point Position => LevelData.Position;
 
@@ -23,45 +25,45 @@ namespace Editor
             LevelData = data;
 
             foreach (EntityData entityData in LevelData.Entities)
-                Entities.Add(new(entityData, this));
+            {
+                Entity entity;
+
+                string shortName = entityData.Name;
+                if (shortName.StartsWith("spikes"))
+                    shortName = "spikes";
+                else if (shortName.ToLower().Contains("spring"))
+                    shortName = "spring";
+
+                entity = shortName switch
+                {
+                    "spinner" => new Spinner(entityData, this),
+                    "spikes" => new Spikes(entityData, this),
+                    "jumpThru" => new JumpThru(entityData, this),
+                    "spring" => new Spring(entityData, this),
+                    _ => new(entityData, this)
+                };
+                entity.UpdateTexture();
+                Entities.Add(entity);
+            }
 
             ForegroundTiles = Autotiler.ForegroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.ForegroundTiles);
             BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
         }
 
-        /// <summary>
-        /// Renders this Level to the passed Image, only rendering the entities
-        /// located inside the given RectangleF.
-        /// </summary>
-        /// <param name="cameraBounds">
-        /// The RectangleF representing the camera bounds. The entities are only rendered
-        /// if they are located inside this rectangle.
-        /// </param>
-        /// <param name="image">The image to render to.</param>
-        /// <returns>The number of entities that were rendered.</returns>
-        public void Render(RectangleF cameraBounds, Image<Rgba32> image)
+        public void Render(SpriteBatch spriteBatch, Camera camera)
         {
-            PointF relativePosition = new(Position.X - cameraBounds.X, Position.Y - cameraBounds.Y);
-
-            if (Session.CurrentSession.Config.ShowDebugInfo)
-                image.Mutate(o => o.DrawPolygon(Color.Magenta, 2,
-                    new PointF(relativePosition.X, relativePosition.Y),
-                    new PointF(relativePosition.X + Bounds.Width, relativePosition.Y),
-                    new PointF(relativePosition.X + Bounds.Width, relativePosition.Y + Bounds.Height),
-                    new PointF(relativePosition.X, relativePosition.Y + Bounds.Height)));
-
-            foreach (Entity entity in Entities)
-            {
-                if (entity.AbsolutePosition.X >= cameraBounds.Right
-                    || entity.AbsolutePosition.Y >= cameraBounds.Bottom
-                    || entity.AbsolutePosition.X + entity.Size.Width < cameraBounds.Left
-                    || entity.AbsolutePosition.Y + entity.Size.Height < cameraBounds.Top)
-                    continue;
-
-                entity.Render(cameraBounds, image);
-            }
-
-            ForegroundTiles.Render(cameraBounds, image, Position);
+            ForegroundTiles.Render(spriteBatch, camera, Position.ToVector2());
         }
+
+        public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
+            => spriteBatch.DrawRectangle(
+                new RectangleF(camera.MapToWindow(Position.ToVector2()), Bounds.Size.Mul(camera.Zoom)),
+                Color.Magenta
+            );
+
+        public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.Bounds));
+
+        public IEnumerable<Vector2> GetVisiblePlayerSpawns(RectangleF cameraBounds)
+            => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn, MapViewer.PlayerSpawnSize)));
     }
 }

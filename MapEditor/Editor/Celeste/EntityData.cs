@@ -1,8 +1,7 @@
-﻿using Editor.Utils;
-using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
+using Editor.Utils;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Numerics;
 
 namespace Editor.Celeste
 {
@@ -16,7 +15,7 @@ namespace Editor.Celeste
         /// </summary>
         public Vector2 Position;
         public Vector2 Origin;
-        public Size Size;
+        public Point Size;
         public Vector2[] Nodes;
         public Dictionary<string, object> Values = new();
 
