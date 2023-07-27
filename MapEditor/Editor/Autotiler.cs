@@ -1,4 +1,8 @@
-﻿using Editor.Extensions;
+﻿using Editor.Celeste;
+using Editor.Extensions;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,9 +10,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace Editor.Celeste
+namespace Editor
 {
-    public partial class Autotiler
+    public class Autotiler
     {
         /// <summary>
         /// THe object representation of a tileset's XML data.
@@ -20,28 +24,34 @@ namespace Editor.Celeste
             public List<MaskedTile> Masked = new();
             public Tile Padded = new();
             public Tile Center = new();
+            public Tileset Tileset;
 
-            public TerrainType(char id) => ID = id;
+            public TerrainType(char id, Tileset tileset)
+            {
+                ID = id;
+                Tileset = tileset;
+            }
 
             public Texture GetTileFromMask(byte[] mask)
             {
                 Tile result = null;
 
-                for (int i = 0; i < mask.Length; i++)
+                for (int i = 0; i < 3 * 3; i++)
                 {
-                    // The tile is neither padded nor centered if its mask has at least one empty tile
-                    if (mask[i] is 0 or 2)
+                    // The tile is neither padded nor centered if its 3x3 mask has at least one empty tile
+                    if (mask[i + (3 + i / 3) * 2] == 0)
                     {
                         for (int j = 0; j < Masked.Count; j++)
                         {
                             bool same = true;
-                            for (int k = 0; k < 3 * 3;  k++)
+                            for (int k = 0; k < 3 * 3; k++)
                             {
-                                byte currentMask = Masked.ElementAt(j).Mask[k];
-                                if (currentMask == 2 || mask[k] == 2)
+                                byte currentMask = Masked[j].Mask[k];
+                                int maskIndex = k + (3 + k / 3) * 2;
+                                if (currentMask == 2 || mask[maskIndex] == 2)
                                     continue;
 
-                                if (currentMask != mask[k])
+                                if (currentMask != mask[maskIndex])
                                 {
                                     same = false;
                                     break;
@@ -49,10 +59,20 @@ namespace Editor.Celeste
                             }
 
                             if (same)
-                                result = Masked.ElementAt(j).Tile;
+                                result = Masked[j].Tile;
                         }
                         break;
                     }
+                }
+
+                // If it is considered as a center tile, check if it is instead a padded one
+                if (result == null)
+                {
+                    if (mask[2] == 0
+                        || mask[10] == 0
+                        || mask[14] == 0
+                        || mask[22] == 0)
+                        result = Padded;
                 }
 
                 result ??= Center;
@@ -60,11 +80,18 @@ namespace Editor.Celeste
                 return Calc.Random.Choose(result.Textures);
             }
 
-            public bool Links(char c)
+            public byte GetMask(char otherId)
             {
-                if (ID == c)
-                    return true;
-                return Ignores.Contains(c) || Ignores.Contains('*');
+                if (otherId is '0' or char.MinValue)
+                    return 0;
+
+                if (otherId == ID)
+                    return 1;
+
+                if (Ignores.Contains('*') || Ignores.Contains(otherId))
+                    return 0;
+
+                return 1;
             }
         }
 
@@ -94,7 +121,7 @@ namespace Editor.Celeste
             {
                 char id = tilesetXml.AttrChar("id");
                 Tileset tileset = new(Atlas.Gameplay["tilesets/" + tilesetXml.Attr("path")]);
-                TerrainType data = new(id);
+                TerrainType data = new(id, tileset);
 
                 ReadInto(data, tileset, tilesetXml);
 
@@ -121,9 +148,9 @@ namespace Editor.Celeste
             }
         }
 
-        private void ReadInto(TerrainType data, Tileset tileset, XmlElement xml)
+        private static void ReadInto(TerrainType data, Tileset tileset, XmlElement xml)
         {
-            foreach (object tilesetXmlObj in (XmlNode) xml)
+            foreach (object tilesetXmlObj in (XmlNode)xml)
             {
                 if (tilesetXmlObj is not XmlComment)
                 {
@@ -147,8 +174,12 @@ namespace Editor.Celeste
                         int maskIndex = 0;
                         for (int i = 0; i < mask.Length; i++)
                         {
-                            if (mask[i] is '0' or '1' or 'x' or 'X' or '*')
-                                maskedTile.Mask[maskIndex++] = GetMask(mask[i]);
+                            if (mask[i] == '0')
+                                maskedTile.Mask[maskIndex++] = 0;
+                            else if (mask[i] == '1')
+                                maskedTile.Mask[maskIndex++] = 1;
+                            else if (mask[i] is 'x' or 'X')
+                                maskedTile.Mask[maskIndex++] = 2;
                         }
 
                         data.Masked.Add(maskedTile);
@@ -207,20 +238,21 @@ namespace Editor.Celeste
                     if (IsEmpty(tile))
                         continue;
 
-                    byte[] mask = new byte[3 * 3];
-                    for (int i = 0; i < 3; i++)
-                    {
-                        for (int j = 0; j < 3; j++)
-                        {
-                            // I don't know why 'i' and 'j' should be reversed here but it works
-                            int tileX = Math.Clamp(x + j - 1, 0, tiles.GetLength(0) - 1);
-                            int tileY = Math.Clamp(y + i - 1, 0, tiles.GetLength(1) - 1);
+                    TerrainType terrainType = lookup[tile];
 
-                            mask[i * 3 + j] = GetMaskFromIds(tile, tiles[tileX, tileY]);
+                    byte[] mask = new byte[5 * 5];
+                    for (int i = 0; i < 5; i++)
+                    {
+                        for (int j = 0; j < 5; j++)
+                        {
+                            int tileX = Math.Clamp(x + j - 2, 0, tiles.GetLength(0) - 1);
+                            int tileY = Math.Clamp(y + i - 2, 0, tiles.GetLength(1) - 1);
+
+                            mask[i * 5 + j] = terrainType.GetMask(tiles[tileX, tileY]);
                         }
                     }
 
-                    result.Tiles[x, y] = lookup[tile].GetTileFromMask(mask);
+                    result.Tiles[x, y] = terrainType.GetTileFromMask(mask);
                 }
             }
 
@@ -228,10 +260,6 @@ namespace Editor.Celeste
         }
 
         private static bool IsEmpty(char id) => id is '0' or char.MinValue;
-
-        private byte GetMask(char mask) => GetMaskFromIds('1', mask);
-
-        private static byte GetMaskFromIds(char id, char maskId) => (byte) (maskId == '0' ? 0 : (id == maskId ? 1 : 2));
 
         public static void LoadAutotilers(string celesteGraphicsDirectory)
         {

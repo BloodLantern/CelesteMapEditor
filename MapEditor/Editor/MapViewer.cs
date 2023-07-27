@@ -40,6 +40,7 @@ namespace Editor
         {
             MapEditor = mapEditor;
             Session = mapEditor.Session;
+
             Camera = new(Vector2.Zero, 0.00001f);
             Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
 
