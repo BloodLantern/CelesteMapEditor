@@ -35,15 +35,11 @@ namespace Editor
             }
         }
 
-        public Camera(RectangleF bounds, float zoom = DefaultZoom)
+        public Camera(Vector2 centerPosition, float zoom = DefaultZoom)
         {
-            Bounds = bounds;
+            Vector2 size = ZoomToSize(zoom);
+            Bounds = new(centerPosition - size / 2, size);
             TargetZoom = this.zoom = zoom;
-        }
-
-        public Camera(Vector2 position, Vector2 size, float zoom = DefaultZoom)
-            : this(new RectangleF(position, size), zoom)
-        {
         }
 
         public void MoveTo(Vector2 targetCenterPosition, float duration = DefaultMoveDuration)
@@ -56,18 +52,10 @@ namespace Editor
         public void ZoomToDefault(float duration = DefaultZoomDuration) => ZoomTo(DefaultZoom, duration);
 
         public void ZoomTo(float targetZoom, float duration = DefaultZoomDuration)
-        {
-            if (zoomRoutineGuid != Guid.Empty && Coroutine.IsRunning(zoomRoutineGuid))
-                Coroutine.Stop(zoomRoutineGuid);
-            zoomRoutineGuid = Coroutine.Start(ZoomRoutine(targetZoom, duration));
-        }
+            => Coroutine.Start(ZoomRoutine(targetZoom, duration), ref zoomRoutineGuid);
 
         public void ZoomTo(Vector2 targetWindowPosition, float targetZoom, float duration = DefaultZoomDuration)
-        {
-            if (zoomRoutineGuid != Guid.Empty && Coroutine.IsRunning(zoomRoutineGuid))
-                Coroutine.Stop(zoomRoutineGuid);
-            zoomRoutineGuid = Coroutine.Start(ZoomRoutine(targetWindowPosition, targetZoom, duration));
-        }
+            => Coroutine.Start(ZoomRoutine(targetWindowPosition, targetZoom, duration), ref zoomRoutineGuid);
 
         private IEnumerator ZoomRoutine(Vector2 targetWindowPosition, float targetZoom, float duration)
         {
@@ -76,15 +64,20 @@ namespace Editor
             TargetZoom = targetZoom;
             float oldZoom = Zoom;
 
+            Vector2 oldMapPosition;
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                Vector2 oldMapPosition = WindowToMap(targetWindowPosition);
+                oldMapPosition = WindowToMap(targetWindowPosition);
 
                 Zoom = Calc.EaseLerp(oldZoom, targetZoom, timer, duration, Ease.QuadOut);
                 Position += oldMapPosition - WindowToMap(targetWindowPosition);
 
                 yield return null;
             }
+
+            oldMapPosition = WindowToMap(targetWindowPosition);
+            Zoom = targetZoom;
+            Position += oldMapPosition - WindowToMap(targetWindowPosition);
         }
 
         private IEnumerator ZoomRoutine(float targetZoom, float duration)
@@ -100,6 +93,8 @@ namespace Editor
 
                 yield return null;
             }
+
+            Zoom = targetZoom;
         }
 
         public void UpdateSize() => Size = ZoomToSize(Zoom);

@@ -58,7 +58,7 @@ namespace Editor
             // If an error occured while creating the Session instance, exit the program
             if (Session.Current == null)
                 Exit();
-            MapViewer = new(this, Window.ClientBounds.Size.ToVector2());
+            MapViewer = new(this);
 
             Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
             TargetElapsedTime = Session.Config.MapViewerRefreshRate;

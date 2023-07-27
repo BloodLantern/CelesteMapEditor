@@ -61,11 +61,32 @@ namespace Editor.Utils
 
         private static readonly Dictionary<Guid, Routine> runningRoutines = new();
 
+        public static int RunningCount => runningRoutines.Count;
+
+        /// <summary>
+        /// Starts a new coroutine, assigning it a <see cref="Guid"/>. Note that the coroutine
+        /// will start running next frame update.
+        /// </summary>
+        /// <param name="routine">The coroutine to start.</param>
+        /// <returns>The newly created <see cref="Guid"/> assigned to the coroutine.</returns>
         public static Guid Start(IEnumerator routine)
         {
             Guid guid = Guid.NewGuid();
             runningRoutines.Add(guid, new(guid, routine));
             return guid;
+        }
+
+        /// <summary>
+        /// Starts a coroutine using an existing coroutine <see cref="Guid"/>, stopping the existing
+        /// coroutine if it is still running and assigning the guid with a newly created one.
+        /// </summary>
+        /// <param name="routine">The coroutine to start.</param>
+        /// <param name="guid">The existing coroutine <see cref="Guid"/> that will be overriden with the new one.</param>
+        public static void Start(IEnumerator routine, ref Guid guid)
+        {
+            if (guid != Guid.Empty && IsRunning(guid))
+                Stop(guid);
+            guid = Start(routine);
         }
 
         internal static void UpdateAll(GameTime time)

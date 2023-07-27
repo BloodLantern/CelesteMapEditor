@@ -1,5 +1,6 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
+using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -35,12 +36,12 @@ namespace Editor
 
         private Entity selectedEntity;
 
-        public MapViewer(MapEditor mapEditor, Vector2 size)
+        public MapViewer(MapEditor mapEditor)
         {
             MapEditor = mapEditor;
             Session = mapEditor.Session;
-            Camera = new(-size / 2, size, 1f);
-            //Camera.ZoomToDefault();
+            Camera = new(Vector2.Zero, 0.00001f);
+            Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
 
             playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
@@ -196,6 +197,8 @@ namespace Editor
 
                 ImGui.TreePop();
             }
+
+            ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
 
             ImGui.End();
         }
