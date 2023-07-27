@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Editor.Utils;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
@@ -65,5 +66,11 @@ namespace Editor
             G = (byte) (hex >> 8),
             B = (byte) hex
         };
+
+        public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
+            => new(MathHelper.Lerp(a.X, b.X, t), MathHelper.Lerp(a.Y, b.Y, t));
+
+        public static float EaseLerp(float a, float b, float t, float duration, Ease.Easer ease)
+            => MathHelper.Lerp(a, b, ease(Math.Min(t, duration) / duration));
     }
 }

@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame;
-using ImGuiNET;
 using System;
 using Editor.ImGuiNet;
 using Editor.Celeste;
@@ -29,7 +26,7 @@ namespace Editor
         public Session Session;
         public MapViewer MapViewer;
         
-        public Point WindowSize => new(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+        public Point WindowSize => new(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
         public MapEditor()
         {
@@ -37,9 +34,14 @@ namespace Editor
                 throw new InvalidOperationException($"There should be only one {nameof(MapEditor)} instance.");
             Instance = this;
 
+            Logger.AddDefaultLoggingFiles();
+
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            Window.ClientSizeChanged += OnWindowResize;
+            Window.FileDrop += OnFileDrop;
         }
 
         protected override void Initialize()
@@ -109,6 +111,7 @@ namespace Editor
             base.EndRun();
 
             Session.Exit();
+            Logger.ClearLoggingFiles();
         }
 
         public Map LoadMap(string filepath)
@@ -151,6 +154,13 @@ namespace Editor
             MapViewer.Render();*/
 
             return result;
+        }
+
+        private void OnWindowResize(object sender, EventArgs e) => MapViewer?.Camera.UpdateSize();
+
+        private void OnFileDrop(object sender, FileDropEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

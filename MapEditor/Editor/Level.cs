@@ -5,7 +5,7 @@ using Editor.Celeste;
 using System.Collections.Generic;
 using MonoGame.Extended;
 using Editor.Entities;
-using Editor.Utils;
+using Editor.Extensions;
 
 namespace Editor
 {

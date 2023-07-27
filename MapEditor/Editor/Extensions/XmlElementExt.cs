@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Xml;
 
-namespace Editor.Utils
+namespace Editor.Extensions
 {
     public static class XmlElementExt
     {

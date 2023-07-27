@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Editor.Utils
+namespace Editor.Extensions
 {
     public static class BinaryReaderExt
     {

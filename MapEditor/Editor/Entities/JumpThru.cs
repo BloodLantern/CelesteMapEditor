@@ -1,5 +1,5 @@
 ﻿using Editor.Celeste;
-using Editor.Utils;
+using Editor.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

@@ -1,5 +1,5 @@
 ﻿using Editor.Celeste;
-using Editor.Utils;
+using Editor.Extensions;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,7 +14,6 @@ namespace Editor
 {
     public class MapViewer
     {
-        private const float ZoomAnimationDuration = 0.25f;
         public Session Session;
         public MapEditor MapEditor;
         public Map CurrentMap;
@@ -40,7 +39,8 @@ namespace Editor
         {
             MapEditor = mapEditor;
             Session = mapEditor.Session;
-            Camera = new(-size / 2, size);
+            Camera = new(-size / 2, size, 1f);
+            //Camera.ZoomToDefault();
 
             playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
@@ -91,29 +91,7 @@ namespace Editor
                 selectedEntity = GetEntityAt(Camera.WindowToMap(mouse.Position).ToVector2());
 
             if (mouse.DeltaScrollWheelValue != 0)
-            {
-                if (currentZoomRoutineId.HasValue && Coroutine.IsRunning(currentZoomRoutineId.Value))
-                    Coroutine.Stop(currentZoomRoutineId.Value);
-
-                currentZoomRoutineId = Coroutine.Start(
-                    ZoomRoutine(time, mouse, MathF.Pow(Session.Config.ZoomFactor, -mouse.DeltaScrollWheelValue / 120))
-                );
-            }
-        }
-
-        private Guid? currentZoomRoutineId;
-        private float currentZoomTarget = Camera.DefaultZoom;
-        private IEnumerator ZoomRoutine(GameTime time, MouseStateExtended mouse, float factor)
-        {
-            float oldZoom = Camera.Zoom;
-            currentZoomTarget *= factor;
-            for (float timer = 0f; timer < ZoomAnimationDuration; timer += time.GetElapsedSeconds())
-            {
-                Vector2 oldMouseMapPosition = Camera.WindowToMap(mouse.Position.ToVector2());
-                Camera.Zoom = MathHelper.Lerp(oldZoom, currentZoomTarget, Ease.QuadOut(Math.Min(timer, ZoomAnimationDuration) / ZoomAnimationDuration));
-                Camera.Position += oldMouseMapPosition - Camera.WindowToMap(mouse.Position.ToVector2());
-                yield return null;
-            }
+                Camera.ZoomTo(mouse.Position.ToVector2(), Camera.TargetZoom * MathF.Pow(Session.Config.ZoomFactor, -mouse.DeltaScrollWheelValue / 120));
         }
 
         public Level GetLevelAt(Vector2 mapPosition)
@@ -186,7 +164,7 @@ namespace Editor
             ImGui.Text("Mouse level position: " + (hoveredLevel != null ? (mouseMapPosition - hoveredLevel.Position).ToString() : "N/A"));
             ImGui.Text($"Camera bounds: {Camera.Bounds}");
             if (ImGui.Button("Reset"))
-                Camera.Zoom = Camera.DefaultZoom;
+                Camera.ZoomToDefault();
             ImGui.SameLine();
             ImGui.Text($"Camera zoom factor: {Camera.Zoom}");
 
