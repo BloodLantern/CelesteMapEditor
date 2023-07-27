@@ -31,6 +31,8 @@ namespace Editor
 
         public Vector2 Origin = Vector2.Zero;
 
+        public float Rotation = 0f;
+
         public Texture(string name)
         {
             Name = name;
@@ -212,16 +214,16 @@ namespace Editor
         public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset)
             => Render(spriteBatch, camera, offset, Color.White);
 
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f, float rotation = 0f)
-            => Render(spriteBatch, camera, offset, color, new Vector2(scale), rotation);
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f)
+            => Render(spriteBatch, camera, offset, color, new Vector2(scale));
 
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale, float rotation = 0f)
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale)
             => spriteBatch.Draw(
                 Image,
                 camera.MapToWindow(offset),
                 ClipRect,
                 color,
-                rotation,
+                Rotation,
                 Origin - DrawOffset.ToVector2(),
                 scale * camera.Zoom,
                 SpriteEffects.None,

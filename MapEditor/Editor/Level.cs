@@ -24,6 +24,7 @@ namespace Editor
 
         public readonly LevelData LevelData;
         public readonly List<Entity> Entities = new();
+        public readonly List<Spinner.BackgroundSpinner> BackgroundSpinners = new();
         public readonly TileGrid ForegroundTiles;
         public readonly TileGrid BackgroundTiles;
         public readonly List<Decal> ForegroundDecals = new();
@@ -60,6 +61,17 @@ namespace Editor
                 Entities.Add(entity);
             }
 
+            foreach (Entity entity in Entities)
+            {
+                if (entity is Spinner spinner)
+                {
+                    spinner.CreateBackgroundSpinners(Entities, BackgroundSpinners);
+                }
+            }
+
+            foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
+                bgSpinner.UpdateTexture();
+
             ForegroundTiles = Autotiler.ForegroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.ForegroundTiles);
             BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
 
@@ -75,6 +87,7 @@ namespace Editor
         {
             Vector2 position = Position.ToVector2();
             ForegroundTiles.Render(spriteBatch, camera, position);
+
             foreach (Decal decal in ForegroundDecals)
                 decal.Render(spriteBatch, camera, position);
         }
@@ -83,8 +96,12 @@ namespace Editor
         {
             Vector2 position = Position.ToVector2();
             BackgroundTiles.Render(spriteBatch, camera, position);
+
             foreach (Decal decal in BackgroundDecals)
                 decal.Render(spriteBatch, camera, position);
+
+            foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
+                bgSpinner.Render(spriteBatch, camera);
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)

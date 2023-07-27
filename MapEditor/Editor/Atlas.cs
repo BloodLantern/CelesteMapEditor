@@ -65,5 +65,35 @@ namespace Editor.Celeste
         {
             get => Textures[key];
         }
+
+        public List<Texture> GetAtlasSubtextures(string key)
+        {
+            List<Texture> subtextures = new();
+            for (int i = 0; ; i++)
+            {
+                Texture subtexture = GetAtlasSubtextureFromAtlasAt(key, i);
+
+                if (subtexture == null)
+                    break;
+
+                subtextures.Add(subtexture);
+            }
+            return subtextures;
+        }
+
+        private Texture GetAtlasSubtextureFromAtlasAt(string key, int index)
+        {
+            if (index == 0 && Textures.ContainsKey(key))
+                return Textures[key];
+
+            string indexStr = index.ToString();
+            for (int length = indexStr.Length; indexStr.Length < length + 6; indexStr = "0" + indexStr)
+            {
+                if (Textures.TryGetValue(key + indexStr, out Texture subtextureFromAtlasAt))
+                    return subtextureFromAtlasAt;
+            }
+
+            return null;
+        }
     }
 }
