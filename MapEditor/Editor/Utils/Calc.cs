@@ -67,10 +67,34 @@ namespace Editor
             B = (byte) hex
         };
 
+        public static Color HsvToColor(float hue, float s, float v)
+        {
+            int angle = (int) (hue * 360f);
+            float num2 = s * v;
+            float num3 = num2 * (1f - Math.Abs(angle / 60f % 2f - 1f));
+            float num4 = v - num2;
+            if (angle < 60)
+                return new Color(num4 + num2, num4 + num3, num4);
+            if (angle < 120)
+                return new Color(num4 + num3, num4 + num2, num4);
+            if (angle < 180)
+                return new Color(num4, num4 + num2, num4 + num3);
+            if (angle < 240)
+                return new Color(num4, num4 + num3, num4 + num2);
+            return angle < 300 ? new Color(num4 + num3, num4, num4 + num2) : new Color(num4 + num2, num4, num4 + num3);
+        }
+
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
             => new(MathHelper.Lerp(a.X, b.X, t), MathHelper.Lerp(a.Y, b.Y, t));
 
         public static float EaseLerp(float a, float b, float t, float duration, Ease.Easer ease)
             => MathHelper.Lerp(a, b, ease(Math.Min(t, duration) / duration));
+
+        public static float YoYo(float value) => value <= 0.5f ? value * 2f : 1f - (value - 0.5f) * 2f;
+
+        public static Color GetHue(Vector2 position, float time)
+            => HsvToColor(0.4f + YoYo((position.Length() + time * 50f) % 280f / 280f) * 0.4f, 0.4f, 0.9f);
+
+        public static bool EqualsWithTolerance(this float value, float other, float tolerance = 1E-05f) => Math.Abs(value - other) <= tolerance;
     }
 }

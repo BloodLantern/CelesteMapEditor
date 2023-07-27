@@ -1,4 +1,5 @@
 ﻿using Editor.Celeste;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 namespace Editor.Entities

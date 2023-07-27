@@ -31,7 +31,7 @@ namespace Editor
         private readonly List<Vector2> visiblePlayerSpawns = new();
 
         public static readonly Point PlayerSpawnSize = new(13, 17);
-        private static readonly Point PlayerSpawnOffset = new(-PlayerSpawnSize.X / 2, -PlayerSpawnSize.Y);
+        public static readonly Vector2 PlayerSpawnOffset = new(-PlayerSpawnSize.X / 2, -PlayerSpawnSize.Y);
         private readonly Texture playerSpawnSprite;
 
         private Entity selectedEntity;
@@ -118,17 +118,8 @@ namespace Editor
 
         public void Render(SpriteBatch spriteBatch)
         {
-            if (Session.Config.DebugMode)
-            {
-                foreach (Level level in visibleLevels)
-                    level.RenderDebug(spriteBatch, Camera);
-
-                foreach (Rectangle filler in visibleFillers)
-                    RenderDebugFiller(spriteBatch, Camera, filler);
-
-                foreach (Vector2 playerSpawn in visiblePlayerSpawns)
-                    RenderDebugPlayerSpawn(spriteBatch, Camera, playerSpawn);
-            }
+            foreach (Level level in visibleLevels)
+                level.RenderBackground(spriteBatch, Camera);
 
             foreach (Vector2 playerSpawn in visiblePlayerSpawns)
                 RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
@@ -137,20 +128,38 @@ namespace Editor
                 entity.Render(spriteBatch, Camera);
 
             foreach (Level level in visibleLevels)
-                level.Render(spriteBatch, Camera);
+                level.RenderForeground(spriteBatch, Camera);
 
-            // Draw filler tiles
+            // TODO Draw filler tiles
+
+            if (Session.Config.DebugMode)
+            {
+                foreach (Level level in visibleLevels)
+                    level.RenderDebug(spriteBatch, Camera);
+
+                foreach (Rectangle filler in visibleFillers)
+                    RenderDebugFiller(spriteBatch, Camera, filler);
+            }
         }
 
         public void RenderPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
-            => playerSpawnSprite.Render(spriteBatch, camera, position + PlayerSpawnOffset.ToVector2());
+            => playerSpawnSprite.Render(spriteBatch, camera, position + PlayerSpawnOffset);
 
         public void RenderDebugPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
-            => spriteBatch.DrawRectangle(new RectangleF(camera.MapToWindow(position + PlayerSpawnOffset.ToVector2()), PlayerSpawnSize.Mul(camera.Zoom)), Color.DarkGreen);
+            => spriteBatch.DrawRectangle(
+                new RectangleF(camera.MapToWindow(position + PlayerSpawnOffset), PlayerSpawnSize.Mul(camera.Zoom)),
+                Color.DarkGreen,
+                Math.Max(camera.Zoom, 1f)
+            );
 
         public void RenderDebugFiller(SpriteBatch spriteBatch, Camera camera, Rectangle filler)
-            => spriteBatch.DrawRectangle(new RectangleF(Camera.MapToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)), Color.Brown);
+            => spriteBatch.DrawRectangle(
+                new RectangleF(Camera.MapToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
+                Color.Brown,
+                Math.Max(camera.Zoom, 1f)
+            );
 
+        private float cameraZoomSizeEqualTolerance = 1E-03f;
         public void RenderDebug()
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -161,14 +170,29 @@ namespace Editor
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
             ImGui.Checkbox("Debug mode", ref Session.Config.DebugMode);
+
             ImGui.Text($"Mouse window position: {mousePosition}");
             ImGui.Text($"Mouse map position: {mouseMapPosition}");
             ImGui.Text("Mouse level position: " + (hoveredLevel != null ? (mouseMapPosition - hoveredLevel.Position).ToString() : "N/A"));
+
+            ImGui.Separator();
+
             ImGui.Text($"Camera bounds: {Camera.Bounds}");
             if (ImGui.Button("Reset"))
                 Camera.ZoomToDefault();
             ImGui.SameLine();
             ImGui.Text($"Camera zoom factor: {Camera.Zoom}");
+
+            Vector2 cameraZoomToSize = Camera.ZoomToSize(Camera.Zoom);
+            bool cameraZoomToSizeEqual = cameraZoomToSize.EqualsWithTolerence(Camera.Size, cameraZoomSizeEqualTolerance);
+            float cameraSizeToZoom = Camera.SizeToZoom(Camera.Size);
+            bool cameraSizeToZoomEqual = cameraSizeToZoom.EqualsWithTolerance(Camera.Zoom, cameraZoomSizeEqualTolerance);
+            ImGui.Text($"Camera zoom to size: {cameraZoomToSize}, equal: {cameraZoomToSizeEqual}");
+            ImGui.Text($"Camera size to zoom: {cameraSizeToZoom}, equal: {cameraSizeToZoomEqual}");
+            ImGui.Text($"Camera size & zoom sync: {cameraZoomToSizeEqual && cameraSizeToZoomEqual}");
+            ImGui.InputFloat("Camera size & zoom tolerance", ref cameraZoomSizeEqualTolerance, 0.001f, 0.01f, "%f");
+
+            ImGui.Separator();
 
             if (selectedEntity != null)
             {

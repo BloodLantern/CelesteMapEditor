@@ -29,6 +29,8 @@ namespace Editor
 
         public Point DrawOffset { get; private set; }
 
+        public Vector2 Origin = Vector2.Zero;
+
         public Texture(string name)
         {
             Name = name;
@@ -211,16 +213,19 @@ namespace Editor
             => Render(spriteBatch, camera, offset, Color.White);
 
         public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f, float rotation = 0f)
+            => Render(spriteBatch, camera, offset, color, new Vector2(scale), rotation);
+
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale, float rotation = 0f)
             => spriteBatch.Draw(
                 Image,
                 camera.MapToWindow(offset),
                 ClipRect,
                 color,
                 rotation,
-                rotation == 0 ? Vector2.Zero : ClipRect.Size.ToVector2() / 2,
-                camera.Zoom * scale,
+                Origin - DrawOffset.ToVector2(),
+                scale * camera.Zoom,
                 SpriteEffects.None,
-                0
+                0f
             );
     }
 }

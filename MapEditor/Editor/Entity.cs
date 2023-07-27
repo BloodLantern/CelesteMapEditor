@@ -37,7 +37,6 @@ namespace Editor
         /// </summary>
         public virtual Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
         public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
-        public virtual Vector2 TextureAbsolutePosition => AbsolutePosition + (Texture != null ? Texture.DrawOffset.ToVector2() : Vector2.Zero);
         public virtual Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
 
         public RectangleF Bounds => new(AbsolutePosition, Size);
@@ -61,7 +60,7 @@ namespace Editor
         public virtual void Render(SpriteBatch spriteBatch, Camera camera)
         {
             if (Texture != null)
-                Texture.Render(spriteBatch, camera, TextureAbsolutePosition);
+                Texture.Render(spriteBatch, camera, AbsolutePosition);
             else
                 RenderDebug(spriteBatch, camera);
         }
@@ -70,7 +69,7 @@ namespace Editor
             => spriteBatch.DrawRectangle(
                 new RectangleF(
                     camera.MapToWindow(AbsolutePosition),
-                    ((Texture != null ? Texture.DrawOffset.ToVector2() * 2 : Vector2.Zero) + Size.ToVector2()) * camera.Zoom
+                    Size.ToVector2() * camera.Zoom
                 ),
                 Color.Red
             );
