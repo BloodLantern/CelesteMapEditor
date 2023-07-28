@@ -116,6 +116,7 @@ namespace Editor
             return null;
         }
 
+        private bool showEntityBounds = false;
         public void Render(SpriteBatch spriteBatch)
         {
             foreach (Level level in visibleLevels)
@@ -136,6 +137,12 @@ namespace Editor
             {
                 foreach (Level level in visibleLevels)
                     level.RenderDebug(spriteBatch, Camera);
+
+                if (showEntityBounds)
+                {
+                    foreach (Entity entity in visibleEntities)
+                        entity.RenderDebug(spriteBatch, Camera);
+                }
 
                 foreach (Rectangle filler in visibleFillers)
                     RenderDebugFiller(spriteBatch, Camera, filler);
@@ -170,6 +177,12 @@ namespace Editor
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
             ImGui.Checkbox("Debug mode", ref Session.Config.DebugMode);
+
+            ImGui.Separator();
+
+            ImGui.Checkbox("Show entity bounds", ref showEntityBounds);
+
+            ImGui.Separator();
 
             ImGui.Text($"Mouse window position: {mousePosition}");
             ImGui.Text($"Mouse map position: {mouseMapPosition}");

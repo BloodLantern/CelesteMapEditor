@@ -43,17 +43,17 @@ namespace Editor
             {
                 Entity entity;
 
-                string shortName = entityData.Name;
+                string shortName = entityData.Name.ToLower();
                 if (shortName.StartsWith("spikes"))
                     shortName = "spikes";
-                else if (shortName.ToLower().Contains("spring"))
+                else if (shortName.Contains("spring"))
                     shortName = "spring";
 
                 entity = shortName switch
                 {
                     "spinner" => new Spinner(entityData, this),
                     "spikes" => new Spikes(entityData, this),
-                    "jumpThru" => new JumpThru(entityData, this),
+                    "jumpthru" => new JumpThru(entityData, this),
                     "spring" => new Spring(entityData, this),
                     _ => new(entityData, this)
                 };

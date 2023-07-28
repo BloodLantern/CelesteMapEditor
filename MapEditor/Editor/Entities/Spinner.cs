@@ -11,10 +11,12 @@ namespace Editor.Entities
         {
             public override Vector2 Position => EntityData.Position + Offset;
             public Vector2 Offset = Vector2.Zero;
+            public readonly Spinner Spinner;
 
-            public BackgroundSpinner(EntityData data, Level level, Vector2 offset) : base(data, level)
+            public BackgroundSpinner(Spinner spinner, Vector2 offset) : base(spinner.EntityData, spinner.Level)
             {
                 Offset = offset;
+                Spinner = spinner;
             }
 
             public override void UpdateTexture()
@@ -26,14 +28,13 @@ namespace Editor.Entities
                     Color = "Red";
                 }
 
-                string path = BasePath + "bg_" + Color.ToLower();
-                Texture = Calc.Random.Choose(Atlas.Gameplay.GetAtlasSubtextures(path));
-                Texture.Rotation = Calc.Random.Choose(0, 1, 2, 3) * MathHelper.PiOver2;
+                string path = BasePath.Replace("{layer}", "bg").Replace("{color}", Color.ToLower());
+                Texture = Atlas.Gameplay[path + "00"];
                 Texture.Origin = Texture.Size.ToVector2() / 2;
             }
         }
 
-        public const string BasePath = "danger/crystal/";
+        public const string BasePath = "danger/crystal/{layer}_{color}";
 
         public string Color = "Blue";
         public bool Dust = false;
@@ -55,8 +56,8 @@ namespace Editor.Entities
                 Color = "Red";
             }
 
-            string path = BasePath + "fg_" + Color.ToLower();
-            Texture = Calc.Random.Choose(Atlas.Gameplay.GetAtlasSubtextures(path));
+            string path = BasePath.Replace("{layer}", "fg").Replace("{color}", Color.ToLower());
+            Texture = Atlas.Gameplay[path + "00"];
         }
 
         public void CreateBackgroundSpinners(List<Entity> entities, List<BackgroundSpinner> backgroundSpinners)
@@ -66,7 +67,7 @@ namespace Editor.Entities
                 if (entity is Spinner otherSpinner)
                 {
                     if (otherSpinner != this && AttachToSolid == otherSpinner.AttachToSolid && otherSpinner.Position.X >= Position.X && (otherSpinner.Position - Position).Length() < 24f)
-                        backgroundSpinners.Add(new BackgroundSpinner(EntityData, Level, (Position + otherSpinner.Position) / 2f - Position));
+                        backgroundSpinners.Add(new BackgroundSpinner(this, (Position + otherSpinner.Position) / 2f - Position));
                 }
             }
         }

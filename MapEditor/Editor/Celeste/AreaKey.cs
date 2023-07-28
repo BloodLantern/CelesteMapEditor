@@ -39,7 +39,7 @@ namespace Editor.Celeste
                     while (digitCount < prefix.Length && char.IsNumber(prefix[digitCount]))
                         digitCount++;
 
-                    ID = int.Parse(prefix.Substring(0, digitCount));
+                    ID = int.Parse(prefix[..digitCount]);
 
                     if (digitCount < prefix.Length)
                     {

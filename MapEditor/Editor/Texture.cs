@@ -30,6 +30,7 @@ namespace Editor
         public Point DrawOffset { get; private set; }
 
         public Vector2 Origin = Vector2.Zero;
+        public Vector2 Offset = Vector2.Zero;
 
         public float Rotation = 0f;
 
@@ -94,6 +95,18 @@ namespace Editor
             ClipRect = parent.GetRelativeRect(x, y, width, height);
             DrawOffset = new Point(-Math.Min(x - parent.DrawOffset.X, 0), -Math.Min(y - parent.DrawOffset.Y, 0));
             Size = new Point(width, height);
+        }
+
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="other">A texture to copy the data from.</param>
+        public Texture(Texture other)
+        {
+            Image = other.Image;
+            ClipRect = other.ClipRect;
+            DrawOffset = other.DrawOffset;
+            Size = other.Size;
         }
 
         public void Dispose() => Image.Dispose();
@@ -199,6 +212,28 @@ namespace Editor
             return new Rectangle(resultX, resultY, resultW, resultH);
         }
 
+        public void JustifyOrigin(float x, float y)
+            => Origin = new(Width * x, Height * y);
+
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset)
+            => Render(spriteBatch, camera, offset, Color.White);
+
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f)
+            => Render(spriteBatch, camera, offset, color, new Vector2(scale));
+
+        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale)
+            => spriteBatch.Draw(
+                Image,
+                camera.MapToWindow(offset + Offset),
+                ClipRect,
+                color,
+                Rotation,
+                Origin - DrawOffset.ToVector2(),
+                scale * camera.Zoom,
+                SpriteEffects.None,
+                0f
+            );
+
         public static void AllocateBuffers()
         {
             buffer = new byte[0x04000000];
@@ -210,24 +245,5 @@ namespace Editor
             buffer = null;
             buffer2 = null;
         }
-
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset)
-            => Render(spriteBatch, camera, offset, Color.White);
-
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, float scale = 1f)
-            => Render(spriteBatch, camera, offset, color, new Vector2(scale));
-
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale)
-            => spriteBatch.Draw(
-                Image,
-                camera.MapToWindow(offset),
-                ClipRect,
-                color,
-                Rotation,
-                Origin - DrawOffset.ToVector2(),
-                scale * camera.Zoom,
-                SpriteEffects.None,
-                0f
-            );
     }
 }

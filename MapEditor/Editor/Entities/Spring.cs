@@ -29,8 +29,6 @@ namespace Editor.Entities
         }
 
         public override void Render(SpriteBatch spriteBatch, Camera camera)
-        {
-            Texture.Render(spriteBatch, camera, AbsolutePosition + Offset, Color.White);
-        }
+            => Texture.Render(spriteBatch, camera, AbsolutePosition + Offset, Color.White);
     }
 }
