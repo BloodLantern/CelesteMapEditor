@@ -4,17 +4,45 @@ using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Input;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Editor
 {
     public class MapViewer
     {
+        [Flags]
+        private enum Layers : byte
+        {
+            None            = 0b00000000,
+            LevelForeground = 0b00000001,
+            LevelBackground = 0b00000010,
+            Fillers         = 0b00000100,
+            Entities        = 0b00001000,
+            Triggers        = 0b00010000,
+            PlayerSpawns    = 0b00100000,
+            Unused1         = 0b01000000,
+            Unused2         = 0b10000000,
+            All             = 0b11111111
+        }
+
+        [Flags]
+        private enum DebugLayers : byte
+        {
+            None            = 0b00000000,
+            LevelBounds     = 0b00000001,
+            FillerBounds    = 0b00000010,
+            EntityBounds    = 0b00000100,
+            Unused1         = 0b00001000,
+            Unused2         = 0b00010000,
+            Unused3         = 0b00100000,
+            Unused4         = 0b01000000,
+            Unused5         = 0b10000000,
+            All             = 0b11111111
+        }
+
         public Session Session;
         public MapEditor MapEditor;
         public Map CurrentMap;
@@ -28,6 +56,7 @@ namespace Editor
         private List<Level> visibleLevels;
         private List<Rectangle> visibleFillers;
         private readonly List<Entity> visibleEntities = new();
+        private readonly List<Trigger> visibleTriggers = new();
         private readonly List<Vector2> visiblePlayerSpawns = new();
 
         public static readonly Point PlayerSpawnSize = new(13, 17);
@@ -35,6 +64,9 @@ namespace Editor
         private readonly Texture playerSpawnSprite;
 
         private Entity selectedEntity;
+
+        private Layers renderedLayers = Layers.All;
+        private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
 
         public MapViewer(MapEditor mapEditor)
         {
@@ -47,15 +79,17 @@ namespace Editor
             playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
 
-        public void Update(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        public void Update(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             visibleLevels = CurrentMap.GetVisibleLevels(Camera.Bounds);
             visibleFillers = CurrentMap.GetVisibleFillers(Camera.Bounds);
             visibleEntities.Clear();
+            visibleTriggers.Clear();
             visiblePlayerSpawns.Clear();
             foreach (Level level in visibleLevels)
             {
                 visibleEntities.AddRange(level.GetVisibleEntities(Camera.Bounds));
+                visibleTriggers.AddRange(level.GetVisibleTriggers(Camera.Bounds));
                 visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(Camera.Bounds));
             }
 
@@ -63,10 +97,10 @@ namespace Editor
             if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
                 return;
 
-            HandleInputs(time, mouse, keyboard);
+            HandleInputs(mouse, keyboard);
         }
 
-        private void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        private void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             if (mouse.IsButtonUp(Session.Config.CameraMoveButton))
             {
@@ -116,36 +150,59 @@ namespace Editor
             return null;
         }
 
-        private bool showEntityBounds = false;
         public void Render(SpriteBatch spriteBatch)
         {
-            foreach (Level level in visibleLevels)
-                level.RenderBackground(spriteBatch, Camera);
+            if (renderedLayers.HasFlag(Layers.LevelBackground))
+            {
+                foreach (Level level in visibleLevels)
+                    level.RenderBackground(spriteBatch, Camera);
+            }
 
-            foreach (Vector2 playerSpawn in visiblePlayerSpawns)
+            if (renderedLayers.HasFlag(Layers.PlayerSpawns))
+            {
+                foreach (Vector2 playerSpawn in visiblePlayerSpawns)
                 RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
+            }
 
-            foreach (Entity entity in visibleEntities)
-                entity.Render(spriteBatch, Camera);
+            if (renderedLayers.HasFlag(Layers.Entities))
+            {
+                foreach (Entity entity in visibleEntities)
+                    entity.Render(spriteBatch, Camera);
+            }
 
-            foreach (Level level in visibleLevels)
-                level.RenderForeground(spriteBatch, Camera);
+            if (renderedLayers.HasFlag(Layers.LevelForeground))
+            {
+                foreach (Level level in visibleLevels)
+                    level.RenderForeground(spriteBatch, Camera);
+            }
+
+            if (renderedLayers.HasFlag(Layers.Triggers))
+            {
+                foreach (Trigger trigger in visibleTriggers)
+                    trigger.Render(spriteBatch, Camera);
+            }
 
             // TODO Draw filler tiles
 
             if (Session.Config.DebugMode)
             {
-                foreach (Level level in visibleLevels)
-                    level.RenderDebug(spriteBatch, Camera);
+                if (renderedDebugLayers.HasFlag(DebugLayers.LevelBounds))
+                {
+                    foreach (Level level in visibleLevels)
+                        level.RenderDebug(spriteBatch, Camera);
+                }
 
-                if (showEntityBounds)
+                if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
                 {
                     foreach (Entity entity in visibleEntities)
                         entity.RenderDebug(spriteBatch, Camera);
                 }
 
-                foreach (Rectangle filler in visibleFillers)
-                    RenderDebugFiller(spriteBatch, Camera, filler);
+                if (renderedDebugLayers.HasFlag(DebugLayers.FillerBounds))
+                {
+                    foreach (Rectangle filler in visibleFillers)
+                        RenderDebugFiller(spriteBatch, Camera, filler);
+                }
             }
         }
 
@@ -166,7 +223,6 @@ namespace Editor
                 Math.Max(camera.Zoom, 1f)
             );
 
-        private float cameraZoomSizeEqualTolerance = 1E-03f;
         public void RenderDebug()
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -180,7 +236,30 @@ namespace Editor
 
             ImGui.Separator();
 
-            ImGui.Checkbox("Show entity bounds", ref showEntityBounds);
+            if (ImGui.TreeNode("Layers"))
+            {
+                int renderedLayersInt = (int) renderedLayers;
+                ImGui.CheckboxFlags("Level background", ref renderedLayersInt, (int) Layers.LevelBackground);
+                ImGui.CheckboxFlags("Level foreground", ref renderedLayersInt, (int) Layers.LevelForeground);
+                ImGui.CheckboxFlags("Fillers", ref renderedLayersInt, (int) Layers.Fillers);
+                ImGui.CheckboxFlags("Entities", ref renderedLayersInt, (int) Layers.Entities);
+                ImGui.CheckboxFlags("Triggers", ref renderedLayersInt, (int) Layers.Triggers);
+                ImGui.CheckboxFlags("Player spawns", ref renderedLayersInt, (int) Layers.PlayerSpawns);
+                renderedLayers = (Layers) renderedLayersInt;
+
+                ImGui.TreePop();
+            }
+
+            if (ImGui.TreeNode("Debug layers"))
+            {
+                int renderedDebugLayersInt = (int) renderedDebugLayers;
+                ImGui.CheckboxFlags("Level bounds", ref renderedDebugLayersInt, (int) DebugLayers.LevelBounds);
+                ImGui.CheckboxFlags("Filler bounds", ref renderedDebugLayersInt, (int) DebugLayers.FillerBounds);
+                ImGui.CheckboxFlags("Entity bounds", ref renderedDebugLayersInt, (int) DebugLayers.EntityBounds);
+                renderedDebugLayers = (DebugLayers) renderedDebugLayersInt;
+
+                ImGui.TreePop();
+            }
 
             ImGui.Separator();
 
@@ -190,20 +269,11 @@ namespace Editor
 
             ImGui.Separator();
 
-            ImGui.Text($"Camera bounds: {Camera.Bounds}");
+            ImGui.Text($"Camera position: {Camera.Position}");
             if (ImGui.Button("Reset"))
                 Camera.ZoomToDefault();
             ImGui.SameLine();
             ImGui.Text($"Camera zoom factor: {Camera.Zoom}");
-
-            Vector2 cameraZoomToSize = Camera.ZoomToSize(Camera.Zoom);
-            bool cameraZoomToSizeEqual = cameraZoomToSize.EqualsWithTolerence(Camera.Size, cameraZoomSizeEqualTolerance);
-            float cameraSizeToZoom = Camera.SizeToZoom(Camera.Size);
-            bool cameraSizeToZoomEqual = cameraSizeToZoom.EqualsWithTolerance(Camera.Zoom, cameraZoomSizeEqualTolerance);
-            ImGui.Text($"Camera zoom to size: {cameraZoomToSize}, equal: {cameraZoomToSizeEqual}");
-            ImGui.Text($"Camera size to zoom: {cameraSizeToZoom}, equal: {cameraSizeToZoomEqual}");
-            ImGui.Text($"Camera size & zoom sync: {cameraZoomToSizeEqual && cameraSizeToZoomEqual}");
-            ImGui.InputFloat("Camera size & zoom tolerance", ref cameraZoomSizeEqualTolerance, 0.001f, 0.01f, "%f");
 
             ImGui.Separator();
 

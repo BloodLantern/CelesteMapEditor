@@ -1,12 +1,8 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -57,7 +53,6 @@ namespace Editor
                                     break;
                                 }
                             }
-
                             if (same)
                                 result = Masked[j].Tile;
                         }

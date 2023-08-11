@@ -107,8 +107,16 @@ namespace Editor
 
         public Point MapToWindow(Point position) => (position - Position.ToPoint()).Mul(Zoom);
 
+        public Size2 MapToWindow(Size2 size) => size * Zoom;
+
+        public RectangleF MapToWindow(RectangleF bounds) => new(MapToWindow((Vector2) bounds.Position), MapToWindow(bounds.Size));
+
         public Vector2 WindowToMap(Vector2 position) => position / Zoom + Position;
 
         public Point WindowToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
+
+        public float GetLineThickness() => Math.Max(Zoom, 1f);
+
+        public float GetStringScale() => Math.Max(Zoom / 2, 0.5f);
     }
 }

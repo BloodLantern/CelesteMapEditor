@@ -241,8 +241,8 @@ namespace Editor.Celeste
                         result.Origin.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else
                     {
-                        result.Values ??= new Dictionary<string, object>();
-                        result.Values.Add(attribute.Key, attribute.Value);
+                        result.Attributes ??= new Dictionary<string, object>();
+                        result.Attributes.Add(attribute.Key, attribute.Value);
                     }
                 }
 

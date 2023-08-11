@@ -1,10 +1,10 @@
 ﻿using Editor.Utils;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Editor
@@ -146,5 +146,35 @@ namespace Editor
             => HsvToColor(0.4f + YoYo((position.Length() + time * 50f) % 280f / 280f) * 0.4f, 0.4f, 0.9f);
 
         public static bool EqualsWithTolerance(this float value, float other, float tolerance = 1E-05f) => Math.Abs(value - other) <= tolerance;
+
+        public static string HumanizeString(string str)
+        {
+            str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value.ToLowerInvariant());
+            return char.ToUpperInvariant(str[0]) + str[1..];
+        }
+
+        /// <summary>
+        /// Loads a monospace font from a font texture.
+        /// </summary>
+        /// <param name="texture">The font texture.</param>
+        /// <param name="charSize">The size of a single character.</param>
+        /// <param name="characters">The list of characters in order in the texture.</param>
+        /// <returns>A dictionary containing a texture for each character in the list.</returns>
+        public static Dictionary<char, Texture> LoadFontFromTexture(Texture texture, Point charSize, List<char> characters)
+        {
+            Dictionary<char, Texture> result = new();
+
+            for (int y = 0; y < texture.Height; y += charSize.Y + 1)
+            {
+                for (int x = 0; x < texture.Width; x += charSize.X + 1)
+                {
+                    if (result.Count >= characters.Count)
+                        return result;
+                    result.Add(characters[result.Count], new Texture(texture, new Rectangle(x, y, charSize.X, charSize.Y), Point.Zero));
+                }
+            }
+
+            return result;
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Editor.Celeste
         public Vector2 Origin;
         public Point Size;
         public Vector2[] Nodes;
-        public Dictionary<string, object> Values = new();
+        public Dictionary<string, object> Attributes = new();
 
         public EntityData(string name, LevelData level, Vector2[] nodes)
         {
@@ -26,16 +26,16 @@ namespace Editor.Celeste
             Nodes = nodes;
         }
 
-        public bool Has(string key) => Values.ContainsKey(key);
+        public bool Has(string key) => Attributes.ContainsKey(key);
 
         public string Attr(string key, string defaultValue = "")
         {
-            return Values.TryGetValue(key, out object obj) ? (string) obj : defaultValue;
+            return Attributes.TryGetValue(key, out object obj) ? (string) obj : defaultValue;
         }
 
         public float Float(string key, float defaultValue = 0.0f)
         {
-            if (Values.TryGetValue(key, out object obj))
+            if (Attributes.TryGetValue(key, out object obj))
             {
                 if (obj is float num)
                     return num;
@@ -47,7 +47,7 @@ namespace Editor.Celeste
 
         public bool Bool(string key, bool defaultValue = false)
         {
-            if (Values.TryGetValue(key, out object obj))
+            if (Attributes.TryGetValue(key, out object obj))
             {
                 if (obj is bool flag)
                     return flag;
@@ -59,7 +59,7 @@ namespace Editor.Celeste
 
         public int Int(string key, int defaultValue = 0)
         {
-            if (Values.TryGetValue(key, out object obj))
+            if (Attributes.TryGetValue(key, out object obj))
             {
                 if (obj is int num)
                     return num;
@@ -71,7 +71,7 @@ namespace Editor.Celeste
 
         public char Char(string key, char defaultValue = '\0')
         {
-            return Values.TryGetValue(key, out object obj) && char.TryParse(obj.ToString(), out char result) ? result : defaultValue;
+            return Attributes.TryGetValue(key, out object obj) && char.TryParse(obj.ToString(), out char result) ? result : defaultValue;
         }
     }
 }

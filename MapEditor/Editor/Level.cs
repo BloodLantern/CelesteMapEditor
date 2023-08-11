@@ -7,6 +7,7 @@ using MonoGame.Extended;
 using Editor.Entities;
 using Editor.Extensions;
 using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace Editor
 {
@@ -24,6 +25,7 @@ namespace Editor
 
         public readonly LevelData LevelData;
         public readonly List<Entity> Entities = new();
+        public readonly List<Trigger> Triggers = new();
         public readonly List<Spinner.BackgroundSpinner> BackgroundSpinners = new();
         public readonly TileGrid ForegroundTiles;
         public readonly TileGrid BackgroundTiles;
@@ -61,12 +63,13 @@ namespace Editor
                 Entities.Add(entity);
             }
 
+            foreach (EntityData triggerData in LevelData.Triggers)
+                Triggers.Add(new(triggerData, this));
+
             foreach (Entity entity in Entities)
             {
                 if (entity is Spinner spinner)
-                {
                     spinner.CreateBackgroundSpinners(Entities, BackgroundSpinners);
-                }
             }
 
             foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
@@ -105,15 +108,13 @@ namespace Editor
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
-            => spriteBatch.DrawRectangle(
-                new RectangleF(camera.MapToWindow(Position.ToVector2()), Bounds.Size.Mul(camera.Zoom)),
-                EditorColor,
-                Math.Max(camera.Zoom, 1f)
-            );
+            => spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), EditorColor, camera.GetLineThickness());
 
         public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.Bounds));
 
-        public IEnumerable<Vector2> GetVisiblePlayerSpawns(RectangleF cameraBounds)
+        public List<Vector2> GetVisiblePlayerSpawns(RectangleF cameraBounds)
             => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn + MapViewer.PlayerSpawnOffset, MapViewer.PlayerSpawnSize)));
+
+        public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.Bounds));
     }
 }

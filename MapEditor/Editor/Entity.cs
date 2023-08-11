@@ -24,9 +24,35 @@ namespace Editor
                 "refill",
                 Atlas.Gameplay["objects/refill/idle00"]
             },
+            {
+                "summitgem0",
+                Atlas.Gameplay["collectables/summitgems/0/gem00"]
+            },
+            {
+                "summitgem1",
+                Atlas.Gameplay["collectables/summitgems/1/gem00"]
+            },
+            {
+                "summitgem2",
+                Atlas.Gameplay["collectables/summitgems/2/gem00"]
+            },
+            {
+                "summitgem3",
+                Atlas.Gameplay["collectables/summitgems/3/gem00"]
+            },
+            {
+                "summitgem4",
+                Atlas.Gameplay["collectables/summitgems/4/gem00"]
+            },
+            {
+                "summitgem5",
+                Atlas.Gameplay["collectables/summitgems/5/gem00"]
+            },
         };
 
-        public EntityData EntityData { get; private set; }
+        public readonly EntityData EntityData;
+        public readonly Level Level;
+
         public Texture Texture;
 
         public string Name => EntityData.Name;
@@ -41,8 +67,6 @@ namespace Editor
 
         public RectangleF Bounds => new(AbsolutePosition, Size);
 
-        public Level Level;
-
         public Entity(EntityData data, Level level)
         {
             EntityData = data;
@@ -55,6 +79,12 @@ namespace Editor
                 Texture = Atlas.Gameplay[Name];
             else if (textureLookupTable.ContainsKey(Name))
                 Texture = textureLookupTable[Name];
+            else
+            {
+                // TODO don't hardcode this
+                if (Name.StartsWith("summitgem"))
+                    Texture = textureLookupTable[Name + EntityData.Int("gem")];
+            }
         }
 
         public virtual void Render(SpriteBatch spriteBatch, Camera camera)
@@ -66,18 +96,20 @@ namespace Editor
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
-            => spriteBatch.DrawRectangle(
-                new RectangleF(
-                    camera.MapToWindow(AbsolutePosition),
-                    Size.ToVector2() * camera.Zoom
-                ),
-                Color.Red
-            );
+            => spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), Color.Red, camera.GetLineThickness());
 
         public virtual void DebugInfo()
         {
             ImGui.Text($"Name: '{Name}'");
             ImGui.Text($"Bounds: {Bounds}");
+            int attributeCount = EntityData.Attributes.Count;
+            ImGui.Text($"Attribute count: {attributeCount}");
+            if (attributeCount > 0 && ImGui.TreeNode("Attributes"))
+            {
+                foreach (KeyValuePair<string, object> attribute in EntityData.Attributes)
+                    ImGui.Text($"{attribute.Key}: {attribute.Value}");
+                ImGui.TreePop();
+            }
         }
     }
 }

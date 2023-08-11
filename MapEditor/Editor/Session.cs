@@ -1,13 +1,12 @@
 ﻿using Editor.Celeste;
 using Editor.Logging;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Metadata;
 using System.Text.Json;
-using System.Xml.Serialization;
 
 namespace Editor
 {
@@ -26,6 +25,7 @@ namespace Editor
 
         private bool debugContentLoaded = false;
         public SpriteFont DebugFont;
+        public SpriteFont PixelatedFont;
 
         public Session(MapEditor mapEditor)
         {
@@ -55,6 +55,8 @@ namespace Editor
         {
             if (Config.DebugMode)
                 LoadDebugContent(content);
+
+            PixelatedFont = content.Load<SpriteFont>("Fonts/pixelated");
         }
 
         public void LoadDebugContent(ContentManager content)
@@ -62,7 +64,7 @@ namespace Editor
             if (debugContentLoaded)
                 return;
 
-            DebugFont = content.Load<SpriteFont>("Fonts/DebugFont");
+            DebugFont = content.Load<SpriteFont>("Fonts/debug");
 
             debugContentLoaded = true;
         }

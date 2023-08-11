@@ -82,7 +82,7 @@ namespace Editor
 
         protected override void Update(GameTime time)
         {
-            MapViewer.Update(time, MouseExtended.GetState(), KeyboardExtended.GetState());
+            MapViewer.Update(MouseExtended.GetState(), KeyboardExtended.GetState());
             Coroutine.UpdateAll(time);
 
             base.Update(time);

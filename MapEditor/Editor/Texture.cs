@@ -56,12 +56,12 @@ namespace Editor
             Texture parent,
             Rectangle clipRect,
             Point drawOffset,
-            Point size)
+            Point? size = null)
         {
             Image = parent.Image;
             ClipRect = parent.GetRelativeRect(clipRect);
             DrawOffset = drawOffset;
-            Size = size;
+            Size = size ?? ClipRect.Size;
         }
 
         /// <summary>
@@ -107,6 +107,14 @@ namespace Editor
             ClipRect = other.ClipRect;
             DrawOffset = other.DrawOffset;
             Size = other.Size;
+        }
+
+        public Texture(Texture2D texture)
+        {
+            Image = texture;
+            ClipRect = new(0, 0, Image.Width, Image.Height);
+            DrawOffset = Point.Zero;
+            Size = ClipRect.Size;
         }
 
         public void Dispose() => Image.Dispose();
