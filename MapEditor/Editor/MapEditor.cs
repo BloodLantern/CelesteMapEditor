@@ -32,6 +32,7 @@ namespace Editor
         public Session Session;
         public MapViewer MapViewer;
         public MenuBar MenuBar;
+        public LevelList LevelList;
 
         public Point WindowSize => new(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -70,6 +71,7 @@ namespace Editor
                 Exit();
             MapViewer = new(this);
             MenuBar = new(this);
+            LevelList = new(this);
 
             Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
             TargetElapsedTime = Session.Config.MapViewerRefreshRate;
@@ -119,7 +121,7 @@ namespace Editor
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             MapViewer.Render(SpriteBatch);
-            SpriteBatch.DrawString(Session.DebugFont, frameCounter.ToString(), new Vector2(10, 30), Color.White);
+            SpriteBatch.DrawString(Session.DebugFont, frameCounter.ToString(), new Vector2(LevelList.Width + 10, 30), Color.White);
             SpriteBatch.End();
 
             base.Draw(time);
@@ -128,6 +130,7 @@ namespace Editor
             if (Session.Config.DebugMode)
                 MapViewer.RenderDebug();
             MenuBar.Render(Session);
+            LevelList.Render();
             ImGuiRenderer.AfterLayout();
         }
 

@@ -35,7 +35,11 @@ namespace Editor
 
         public List<Vector2> PlayerSpawns => LevelData.PlayerSpawns;
         public Rectangle Bounds => LevelData.Bounds;
-        public Point Position => LevelData.Position;
+        public Point Position => Bounds.Location;
+        public Point Size => Bounds.Size;
+        public string Name => LevelData.Name;
+
+        public Vector2 Center => Position.ToVector2() + Size.ToVector2() / 2;
 
         public Level(LevelData data)
         {
