@@ -10,6 +10,7 @@ namespace Editor
         public MapData MapData { get; private set; }
         public readonly List<Level> Levels = new();
         public List<Rectangle> Fillers => MapData.Fillers;
+        public string FilePath => MapData.FilePath;
 
         public Map(MapData data)
         {

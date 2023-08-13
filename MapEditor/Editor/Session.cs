@@ -1,8 +1,10 @@
 ﻿using Editor.Celeste;
 using Editor.Logging;
+using Editor.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +25,8 @@ namespace Editor
         public string CelesteContentDirectory;
         public string CelesteGraphicsDirectory;
 
+        public string ContentDirectory;
+
         private bool debugContentLoaded = false;
         public SpriteFont DebugFont;
         public SpriteFont PixelatedFont;
@@ -34,6 +38,8 @@ namespace Editor
             Current = this;
 
             MapEditor = mapEditor;
+
+            ContentDirectory = MapEditor.Content.RootDirectory;
 
             Config = Config.Load();
 
@@ -49,11 +55,14 @@ namespace Editor
 
             Atlas.LoadAtlases(CelesteGraphicsDirectory);
             Autotiler.LoadAutotilers(CelesteGraphicsDirectory);
+
+            ImGuiStyles.Setup(Config.UiStyle);
+            ImGuiStyles.SetupFont(this, mapEditor.ImGuiRenderer);
         }
 
         public void LoadContent(ContentManager content)
         {
-            if (Config.DebugMode)
+            //if (Config.DebugMode)
                 LoadDebugContent(content);
 
             PixelatedFont = content.Load<SpriteFont>("Fonts/pixelated");

@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\..\..\..\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -19,6 +20,9 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/debug.spritefont
+
+#begin Fonts/imgui.ttf
+/copy:Fonts/imgui.ttf
 
 #begin Fonts/pixelated.spritefont
 /importer:FontDescriptionImporter

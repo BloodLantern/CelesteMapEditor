@@ -54,7 +54,7 @@ namespace Editor.Celeste
 
             Area.TryLoadFromFileName(Path.GetFileNameWithoutExtension(FilePath));
 
-            BinaryPacker.Element element = null;
+            BinaryPacker.Element element;
             try
             {
                 element = BinaryPacker.FromBinary(FilePath);

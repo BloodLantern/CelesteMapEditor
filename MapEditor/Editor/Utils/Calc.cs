@@ -1,4 +1,5 @@
 ﻿using Editor.Utils;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -6,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Serialization;
+using static Editor.Utils.ImGuiStyles;
 
 namespace Editor
 {
@@ -151,30 +154,6 @@ namespace Editor
         {
             str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value.ToLowerInvariant());
             return char.ToUpperInvariant(str[0]) + str[1..];
-        }
-
-        /// <summary>
-        /// Loads a monospace font from a font texture.
-        /// </summary>
-        /// <param name="texture">The font texture.</param>
-        /// <param name="charSize">The size of a single character.</param>
-        /// <param name="characters">The list of characters in order in the texture.</param>
-        /// <returns>A dictionary containing a texture for each character in the list.</returns>
-        public static Dictionary<char, Texture> LoadFontFromTexture(Texture texture, Point charSize, List<char> characters)
-        {
-            Dictionary<char, Texture> result = new();
-
-            for (int y = 0; y < texture.Height; y += charSize.Y + 1)
-            {
-                for (int x = 0; x < texture.Width; x += charSize.X + 1)
-                {
-                    if (result.Count >= characters.Count)
-                        return result;
-                    result.Add(characters[result.Count], new Texture(texture, new Rectangle(x, y, charSize.X, charSize.Y), Point.Zero));
-                }
-            }
-
-            return result;
         }
     }
 }

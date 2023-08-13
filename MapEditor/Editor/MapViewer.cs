@@ -1,5 +1,6 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
+using Editor.Logging;
 using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -307,8 +308,32 @@ namespace Editor
             }
 
             ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
+            ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsole);
+            ImGui.Checkbox("Show average fps", ref Session.Config.ShowAverageFps);
 
             ImGui.End();
+
+            if (Session.Config.ShowDebugConsole)
+            {
+                ImGui.Begin("Debug console", ImGuiWindowFlags.NoFocusOnAppearing);
+
+                // Show the current logs
+                Color color = Color.White;
+                foreach (string log in Logger.Logs)
+                {
+                    if (log.Contains("[INFO]"))
+                        color = Color.LightGreen;
+                    else if (log.Contains("[WARN]"))
+                        color = Color.Orange;
+                    else if (log.Contains("[ERROR]"))
+                        color = Color.Red;
+                    else if (log.Contains("[FATAL]"))
+                        color = Color.DarkRed;
+                    ImGui.TextColored(color.ToVector4().ToNumerics(), log);
+                }
+
+                ImGui.End();
+            }
         }
 
         public static Point ToTilePosition(Point position) => position.Div(Tileset.TileSize);

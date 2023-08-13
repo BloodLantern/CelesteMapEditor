@@ -3,10 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using Editor.ImGuiNet;
 using Editor.Celeste;
+using Editor.Extensions;
 using System.IO;
 using Editor.Logging;
 using MonoGame.Extended.Input;
 using Editor.Utils;
+using MonoGame.Extended;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Editor
 {
@@ -23,9 +27,12 @@ namespace Editor
 
         public ImGuiRenderer ImGuiRenderer;
 
+        private FrameCounter frameCounter = new();
+
         public Session Session;
         public MapViewer MapViewer;
-        
+        public MenuBar MenuBar;
+
         public Point WindowSize => new(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
         public MapEditor()
@@ -34,7 +41,10 @@ namespace Editor
                 throw new InvalidOperationException($"There should be only one {nameof(MapEditor)} instance.");
             Instance = this;
 
-            Logger.AddDefaultLoggingFiles();
+            Logger.Log($"Starting {nameof(MapEditor)} instance...");
+
+            /*Logger.Log("Testing logger...");
+            Logger.Test();*/
 
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -46,8 +56,8 @@ namespace Editor
 
         protected override void Initialize()
         {
+            Logger.Log($"Initializing {nameof(MapEditor)}...");
             ImGuiRenderer = new ImGuiRenderer(this);
-            ImGuiRenderer.RebuildFontAtlas();
 
             Window.AllowUserResizing = true;
             Graphics.PreferredBackBufferWidth = BaseWindowWidth;
@@ -59,6 +69,7 @@ namespace Editor
             if (Session.Current == null)
                 Exit();
             MapViewer = new(this);
+            MenuBar = new(this);
 
             Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
             TargetElapsedTime = Session.Config.MapViewerRefreshRate;
@@ -68,22 +79,36 @@ namespace Editor
             Window.Title = BaseTitle;
 
             Logger.Log($"Working directory: {Directory.GetCurrentDirectory()}");
-            MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Path.Combine("..", "..", "..", "..", "maps", "7-Summit.bin")));
+            if (Session.Config.LastEditedFiles.Count > 0)
+                MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
 
             base.Initialize();
+            Logger.Log($"{nameof(MapEditor)} initialization complete.");
         }
 
         protected override void LoadContent()
         {
+            Logger.Log($"Loading content...");
             SpriteBatch = new(GraphicsDevice);
 
             Session.LoadContent(Content);
+            Logger.Log($"Content loaded.");
         }
 
         protected override void Update(GameTime time)
         {
-            MapViewer.Update(MouseExtended.GetState(), KeyboardExtended.GetState());
+            KeyboardStateExtended keyboardState = KeyboardExtended.GetState();
+
+            MapViewer.Update(MouseExtended.GetState(), keyboardState);
+
+            // Toggle debug mode with F3
+            if (keyboardState.WasKeyJustUp(Microsoft.Xna.Framework.Input.Keys.F3))
+                Session.Config.DebugMode = !Session.Config.DebugMode;
+
             Coroutine.UpdateAll(time);
+            Logger.UpdateLogsAsync();
+
+            frameCounter.Update(time.GetElapsedSeconds());
 
             base.Update(time);
         }
@@ -94,15 +119,15 @@ namespace Editor
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             MapViewer.Render(SpriteBatch);
+            SpriteBatch.DrawString(Session.DebugFont, frameCounter.ToString(), new Vector2(10, 30), Color.White);
             SpriteBatch.End();
 
             base.Draw(time);
 
-            /*if (!Session.Config.DebugMode)
-                return;*/
-
             ImGuiRenderer.BeforeLayout(time);
-            MapViewer.RenderDebug();
+            if (Session.Config.DebugMode)
+                MapViewer.RenderDebug();
+            MenuBar.Render(Session);
             ImGuiRenderer.AfterLayout();
         }
 
@@ -111,7 +136,8 @@ namespace Editor
             base.EndRun();
 
             Session.Exit();
-            Logger.ClearLoggingFiles();
+            Logger.Log($"Stopping {nameof(MapEditor)} instance...");
+            Logger.EndLogging(Session);
         }
 
         public Map LoadMap(string filepath)
@@ -125,13 +151,13 @@ namespace Editor
 
             MapViewer.CurrentMap = result;
 
+            Session.Config.AddEditedFile(filepath);
+
             Window.Title = BaseTitle + " - " + Path.GetFileName(filepath);
             if (map.Area != AreaKey.None)
                 Window.Title += " - " + map.Area;
 
-            /*UpdateRecentFileList(filePath);
-
-            ListViewItem room;
+            /*ListViewItem room;
             foreach (LevelData level in map.Levels)
             {
                 room = new ListViewItem
@@ -149,9 +175,7 @@ namespace Editor
                     Tag = map.Fillers[i]
                 };
                 RoomList.Items.Add(room);
-            }
-
-            MapViewer.Render();*/
+            }*/
 
             return result;
         }
@@ -160,7 +184,19 @@ namespace Editor
 
         private void OnFileDrop(object sender, FileDropEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.Files.Length != 1)
+                return;
+
+            LoadMap(e.Files[0]);
+        }
+
+        public void Restart()
+        {
+            Logger.Log($"Restarting {nameof(MapEditor)}...");
+
+            Process.Start(Environment.ProcessPath);
+
+            Exit();
         }
     }
 }

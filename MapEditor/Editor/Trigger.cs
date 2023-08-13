@@ -31,7 +31,7 @@ namespace Editor
 
         public virtual void Render(SpriteBatch spriteBatch, Camera camera)
         {
-            SpriteFont font = Session.Current.PixelatedFont;
+            /*SpriteFont font = Session.Current.PixelatedFont;
             float stringScale = camera.GetStringScale();
             string str = DisplayName;
             int strIndex = 0, strLength = str.Length;
@@ -61,7 +61,7 @@ namespace Editor
                 if (strIndex + strLength >= DisplayName.Length)
                     break;
                 str = DisplayName.Substring(strIndex, strLength);
-            }
+            }*/
 
             //spriteBatch.FillRectangle(camera.MapToWindow(Bounds), DefaultColor);
             spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), DefaultColor, camera.GetLineThickness());

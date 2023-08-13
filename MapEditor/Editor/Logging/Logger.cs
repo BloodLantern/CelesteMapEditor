@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Editor.Logging
 {
@@ -8,29 +10,79 @@ namespace Editor.Logging
     {
         private const string LogsDirectory = "logs";
 
-        private static readonly List<StreamWriter> logFiles = new();
+        public static readonly List<string> Logs = new();
+        private static readonly ConcurrentQueue<string> logsQueue = new();
 
-        public static void AddDefaultLoggingFiles()
+        public static void Log(string message, LogLevel logLevel = LogLevel.Info)
         {
-            AddLatestLoggingFile();
-            AddDefaultLoggingFile();
+            DateTime now = DateTime.Now;
+            string toWrite = "[" + (now.Hour < 10 ? "0" + now.Hour : now.Hour)
+                + ":" + (now.Minute < 10 ? "0" + now.Minute : now.Minute)
+                + ":" + (now.Second < 10 ? "0" + now.Second : now.Second);
+
+            switch (logLevel)
+            {
+                case LogLevel.Info:
+                    toWrite += "] [INFO] ";
+                    break;
+                case LogLevel.Warning:
+                    toWrite += "] [WARN] ";
+                    break;
+                case LogLevel.Error:
+                    toWrite += "] [ERROR] ";
+                    break;
+                case LogLevel.Fatal:
+                    toWrite += "] [FATAL] ";
+                    break;
+            }
+
+            logsQueue.Enqueue(toWrite + message);
         }
 
-        public static void AddLatestLoggingFile()
+        public static async void UpdateLogsAsync()
         {
-            string file = Path.Combine(LogsDirectory, "latest.log");
+            if (logsQueue.IsEmpty)
+                return;
+
+            await Task.Run(updateLogs);
+        }
+
+        private static readonly Action updateLogs = () =>
+        {
+            // Empty the queue
+            while (!logsQueue.IsEmpty)
+            {
+                if (!logsQueue.TryDequeue(out string log))
+                    // Avoid deadlocks by breaking out of the loop
+                    break;
+
+                Logs.Add(log);
+            }
+        };
+
+        public static void EndLogging(Session session)
+        {
+            if (!session.Config.EnableLogging)
+                return;
+
+            updateLogs();
+            AddLogsToLatestFile();
+            AddLogsToDefaultFile();
+        }
+
+        private static void AddLogsToLatestFile()
+        {
+            string latestFile = Path.Combine(LogsDirectory, "latest.log");
 
             Directory.CreateDirectory(LogsDirectory);
 
-            StreamWriter stream = File.CreateText(file);
-            stream.AutoFlush = true;
-            logFiles.Add(stream);
+            AddLogsToFile(latestFile, true);
         }
 
-        public static void AddDefaultLoggingFile()
+        private static void AddLogsToDefaultFile()
         {
             DateTime now = DateTime.Now;
-            string file = Path.Combine(
+            string defaultFile = Path.Combine(
                 LogsDirectory,
                 now.Year
                 + "-" + (now.Month < 10 ? "0" + now.Month : now.Month)
@@ -38,69 +90,25 @@ namespace Editor.Logging
                 + ".log"
             );
 
-            AddLoggingFile(file);
+            AddLogsToFile(defaultFile, false);
         }
 
-        public static void AddLoggingFile(string filePath)
+        private static void AddLogsToFile(string filePath, bool overwrite)
         {
             Directory.CreateDirectory(Directory.GetParent(filePath).ToString());
 
-            int logCount = 0;
-            if (File.Exists(filePath))
-            {
-                foreach (string line in File.ReadLines(filePath))
-                {
-                    if (line == string.Empty)
-                        logCount++;
-                }
-            }
-
-            StreamWriter stream = File.AppendText(filePath);
-            stream.AutoFlush = true;
-            logFiles.Add(stream);
-            Log($"Starting logging #{logCount} to file: {filePath}");
+            if (overwrite)
+                File.WriteAllLines(filePath, Logs);
+            else
+                File.AppendAllLines(filePath, Logs);
         }
 
-        public static void ClearLoggingFiles()
+        public static void Test()
         {
-            foreach (StreamWriter logFile in logFiles)
-            {
-                if (logFile == null)
-                    continue;
-
-                logFile.Write("\n");
-                logFile.Close();
-            }
-            logFiles.Clear();
-        }
-
-        public static void Log(string message, LogLevel logLevel = LogLevel.Info)
-        {
-            DateTime now = DateTime.Now;
-            foreach (StreamWriter logFile in logFiles)
-            {
-                string toWrite = "[" + (now.Hour < 10 ? "0" + now.Hour : now.Hour)
-                    + ":" + (now.Minute < 10 ? "0" + now.Minute : now.Minute)
-                    + ":" + (now.Second < 10 ? "0" + now.Second : now.Second);
-
-                switch (logLevel)
-                {
-                    case LogLevel.Info:
-                        toWrite += "] [INFO] ";
-                        break;
-                    case LogLevel.Warning:
-                        toWrite += "] [WARN] ";
-                        break;
-                    case LogLevel.Error:
-                        toWrite += "] [ERROR] ";
-                        break;
-                    case LogLevel.Fatal:
-                        toWrite += "] [FATAL] ";
-                        break;
-                }
-
-                logFile.WriteLine(toWrite + message);
-            }
+            Log("Testing INFO log.", LogLevel.Info);
+            Log("Testing WARNING log.", LogLevel.Warning);
+            Log("Testing ERROR log.", LogLevel.Error);
+            Log("Testing FATAL log.", LogLevel.Fatal);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MonoGame.Extended.Input;
+﻿using Editor.Utils;
+using MonoGame.Extended.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ namespace Editor
     public class Config
     {
         public const string ConfigFile = "config.xml";
-
+        
         public int MaxLastEditedFiles = 5;
         public List<string> LastEditedFiles = new();
         public string LastEditedFile => LastEditedFiles.Count > 0 ? LastEditedFiles[0] : null;
@@ -21,7 +22,14 @@ namespace Editor
         public TimeSpan MapViewerRefreshRate = new(0, 0, 0, 0, 16);
         public bool UseMapViewerRefreshRate = true;
         public bool Vsync = false;
+
         public bool DebugMode = false;
+        /// <summary>
+        /// Enables logging to files.
+        /// </summary>
+        public bool EnableLogging = false;
+        public bool ShowDebugConsole = false;
+        public bool ShowAverageFps = false;
 
         public bool AutoLoadLastEditedMap = true;
         public bool RoomSelectionWarp = true;
@@ -31,6 +39,8 @@ namespace Editor
 
         public MouseButton CameraMoveButton = MouseButton.Middle;
         public MouseButton SelectButton = MouseButton.Left;
+
+        public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
 
         public Config()
         {
@@ -70,7 +80,7 @@ namespace Editor
         public void Save()
         {
             XmlSerializer serializer = new(typeof(Config));
-            FileStream output = new(ConfigFile, FileMode.OpenOrCreate, FileAccess.Write);
+            FileStream output = new(ConfigFile, FileMode.Create, FileAccess.Write);
             serializer.Serialize(output, this);
         }
 

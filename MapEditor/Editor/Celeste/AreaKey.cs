@@ -1,21 +1,20 @@
 ﻿using Editor.Logging;
+using System.Data;
 
 namespace Editor.Celeste
 {
     public struct AreaKey
     {
-        public static readonly AreaKey None = new() { ID = -1 };
+        public static readonly AreaKey None = new(-1);
         public static readonly AreaKey Default = new();
+
+        public const string DefaultCampaign = "Uncategorized";
 
         public int ID = 0;
         public AreaMode Mode = AreaMode.Normal;
-        public string Campaign = "Celeste";
+        public string Campaign = DefaultCampaign;
 
-        public AreaKey()
-        {
-        }
-
-        public AreaKey(int id, AreaMode mode = AreaMode.Normal, string campaign = "Uncategorized")
+        public AreaKey(int id, AreaMode mode = AreaMode.Normal, string campaign = DefaultCampaign)
         {
             ID = id;
             Mode = mode;
