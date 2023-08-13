@@ -310,6 +310,8 @@ namespace Editor
             ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
             ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsole);
             ImGui.Checkbox("Show average fps", ref Session.Config.ShowAverageFps);
+            if (ImGui.Button("Test logging"))
+                Logger.Test();
 
             ImGui.End();
 
@@ -321,7 +323,9 @@ namespace Editor
                 Color color = Color.White;
                 foreach (string log in Logger.Logs)
                 {
-                    if (log.Contains("[INFO]"))
+                    if (log.Contains("[DEBUG]"))
+                        color = Color.Green;
+                    else if (log.Contains("[INFO]"))
                         color = Color.LightGreen;
                     else if (log.Contains("[WARN]"))
                         color = Color.Orange;
@@ -331,6 +335,9 @@ namespace Editor
                         color = Color.DarkRed;
                     ImGui.TextColored(color.ToVector4().ToNumerics(), log);
                 }
+
+                if (Logger.LoggedLastFrame)
+                    ImGui.SetScrollHereY(1f);
 
                 ImGui.End();
             }

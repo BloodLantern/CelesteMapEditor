@@ -8,41 +8,38 @@ namespace Editor.Logging
 {
     public static class Logger
     {
+        private class LogEntry
+        {
+            public string Message;
+            public LogLevel Level;
+            public DateTime Time;
+
+            public LogEntry(string message, LogLevel level, DateTime time)
+            {
+                Message = message;
+                Level = level;
+                Time = time;
+            }
+        }
+
         private const string LogsDirectory = "logs";
 
         public static readonly List<string> Logs = new();
-        private static readonly ConcurrentQueue<string> logsQueue = new();
+        private static readonly ConcurrentQueue<LogEntry> logsQueue = new();
+
+        public static bool LoggedLastFrame { get; private set; }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Info)
-        {
-            DateTime now = DateTime.Now;
-            string toWrite = "[" + (now.Hour < 10 ? "0" + now.Hour : now.Hour)
-                + ":" + (now.Minute < 10 ? "0" + now.Minute : now.Minute)
-                + ":" + (now.Second < 10 ? "0" + now.Second : now.Second);
-
-            switch (logLevel)
-            {
-                case LogLevel.Info:
-                    toWrite += "] [INFO] ";
-                    break;
-                case LogLevel.Warning:
-                    toWrite += "] [WARN] ";
-                    break;
-                case LogLevel.Error:
-                    toWrite += "] [ERROR] ";
-                    break;
-                case LogLevel.Fatal:
-                    toWrite += "] [FATAL] ";
-                    break;
-            }
-
-            logsQueue.Enqueue(toWrite + message);
-        }
+            => logsQueue.Enqueue(new LogEntry(message, logLevel, DateTime.Now));
 
         public static async void UpdateLogsAsync()
         {
+            LoggedLastFrame = false;
+
             if (logsQueue.IsEmpty)
                 return;
+
+            LoggedLastFrame = true;
 
             await Task.Run(updateLogs);
         }
@@ -52,11 +49,34 @@ namespace Editor.Logging
             // Empty the queue
             while (!logsQueue.IsEmpty)
             {
-                if (!logsQueue.TryDequeue(out string log))
+                if (!logsQueue.TryDequeue(out LogEntry log))
                     // Avoid deadlocks by breaking out of the loop
                     break;
 
-                Logs.Add(log);
+                string toWrite = "[" + (log.Time.Hour < 10 ? "0" + log.Time.Hour : log.Time.Hour)
+                    + ":" + (log.Time.Minute < 10 ? "0" + log.Time.Minute : log.Time.Minute)
+                    + ":" + (log.Time.Second < 10 ? "0" + log.Time.Second : log.Time.Second);
+
+                switch (log.Level)
+                {
+                    case LogLevel.Debug:
+                        toWrite += "] [DEBUG] ";
+                        break;
+                    case LogLevel.Info:
+                        toWrite += "] [INFO] ";
+                        break;
+                    case LogLevel.Warning:
+                        toWrite += "] [WARN] ";
+                        break;
+                    case LogLevel.Error:
+                        toWrite += "] [ERROR] ";
+                        break;
+                    case LogLevel.Fatal:
+                        toWrite += "] [FATAL] ";
+                        break;
+                }
+
+                Logs.Add(toWrite + log.Message);
             }
         };
 
@@ -105,6 +125,7 @@ namespace Editor.Logging
 
         public static void Test()
         {
+            Log("Testing DEBUG log.", LogLevel.Debug);
             Log("Testing INFO log.", LogLevel.Info);
             Log("Testing WARNING log.", LogLevel.Warning);
             Log("Testing ERROR log.", LogLevel.Error);
