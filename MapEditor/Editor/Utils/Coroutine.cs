@@ -116,5 +116,7 @@ namespace Editor.Utils
         }
 
         public static bool IsRunning(Guid guid) => runningRoutines.ContainsKey(guid);
+
+        public static bool IsRunningAndNotEmpty(Guid guid) => guid != Guid.Empty && IsRunning(guid);
     }
 }

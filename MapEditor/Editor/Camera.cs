@@ -19,6 +19,9 @@ namespace Editor
         public Vector2 Position { get => Bounds.Position; set => Bounds.Position = value; }
         public Vector2 Size { get => Bounds.Size; set => Bounds.Size = value; }
 
+        private Guid moveRoutineGuid = Guid.Empty;
+        public Vector2 TargetPosition { get; private set; }
+
         private Guid zoomRoutineGuid = Guid.Empty;
         private float zoom;
         public float TargetZoom { get; private set; }
@@ -40,14 +43,34 @@ namespace Editor
             Vector2 size = ZoomToSize(zoom);
             Bounds = new(centerPosition - size / 2, size);
             TargetZoom = this.zoom = zoom;
+            TargetPosition = Position;
         }
+
+        public bool IsMoving() => Coroutine.IsRunningAndNotEmpty(moveRoutineGuid);
 
         public void MoveTo(Vector2 targetCenterPosition, float duration = DefaultMoveDuration)
+            => Coroutine.Start(MoveRoutine(targetCenterPosition, duration), ref moveRoutineGuid);
+
+        private IEnumerator MoveRoutine(Vector2 targetCenterPosition, float duration)
         {
-            // TODO
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            Vector2 targetPosition = targetCenterPosition - Size / 2;
+            TargetPosition = targetPosition;
+            Vector2 oldPosition = Position;
+
+            for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
+            {
+                Bounds.X = Calc.EaseLerp(oldPosition.X, targetPosition.X, timer, duration, Ease.QuadOut);
+                Bounds.Y = Calc.EaseLerp(oldPosition.Y, targetPosition.Y, timer, duration, Ease.QuadOut);
+
+                yield return null;
+            }
+
+            Position = targetPosition;
         }
 
-        public bool IsZooming() => zoomRoutineGuid != Guid.Empty && Coroutine.IsRunning(zoomRoutineGuid);
+        public bool IsZooming() => Coroutine.IsRunningAndNotEmpty(zoomRoutineGuid);
 
         public void ZoomToDefault(float duration = DefaultZoomDuration) => ZoomTo(DefaultZoom, duration);
 
