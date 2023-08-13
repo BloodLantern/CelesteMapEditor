@@ -55,7 +55,8 @@ namespace Editor.Logging
 
                 string toWrite = "[" + (log.Time.Hour < 10 ? "0" + log.Time.Hour : log.Time.Hour)
                     + ":" + (log.Time.Minute < 10 ? "0" + log.Time.Minute : log.Time.Minute)
-                    + ":" + (log.Time.Second < 10 ? "0" + log.Time.Second : log.Time.Second);
+                    + ":" + (log.Time.Second < 10 ? "0" + log.Time.Second : log.Time.Second)
+                    + ":" + (log.Time.Millisecond < 10 ? "00" + log.Time.Millisecond : (log.Time.Millisecond < 100 ? "0" + log.Time.Millisecond : log.Time.Millisecond));
 
                 switch (log.Level)
                 {
