@@ -39,6 +39,8 @@ namespace Editor
         public Point Size => Bounds.Size;
         public string Name => LevelData.Name;
 
+        public bool Selected = false;
+
         public Vector2 Center => Position.ToVector2() + Size.ToVector2() / 2;
 
         public Level(LevelData data)

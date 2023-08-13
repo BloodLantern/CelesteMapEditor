@@ -313,6 +313,16 @@ namespace Editor
             if (ImGui.Button("Test logging"))
                 Logger.Test();
 
+            if (ImGui.BeginCombo("UI Style", Session.Config.UiStyle.ToString()))
+            {
+                foreach (ImGuiStyles.Style style in Enum.GetValues(typeof(ImGuiStyles.Style)))
+                {
+                    if (ImGui.Selectable(style.ToString()))
+                        ImGuiStyles.Setup(Session.Config.UiStyle = style);
+                }
+                ImGui.EndCombo();
+            }
+
             ImGui.End();
 
             if (Session.Config.ShowDebugConsole)

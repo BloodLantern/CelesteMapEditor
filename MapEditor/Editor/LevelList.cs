@@ -28,10 +28,9 @@ namespace Editor
 
             foreach (Level level in MapViewer.CurrentMap.Levels)
             {
-                if (ImGui.MenuItem(level.Name))
-                {
+                ImGui.Selectable(level.Name, ref level.Selected, ImGuiSelectableFlags.AllowDoubleClick);
+                if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(0))
                     MapViewer.Camera.MoveTo(level.Center);
-                }
             }
 
             ImGui.End();

@@ -220,6 +220,10 @@ namespace Editor
                 MapMenuStylegrounds();
                 MapMenuMetadata();
 
+                ImGui.Separator();
+
+                MapMenuSaveMapImage();
+
                 ImGui.EndMenu();
             }
         }
@@ -234,6 +238,13 @@ namespace Editor
         private void MapMenuMetadata()
         {
             if (ImGui.MenuItem("Metadata"))
+            {
+            }
+        }
+
+        private void MapMenuSaveMapImage()
+        {
+            if (ImGui.MenuItem("Save map image"))
             {
             }
         }
