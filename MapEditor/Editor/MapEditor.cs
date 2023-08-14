@@ -10,12 +10,13 @@ using MonoGame.Extended.Input;
 using Editor.Utils;
 using MonoGame.Extended;
 using System.Diagnostics;
-using System.Reflection;
+using Editor.UI;
 
 namespace Editor
 {
     public class MapEditor : Game
     {
+        public readonly Version Version = new(0, 1, 0, 0);
         private const string BaseTitle = "CelesteMapEditor";
         private const int BaseWindowWidth = 1280;
         private const int BaseWindowHeight = 720;
@@ -27,7 +28,7 @@ namespace Editor
 
         public ImGuiRenderer ImGuiRenderer;
 
-        private FrameCounter frameCounter = new();
+        private readonly FrameCounter frameCounter = new();
 
         public Session Session;
         public MapViewer MapViewer;
@@ -44,9 +45,6 @@ namespace Editor
 
             Logger.Log($"Starting {nameof(MapEditor)} instance...");
 
-            /*Logger.Log("Testing logger...");
-            Logger.Test();*/
-
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -57,6 +55,7 @@ namespace Editor
 
         protected override void Initialize()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             Logger.Log($"Initializing {nameof(MapEditor)}...");
             ImGuiRenderer = new ImGuiRenderer(this);
 
@@ -85,7 +84,7 @@ namespace Editor
                 MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
 
             base.Initialize();
-            Logger.Log($"{nameof(MapEditor)} initialization complete.");
+            Logger.Log($"{nameof(MapEditor)} initialization complete. Took {stopwatch.ElapsedMilliseconds}ms");
         }
 
         protected override void LoadContent()
@@ -140,7 +139,7 @@ namespace Editor
 
             Session.Exit();
             Logger.Log($"Stopping {nameof(MapEditor)} instance...");
-            Logger.EndLogging(Session);
+            Logger.EndLogging(Session.Config);
         }
 
         public Map LoadMap(string filepath)

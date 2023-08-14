@@ -185,25 +185,25 @@ namespace Editor
 
             // TODO Draw filler tiles
 
+            if (renderedDebugLayers.HasFlag(DebugLayers.LevelBounds))
+            {
+                foreach (Level level in visibleLevels)
+                    level.RenderDebug(spriteBatch, Camera);
+            }
+
             if (Session.Config.DebugMode)
             {
-                if (renderedDebugLayers.HasFlag(DebugLayers.LevelBounds))
-                {
-                    foreach (Level level in visibleLevels)
-                        level.RenderDebug(spriteBatch, Camera);
-                }
-
                 if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
                 {
                     foreach (Entity entity in visibleEntities)
                         entity.RenderDebug(spriteBatch, Camera);
                 }
+            }
 
-                if (renderedDebugLayers.HasFlag(DebugLayers.FillerBounds))
-                {
-                    foreach (Rectangle filler in visibleFillers)
-                        RenderDebugFiller(spriteBatch, Camera, filler);
-                }
+            if (renderedDebugLayers.HasFlag(DebugLayers.FillerBounds))
+            {
+                foreach (Rectangle filler in visibleFillers)
+                    RenderDebugFiller(spriteBatch, Camera, filler);
             }
         }
 
@@ -224,6 +224,7 @@ namespace Editor
                 Math.Max(camera.Zoom, 1f)
             );
 
+        private LogLevel consoleLogLevel = LogLevel.Debug;
         public void RenderDebug()
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -270,8 +271,12 @@ namespace Editor
 
             ImGui.Separator();
 
+            if (ImGui.Button("Reset##0"))
+                Camera.MoveToDefault();
+            ImGui.SameLine();
             ImGui.Text($"Camera position: {Camera.Position}");
-            if (ImGui.Button("Reset"))
+
+            if (ImGui.Button("Reset##1"))
                 Camera.ZoomToDefault();
             ImGui.SameLine();
             ImGui.Text($"Camera zoom factor: {Camera.Zoom}");
@@ -329,25 +334,52 @@ namespace Editor
             {
                 ImGui.Begin("Debug console", ImGuiWindowFlags.NoFocusOnAppearing);
 
+                if (ImGui.BeginCombo("Log level", consoleLogLevel.ToString()))
+                {
+                    foreach (LogLevel level in Enum.GetValues(typeof(LogLevel)))
+                    {
+                        if (ImGui.Selectable(level.ToString()))
+                            consoleLogLevel = level;
+                    }
+                    ImGui.EndCombo();
+                }
+
+                int scroll = 0;
+                if (ImGui.Button("Scroll up"))
+                    scroll = -1;
+                ImGui.SameLine();
+                if (ImGui.Button("Scroll down") || Logger.LoggedLastFrame)
+                    scroll = 1;
+
+                ImGui.BeginChild("Logs", new(-1), false, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);
+
+                if (scroll == -1)
+                    ImGui.SetScrollHereY(0f);
+
                 // Show the current logs
                 Color color = Color.White;
-                foreach (string log in Logger.Logs)
+                foreach (string log in Logger.LogEntries)
                 {
-                    if (log.Contains("[DEBUG]"))
-                        color = Color.Green;
-                    else if (log.Contains("[INFO]"))
-                        color = Color.LightGreen;
-                    else if (log.Contains("[WARN]"))
-                        color = Color.Orange;
-                    else if (log.Contains("[ERROR]"))
-                        color = Color.Red;
-                    else if (log.Contains("[FATAL]"))
-                        color = Color.DarkRed;
+                    LogLevel level = Logger.GetLevel(log);
+                    if ((byte) level < (byte) consoleLogLevel)
+                        continue;
+
+                    color = level switch
+                    {
+                        LogLevel.Debug => Color.Green,
+                        LogLevel.Info => Color.LightGreen,
+                        LogLevel.Warning => Color.Orange,
+                        LogLevel.Error => Color.Red,
+                        LogLevel.Fatal => Color.DarkRed,
+                        _ => throw new InvalidOperationException("Invalid log level")
+                    };
                     ImGui.TextColored(color.ToVector4().ToNumerics(), log);
                 }
 
-                if (Logger.LoggedLastFrame)
+                if (scroll == 1)
                     ImGui.SetScrollHereY(1f);
+
+                ImGui.EndChild();
 
                 ImGui.End();
             }

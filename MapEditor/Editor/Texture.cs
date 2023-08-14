@@ -4,6 +4,7 @@ using Editor.Celeste;
 using Editor.Utils;
 using System;
 using System.IO;
+using ImGuiNET;
 
 namespace Editor
 {
@@ -34,22 +35,22 @@ namespace Editor
 
         public float Rotation = 0f;
 
-        public Texture(string name)
+        public Texture(string directory, string name)
         {
             Name = name;
-            Load();
+            Load(directory);
             if (Image != null)
                 Size = Image.Bounds.Size;
             ClipRect = new Rectangle(Point.Zero, Size);
         }
 
-        public Texture(string name, Point size, Color color)
+        public Texture(string directory, string name, Point size, Color color)
         {
             Name = name;
             Size = size;
             ClipRect = new Rectangle(Point.Zero, Size);
             Color = color;
-            Load();
+            Load(directory);
         }
 
         public Texture(
@@ -123,7 +124,7 @@ namespace Editor
         /// Most of the code in this function comes directly from Celeste so
         /// some variables might have an inaccurate name.
         /// </summary>
-        private void Load()
+        private void Load(string directory)
         {
             if (string.IsNullOrEmpty(Name))
             {
@@ -136,72 +137,96 @@ namespace Editor
             }
             else
             {
-                using FileStream fileStream = File.OpenRead(Path.Combine(Session.Current.CelesteContentDirectory, Name));
-                fileStream.Read(buffer2, 0, ByteArraySize);
-
-                int width = BitConverter.ToInt32(buffer2, 0);
-                int height = BitConverter.ToInt32(buffer2, 4);
-                bool flag = buffer2[8] == 1;
-
-                int bytesIndex = 9;
-                int totalSize = width * height * 4;
-                int bufferIndex = 0;
-                while (bufferIndex < totalSize)
+                switch (Path.GetExtension(Name))
                 {
-                    int blockSize = buffer2[bytesIndex] * 4;
-                    if (flag)
+                    case ".data":
                     {
-                        byte num2 = buffer2[bytesIndex + 1];
-                        if (num2 > 0)
+                        using FileStream fileStream = File.OpenRead(Path.Combine(directory, Name));
+                        fileStream.Read(buffer2, 0, ByteArraySize);
+
+                        int width = BitConverter.ToInt32(buffer2, 0);
+                        int height = BitConverter.ToInt32(buffer2, 4);
+                        bool flag = buffer2[8] == 1;
+
+                        int bytesIndex = 9;
+                        int totalSize = width * height * 4;
+                        int bufferIndex = 0;
+                        while (bufferIndex < totalSize)
                         {
-                            buffer[bufferIndex] = buffer2[bytesIndex + 4];
-                            buffer[bufferIndex + 1] = buffer2[bytesIndex + 3];
-                            buffer[bufferIndex + 2] = buffer2[bytesIndex + 2];
-                            buffer[bufferIndex + 3] = num2;
-                            bytesIndex += 5;
+                            int blockSize = buffer2[bytesIndex] * 4;
+                            if (flag)
+                            {
+                                byte num2 = buffer2[bytesIndex + 1];
+                                if (num2 > 0)
+                                {
+                                    buffer[bufferIndex] = buffer2[bytesIndex + 4];
+                                    buffer[bufferIndex + 1] = buffer2[bytesIndex + 3];
+                                    buffer[bufferIndex + 2] = buffer2[bytesIndex + 2];
+                                    buffer[bufferIndex + 3] = num2;
+                                    bytesIndex += 5;
+                                }
+                                else
+                                {
+                                    buffer[bufferIndex] = 0;
+                                    buffer[bufferIndex + 1] = 0;
+                                    buffer[bufferIndex + 2] = 0;
+                                    buffer[bufferIndex + 3] = 0;
+                                    bytesIndex += 2;
+                                }
+                            }
+                            else
+                            {
+                                buffer[bufferIndex] = buffer2[bytesIndex + 3];
+                                buffer[bufferIndex + 1] = buffer2[bytesIndex + 2];
+                                buffer[bufferIndex + 2] = buffer2[bytesIndex + 1];
+                                buffer[bufferIndex + 3] = byte.MaxValue;
+                                bytesIndex += 4;
+                            }
+                            if (blockSize > 4)
+                            {
+                                int newBufferIndex = bufferIndex + 4;
+                                for (int i = bufferIndex + blockSize; newBufferIndex < i; newBufferIndex += 4)
+                                {
+                                    buffer[newBufferIndex] = buffer[bufferIndex];
+                                    buffer[newBufferIndex + 1] = buffer[bufferIndex + 1];
+                                    buffer[newBufferIndex + 2] = buffer[bufferIndex + 2];
+                                    buffer[newBufferIndex + 3] = buffer[bufferIndex + 3];
+                                }
+                            }
+                            bufferIndex += blockSize;
+                            if (bytesIndex > ByteArrayCheckSize)
+                            {
+                                int offset = ByteArraySize - bytesIndex;
+                                for (int index5 = 0; index5 < offset; ++index5)
+                                    buffer2[index5] = buffer2[bytesIndex + index5];
+                                fileStream.Read(buffer2, offset, ByteArraySize - offset);
+                                bytesIndex = 0;
+                            }
                         }
-                        else
+
+                        Size = new Point(width, height);
+                        Image = new(MapEditor.Instance.GraphicsDevice, width, height);
+                        Image.SetData(buffer, 0, totalSize);
+                        break;
+                    }
+
+                    case ".png":
+                    {
+                        using (FileStream fileStream = File.OpenRead(Path.Combine(directory, Name)))
+                            Image = Texture2D.FromStream(MapEditor.Instance.Graphics.GraphicsDevice, fileStream);
+                        int elementCount = Image.Width * Image.Height;
+                        Color[] data = new Color[elementCount];
+                        Image.GetData(data, 0, elementCount);
+                        for (int index = 0; index < elementCount; ++index)
                         {
-                            buffer[bufferIndex] = 0;
-                            buffer[bufferIndex + 1] = 0;
-                            buffer[bufferIndex + 2] = 0;
-                            buffer[bufferIndex + 3] = 0;
-                            bytesIndex += 2;
+                            data[index].R = (byte) (data[index].R * (data[index].A / (float) byte.MaxValue));
+                            data[index].G = (byte) (data[index].G * (data[index].A / (float) byte.MaxValue));
+                            data[index].B = (byte) (data[index].B * (data[index].A / (float) byte.MaxValue));
                         }
-                    }
-                    else
-                    {
-                        buffer[bufferIndex] = buffer2[bytesIndex + 3];
-                        buffer[bufferIndex + 1] = buffer2[bytesIndex + 2];
-                        buffer[bufferIndex + 2] = buffer2[bytesIndex + 1];
-                        buffer[bufferIndex + 3] = byte.MaxValue;
-                        bytesIndex += 4;
-                    }
-                    if (blockSize > 4)
-                    {
-                        int newBufferIndex = bufferIndex + 4;
-                        for (int i = bufferIndex + blockSize; newBufferIndex < i; newBufferIndex += 4)
-                        {
-                            buffer[newBufferIndex] = buffer[bufferIndex];
-                            buffer[newBufferIndex + 1] = buffer[bufferIndex + 1];
-                            buffer[newBufferIndex + 2] = buffer[bufferIndex + 2];
-                            buffer[newBufferIndex + 3] = buffer[bufferIndex + 3];
-                        }
-                    }
-                    bufferIndex += blockSize;
-                    if (bytesIndex > ByteArrayCheckSize)
-                    {
-                        int offset = ByteArraySize - bytesIndex;
-                        for (int index5 = 0; index5 < offset; ++index5)
-                            buffer2[index5] = buffer2[bytesIndex + index5];
-                        fileStream.Read(buffer2, offset, ByteArraySize - offset);
-                        bytesIndex = 0;
+                        Image.SetData(data, 0, elementCount);
+                        break;
                     }
                 }
-
-                Size = new Point(width, height);
-                Image = new(MapEditor.Instance.GraphicsDevice, width, height);
-                Image.SetData(buffer, 0, totalSize);
             }
         }
 

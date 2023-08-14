@@ -1,6 +1,6 @@
 ﻿namespace Editor.Logging
 {
-    public enum LogLevel
+    public enum LogLevel : byte
     {
         Debug,
         Info,

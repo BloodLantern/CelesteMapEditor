@@ -1,16 +1,19 @@
 ﻿using Editor.Extensions;
-using Editor.Utils;
 using ImGuiNET;
 using NativeFileDialogExtendedSharp;
-using System;
 
-namespace Editor
+namespace Editor.UI
 {
     public class MenuBar
     {
         public MapEditor MapEditor;
+        public ModDependencies ModDependencies;
 
-        public MenuBar(MapEditor mapEditor) => MapEditor = mapEditor;
+        public MenuBar(MapEditor mapEditor)
+        {
+            MapEditor = mapEditor;
+            ModDependencies = new(mapEditor.Session);
+        }
 
         public void Render(Session session)
         {
@@ -19,11 +22,17 @@ namespace Editor
             FileMenu(session.Config);
             EditMenu();
             ViewMenu();
+            ModMenu();
             MapMenu();
             RoomMenu();
             HelpMenu();
 
             ImGui.EndMainMenuBar();
+
+            if (modShouldShowDependencies)
+                ImGui.SetNextWindowFocus();
+
+            ModDependencies.Render();
         }
 
         private void FileMenu(Config config)
@@ -211,6 +220,24 @@ namespace Editor
             {
                 ImGui.EndMenu();
             }
+        }
+
+        private void ModMenu()
+        {
+            if (ImGui.BeginMenu("Mod"))
+            {
+                ModMenuShowDependencies();
+
+                ImGui.EndMenu();
+            }
+        }
+
+        private bool modShouldShowDependencies = false;
+        private void ModMenuShowDependencies()
+        {
+            modShouldShowDependencies = false;
+            if (ImGui.MenuItem("Show dependencies"))
+                modShouldShowDependencies = true;
         }
 
         private void MapMenu()

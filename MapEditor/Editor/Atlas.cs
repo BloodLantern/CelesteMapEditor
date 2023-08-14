@@ -4,33 +4,36 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Celeste
 {
     public class Atlas
     {
-        private static Atlas gameplay = new();
         /// <summary>
         /// The vanilla gameplay Atlas.
         /// </summary>
-        public static Atlas Gameplay { get { return gameplay; } }
+        public static Atlas Gameplay { get; private set; }
 
         public readonly Dictionary<string, Texture> Textures = new(StringComparer.OrdinalIgnoreCase);
 
-        public static void LoadAtlases(string celesteGraphicsDirectory)
+        public static void LoadVanillaAtlases(string celesteGraphicsDirectory)
         {
             Logger.Log("Loading atlases");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             Texture.AllocateBuffers();
-            LoadAtlas(ref gameplay, Path.Combine(celesteGraphicsDirectory, "Atlases", "Gameplay"));
+            Gameplay = LoadAtlasWithMeta(Path.Combine(celesteGraphicsDirectory, "Atlases", "Gameplay"));
             Texture.DeallocateBuffers();
 
             Logger.Log($"Finished loading atlases. Took {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private static void LoadAtlas(ref Atlas atlas, string path)
+        /// <summary>
+        /// Load an Atlas using a meta file.
+        /// </summary>
+        /// <param name="path">The path to the meta file.</param>
+        /// <returns>The loaded Atlas.</returns>
+        private static Atlas LoadAtlasWithMeta(string path)
         {
             using FileStream fileStream = File.OpenRead(path + ".meta");
             BinaryReader reader = new(fileStream);
@@ -39,11 +42,12 @@ namespace Editor.Celeste
             reader.ReadString();
             reader.ReadInt32();
 
+            Atlas result = new();
             short atlasCount = reader.ReadInt16();
             for (int i = 0; i < atlasCount; i++)
             {
                 string dataFileName = reader.ReadString();
-                Texture parentTexture = new(Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, dataFileName + ".data"));
+                Texture parentTexture = new(Session.Current.CelesteContentDirectory, Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, dataFileName + ".data"));
 
                 short childCount = reader.ReadInt16();
                 for (int j = 0; j < childCount; j++)
@@ -56,9 +60,28 @@ namespace Editor.Celeste
                     Point offset = new(-reader.ReadInt16(), -reader.ReadInt16());
                     Point textureSize = new(reader.ReadInt16(), reader.ReadInt16());
 
-                    atlas.Textures[texturePath] = new Texture(parentTexture, new Rectangle(clipPosition, clipSize), offset, textureSize);
+                    result.Textures[texturePath] = new Texture(parentTexture, new Rectangle(clipPosition, clipSize), offset, textureSize);
                 }
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Loads an Atlas from a folder.
+        /// </summary>
+        /// <param name="path">The path to the Atlas' root folder.</param>
+        /// <returns>The loaded Atlas.</returns>
+        public static Atlas LoadAtlas(string path)
+        {
+            Atlas result = new();
+
+            foreach (string file in Directory.EnumerateFiles(path, "*.png", SearchOption.AllDirectories))
+            {
+                result.Textures[Path.ChangeExtension(file, string.Empty)] = new Texture(Path.GetDirectoryName(path), file);
+            }
+
+            return result;
         }
 
         public Texture this[string key]

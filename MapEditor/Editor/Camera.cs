@@ -48,6 +48,8 @@ namespace Editor
 
         public bool IsMoving() => Coroutine.IsRunningAndNotEmpty(moveRoutineGuid);
 
+        public void MoveToDefault() => MoveTo(Vector2.Zero);
+
         public void MoveTo(Vector2 targetCenterPosition, float duration = DefaultMoveDuration)
             => Coroutine.Start(MoveRoutine(targetCenterPosition, duration), ref moveRoutineGuid);
 

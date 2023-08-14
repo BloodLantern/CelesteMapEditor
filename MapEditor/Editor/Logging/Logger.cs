@@ -24,7 +24,7 @@ namespace Editor.Logging
 
         private const string LogsDirectory = "logs";
 
-        public static readonly List<string> Logs = new();
+        public static List<string> LogEntries { get; private set; } = new();
         private static readonly ConcurrentQueue<LogEntry> logsQueue = new();
 
         public static bool LoggedLastFrame { get; private set; }
@@ -56,7 +56,7 @@ namespace Editor.Logging
                 string toWrite = "[" + (log.Time.Hour < 10 ? "0" + log.Time.Hour : log.Time.Hour)
                     + ":" + (log.Time.Minute < 10 ? "0" + log.Time.Minute : log.Time.Minute)
                     + ":" + (log.Time.Second < 10 ? "0" + log.Time.Second : log.Time.Second)
-                    + ":" + (log.Time.Millisecond < 10 ? "00" + log.Time.Millisecond : (log.Time.Millisecond < 100 ? "0" + log.Time.Millisecond : log.Time.Millisecond));
+                    + "." + (log.Time.Millisecond < 10 ? "00" + log.Time.Millisecond : (log.Time.Millisecond < 100 ? "0" + log.Time.Millisecond : log.Time.Millisecond));
 
                 switch (log.Level)
                 {
@@ -77,18 +77,25 @@ namespace Editor.Logging
                         break;
                 }
 
-                Logs.Add(toWrite + log.Message);
+                LogEntries.Add(toWrite + log.Message);
             }
         };
 
-        public static void EndLogging(Session session)
+        public static void EndLogging(Config config)
         {
-            if (!session.Config.EnableLogging)
+            if (!config.EnableLogging)
                 return;
 
             updateLogs();
+            LogEntries.Add(string.Empty); // Add an empty line at the end of the logs
+
+            // Remove all the logs below the minimum log level
+            LogEntries = LogEntries.FindAll(log => (byte) GetLevel(log) >= (byte) config.LogLevel);
+
             AddLogsToLatestFile();
-            AddLogsToDefaultFile();
+
+            if (LogEntries.Count > 0)
+                AddLogsToDefaultFile();
         }
 
         private static void AddLogsToLatestFile()
@@ -119,9 +126,9 @@ namespace Editor.Logging
             Directory.CreateDirectory(Directory.GetParent(filePath).ToString());
 
             if (overwrite)
-                File.WriteAllLines(filePath, Logs);
+                File.WriteAllLines(filePath, LogEntries);
             else
-                File.AppendAllLines(filePath, Logs);
+                File.AppendAllLines(filePath, LogEntries);
         }
 
         public static void Test()
@@ -131,6 +138,19 @@ namespace Editor.Logging
             Log("Testing WARNING log.", LogLevel.Warning);
             Log("Testing ERROR log.", LogLevel.Error);
             Log("Testing FATAL log.", LogLevel.Fatal);
+        }
+
+        public static LogLevel GetLevel(string log)
+        {
+            if (log.Contains("[DEBUG]"))
+                return LogLevel.Debug;
+            else if (log.Contains("[INFO]"))
+                return LogLevel.Info;
+            else if (log.Contains("[WARN]"))
+                return LogLevel.Warning;
+            else if (log.Contains("[ERROR]"))
+                return LogLevel.Error;
+            return LogLevel.Fatal;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Editor.Utils;
+﻿using Editor.Logging;
+using Editor.Utils;
 using MonoGame.Extended.Input;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,10 @@ namespace Editor
         /// Enables logging to files.
         /// </summary>
         public bool EnableLogging = false;
+        /// <summary>
+        /// Lowest log level for log files.
+        /// </summary>
+        public LogLevel LogLevel = LogLevel.Error;
         public bool ShowDebugConsole = false;
         public bool ShowAverageFps = false;
 

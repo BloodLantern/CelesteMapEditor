@@ -18,7 +18,7 @@ namespace Editor.Utils
             return ImGui.Button(label);
         }
 
-        private static bool errorPopupOpen = false;
+        //private static bool errorPopupOpen = false;
         public static void ErrorInfoDialog(string message)
         {
             ImGui.OpenPopup("Error");

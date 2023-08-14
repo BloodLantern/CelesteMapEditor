@@ -1,6 +1,6 @@
 ﻿using ImGuiNET;
 
-namespace Editor
+namespace Editor.UI
 {
     public class LevelList
     {
