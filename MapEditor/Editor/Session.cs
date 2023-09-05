@@ -33,8 +33,15 @@ namespace Editor
 
         public string ContentDirectory;
 
-        private bool debugContentLoaded = false;
-        public SpriteFont DebugFont;
+        /// <summary>
+        /// Mainly used as a debugging font.
+        /// </summary>
+        public SpriteFont ConsolasFont;
+        public SpriteFont UbuntuRegularFont;
+        public SpriteFont UbuntuLightFont;
+        /// <summary>
+        /// Mainly used to display trigger names.
+        /// </summary>
         public SpriteFont PixelatedFont;
 
         public List<CelesteMod> CelesteMods = new();
@@ -51,25 +58,35 @@ namespace Editor
 
             Config = Config.Load();
 
+            ImGuiStyles.Setup(Config.UiStyle);
+            ImGuiStyles.SetupFont(this, MapEditor.ImGuiRenderer);
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            ConsolasFont = content.Load<SpriteFont>("Fonts/consolas");
+            UbuntuRegularFont = content.Load<SpriteFont>("Fonts/ubuntu-regular");
+            UbuntuLightFont = content.Load<SpriteFont>("Fonts/ubuntu-light");
+            PixelatedFont = content.Load<SpriteFont>("Fonts/pixelated");
+        }
+
+        public bool TryLoad()
+        {
             if (!TryGetActiveCelesteDirectory(out CelesteDirectory))
             {
                 Logger.Log("Could not get the active Celeste directory using the Olympus config file. Stopping program.", LogLevel.Fatal);
                 Logger.Log($"Was looking for {OlympusConfigFilePath}", LogLevel.Fatal);
-                Current = null;
-                return;
+                return false;
             }
 
             if (!TryGetActiveCelesteVersion(out CelesteVersion, out EverestVersion))
             {
                 Logger.Log("Could not get the active Celeste version. Stopping program.", LogLevel.Fatal);
-                Current = null;
-                return;
+                return false;
             }
 
             if (EverestVersion == null)
-            {
                 Logger.Log("Everest version not found. Celeste not modded.", LogLevel.Warning);
-            }
 
             Logger.Log($"Detected active Celeste version: {CelesteVersion}");
             Logger.Log($"Detected active Everest version: {EverestVersion}");
@@ -78,32 +95,7 @@ namespace Editor
             CelesteGraphicsDirectory = Path.Combine(CelesteContentDirectory, "Graphics");
             CelesteModsDirectory = Path.Combine(CelesteDirectory, "Mods");
 
-            if (EverestVersion != null)
-                CelesteMod.PreLoadAll(this);
-
-            Atlas.LoadVanillaAtlases(CelesteGraphicsDirectory);
-            Autotiler.LoadAutotilers(CelesteGraphicsDirectory);
-
-            ImGuiStyles.Setup(Config.UiStyle);
-            ImGuiStyles.SetupFont(this, mapEditor.ImGuiRenderer);
-        }
-
-        public void LoadContent(ContentManager content)
-        {
-            //if (Config.DebugMode)
-                LoadDebugContent(content);
-
-            PixelatedFont = content.Load<SpriteFont>("Fonts/pixelated");
-        }
-
-        public void LoadDebugContent(ContentManager content)
-        {
-            if (debugContentLoaded)
-                return;
-
-            DebugFont = content.Load<SpriteFont>("Fonts/debug");
-
-            debugContentLoaded = true;
+            return true;
         }
 
         /// <summary>

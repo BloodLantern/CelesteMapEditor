@@ -123,18 +123,18 @@ namespace Editor
         public static Color HsvToColor(float hue, float s, float v)
         {
             int angle = (int) (hue * 360f);
-            float num2 = s * v;
-            float num3 = num2 * (1f - Math.Abs(angle / 60f % 2f - 1f));
-            float num4 = v - num2;
+            float val1 = s * v;
+            float val2 = val1 * (1f - Math.Abs(angle / 60f % 2f - 1f));
+            float val3 = v - val1;
             if (angle < 60)
-                return new Color(num4 + num2, num4 + num3, num4);
+                return new Color(val3 + val1, val3 + val2, val3);
             if (angle < 120)
-                return new Color(num4 + num3, num4 + num2, num4);
+                return new Color(val3 + val2, val3 + val1, val3);
             if (angle < 180)
-                return new Color(num4, num4 + num2, num4 + num3);
+                return new Color(val3, val3 + val1, val3 + val2);
             if (angle < 240)
-                return new Color(num4, num4 + num3, num4 + num2);
-            return angle < 300 ? new Color(num4 + num3, num4, num4 + num2) : new Color(num4 + num2, num4, num4 + num3);
+                return new Color(val3, val3 + val2, val3 + val1);
+            return angle < 300 ? new Color(val3 + val2, val3, val3 + val1) : new Color(val3 + val1, val3, val3 + val2);
         }
 
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
@@ -155,5 +155,9 @@ namespace Editor
             str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value.ToLowerInvariant());
             return char.ToUpperInvariant(str[0]) + str[1..];
         }
+
+        public static bool BetweenInterval(float val, float interval) => val % (interval * 2) > interval;
+
+        public static bool OnInterval(float val, float prevVal, float interval) => (int) (prevVal / interval) != (int) (val / interval);
     }
 }

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Editor.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Editor.Utils
@@ -12,18 +16,18 @@ namespace Editor.Utils
 
         public const int MaximumSamples = 100;
 
-        private Queue<float> _sampleBuffer = new();
+        private readonly Queue<float> sampleBuffer = new();
 
         public void Update(float deltaTime)
         {
             CurrentFramesPerSecond = 1.0f / deltaTime;
 
-            _sampleBuffer.Enqueue(CurrentFramesPerSecond);
+            sampleBuffer.Enqueue(CurrentFramesPerSecond);
 
-            if (_sampleBuffer.Count > MaximumSamples)
+            if (sampleBuffer.Count > MaximumSamples)
             {
-                _sampleBuffer.Dequeue();
-                AverageFramesPerSecond = _sampleBuffer.Average(i => i);
+                sampleBuffer.Dequeue();
+                AverageFramesPerSecond = sampleBuffer.Average(i => i);
             }
             else
             {
@@ -34,6 +38,7 @@ namespace Editor.Utils
             TotalSeconds += deltaTime;
         }
 
-        public override string ToString() => $"FPS: {(int) AverageFramesPerSecond}";
+        public void Render(SpriteBatch spriteBatch, Session session, LeftPanel leftPanel)
+            => spriteBatch.DrawString(session.UbuntuRegularFont, $"FPS: {(int) AverageFramesPerSecond}", new Vector2((leftPanel != null ? leftPanel.Width : 0f) + 10f, 30f), Color.White);
     }
 }

@@ -7,12 +7,10 @@ namespace Editor.UI
     public class MenuBar
     {
         public MapEditor MapEditor;
-        public ModDependencies ModDependencies;
 
         public MenuBar(MapEditor mapEditor)
         {
             MapEditor = mapEditor;
-            ModDependencies = new(mapEditor.Session);
         }
 
         public void Render(Session session)
@@ -28,11 +26,6 @@ namespace Editor.UI
             HelpMenu();
 
             ImGui.EndMainMenuBar();
-
-            if (modShouldShowDependencies)
-                ImGui.SetNextWindowFocus();
-
-            ModDependencies.Render();
         }
 
         private void FileMenu(Config config)
@@ -232,12 +225,10 @@ namespace Editor.UI
             }
         }
 
-        private bool modShouldShowDependencies = false;
         private void ModMenuShowDependencies()
         {
-            modShouldShowDependencies = false;
             if (ImGui.MenuItem("Show dependencies"))
-                modShouldShowDependencies = true;
+                MapEditor.ModDependencies.Open = true;
         }
 
         private void MapMenu()

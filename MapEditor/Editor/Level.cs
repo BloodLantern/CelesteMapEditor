@@ -5,9 +5,6 @@ using Editor.Celeste;
 using System.Collections.Generic;
 using MonoGame.Extended;
 using Editor.Entities;
-using Editor.Extensions;
-using System;
-using Microsoft.Xna.Framework.Input;
 
 namespace Editor
 {
@@ -42,6 +39,10 @@ namespace Editor
         public bool Selected = false;
 
         public Vector2 Center => Position.ToVector2() + Size.ToVector2() / 2;
+        /// <summary>
+        /// Whether the level is considered to be a room filler.
+        /// </summary>
+        public bool Filler => PlayerSpawns.Count == 0;
 
         public Level(LevelData data)
         {

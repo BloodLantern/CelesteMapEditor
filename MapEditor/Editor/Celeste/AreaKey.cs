@@ -1,5 +1,6 @@
 ﻿using Editor.Logging;
 using System.Data;
+using System.IO;
 
 namespace Editor.Celeste
 {
@@ -9,6 +10,7 @@ namespace Editor.Celeste
         public static readonly AreaKey Default = new();
 
         public const string DefaultCampaign = "Uncategorized";
+        public const string VanillaCampaign = "Celeste";
 
         public int ID = 0;
         public AreaMode Mode = AreaMode.Normal;
@@ -24,9 +26,10 @@ namespace Editor.Celeste
         /// <summary>
         /// Tries to load the area <see cref="ID"/> and <see cref="Mode"/> using the map file name.
         /// </summary>
-        /// <param name="fileName">The map file name to try to load values from.</param>
-        public void TryLoadFromFileName(string fileName)
+        /// <param name="filePath">The map file path to try to load values from.</param>
+        public void TryLoadFromFileName(string filePath)
         {
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
             string[] fileNameParts = fileName.Split('-');
             if (fileNameParts.Length > 1)
             {
@@ -67,7 +70,7 @@ namespace Editor.Celeste
                     string suffix = fileNameParts[suffixIndex];
 
                     if (suffix.Length > 1)
-                        Logger.Log("Invalid map file name suffix: " + suffix);
+                        Logger.Log("Invalid map file name suffix: " + suffix, LogLevel.Warning);
 
                     switch (suffix[0])
                     {
@@ -82,6 +85,10 @@ namespace Editor.Celeste
                     };
                 }
             }
+
+            // Check if the map is a vanilla one
+            if (Directory.GetParent(filePath)?.Parent?.FullName == Session.Current.CelesteContentDirectory)
+                Campaign = VanillaCampaign;
         }
 
         public override readonly bool Equals(object obj) => obj is AreaKey && this == obj as AreaKey?;
@@ -110,7 +117,7 @@ namespace Editor.Celeste
 
         public static bool operator ==(AreaKey a, AreaKey b)
         {
-            return a.ID == b.ID && a.Mode == b.Mode;
+            return a.ID == b.ID && a.Mode == b.Mode && a.Campaign == b.Campaign;
         }
 
         public static bool operator !=(AreaKey a, AreaKey b)

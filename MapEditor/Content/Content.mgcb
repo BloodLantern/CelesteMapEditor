@@ -15,12 +15,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Fonts/debug.spritefont
+#begin Fonts/consolas.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Fonts/debug.spritefont
+/build:Fonts/consolas.spritefont
 
 #begin Fonts/imgui.ttf
 /copy:Fonts/imgui.ttf
@@ -31,4 +31,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/pixelated.spritefont
+
+#begin Fonts/ubuntu-light.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/ubuntu-light.spritefont
+
+#begin Fonts/ubuntu-regular.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/ubuntu-regular.spritefont
 

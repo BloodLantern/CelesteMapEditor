@@ -54,8 +54,8 @@ namespace Editor
         private bool Dragging => cameraStartPosition.HasValue && clickStartPosition.HasValue;
         private Vector2 dragDelta;
 
-        private List<Level> visibleLevels;
-        private List<Rectangle> visibleFillers;
+        private List<Level> visibleLevels = new();
+        private List<Filler> visibleFillers = new();
         private readonly List<Entity> visibleEntities = new();
         private readonly List<Trigger> visibleTriggers = new();
         private readonly List<Vector2> visiblePlayerSpawns = new();
@@ -74,14 +74,20 @@ namespace Editor
             MapEditor = mapEditor;
             Session = mapEditor.Session;
 
+            playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
+        }
+
+        public void InitializeCamera()
+        {
             Camera = new(Vector2.Zero, 0.00001f);
             Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
-
-            playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
 
         public void Update(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
+            if (CurrentMap == null)
+                return;
+
             visibleLevels = CurrentMap.GetVisibleLevels(Camera.Bounds);
             visibleFillers = CurrentMap.GetVisibleFillers(Camera.Bounds);
             visibleEntities.Clear();
@@ -153,6 +159,9 @@ namespace Editor
 
         public void Render(SpriteBatch spriteBatch)
         {
+            if (CurrentMap == null)
+                return;
+
             if (renderedLayers.HasFlag(Layers.LevelBackground))
             {
                 foreach (Level level in visibleLevels)
@@ -224,7 +233,6 @@ namespace Editor
                 Math.Max(camera.Zoom, 1f)
             );
 
-        private LogLevel consoleLogLevel = LogLevel.Debug;
         public void RenderDebug()
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -329,60 +337,6 @@ namespace Editor
             }
 
             ImGui.End();
-
-            if (Session.Config.ShowDebugConsole)
-            {
-                ImGui.Begin("Debug console", ImGuiWindowFlags.NoFocusOnAppearing);
-
-                if (ImGui.BeginCombo("Log level", consoleLogLevel.ToString()))
-                {
-                    foreach (LogLevel level in Enum.GetValues(typeof(LogLevel)))
-                    {
-                        if (ImGui.Selectable(level.ToString()))
-                            consoleLogLevel = level;
-                    }
-                    ImGui.EndCombo();
-                }
-
-                int scroll = 0;
-                if (ImGui.Button("Scroll up"))
-                    scroll = -1;
-                ImGui.SameLine();
-                if (ImGui.Button("Scroll down") || Logger.LoggedLastFrame)
-                    scroll = 1;
-
-                ImGui.BeginChild("Logs", new(-1), false, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);
-
-                if (scroll == -1)
-                    ImGui.SetScrollHereY(0f);
-
-                // Show the current logs
-                Color color = Color.White;
-                foreach (string log in Logger.LogEntries)
-                {
-                    LogLevel level = Logger.GetLevel(log);
-                    if ((byte) level < (byte) consoleLogLevel)
-                        continue;
-
-                    color = level switch
-                    {
-                        LogLevel.Debug => Color.Green,
-                        LogLevel.Info => Color.LightGreen,
-                        LogLevel.Warning => Color.Orange,
-                        LogLevel.Error => Color.Red,
-                        LogLevel.Fatal => Color.DarkRed,
-                        _ => throw new InvalidOperationException("Invalid log level")
-                    };
-                    ImGui.TextColored(color.ToVector4().ToNumerics(), log);
-                }
-
-                if (scroll == 1)
-                    ImGui.SetScrollHereY(1f);
-
-                ImGui.EndChild();
-
-                ImGui.End();
-            }
         }
 
         public static Point ToTilePosition(Point position) => position.Div(Tileset.TileSize);

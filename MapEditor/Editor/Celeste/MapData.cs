@@ -13,7 +13,7 @@ namespace Editor.Celeste
         public AreaKey Area = AreaKey.None;
         public AreaData Metadata;
         public List<LevelData> Levels = new();
-        public List<Rectangle> Fillers = new();
+        public List<Filler> Fillers = new();
         public Color BackgroundColor = Color.Black;
         public BinaryPacker.Element Foreground;
         public BinaryPacker.Element Background;
@@ -52,7 +52,7 @@ namespace Editor.Celeste
                 return false;
             }
 
-            Area.TryLoadFromFileName(Path.GetFileNameWithoutExtension(FilePath));
+            Area.TryLoadFromFileName(FilePath);
 
             BinaryPacker.Element element;
             try
@@ -77,16 +77,18 @@ namespace Editor.Celeste
                         break;
 
                     case "Filler":
-                        Fillers = new List<Rectangle>();
+                        Fillers = new List<Filler>();
                         if (data.Children != null)
                         {
+                            int index = 0;
                             foreach (BinaryPacker.Element filler in data.Children)
                                 Fillers.Add(
-                                    new Rectangle(
+                                    new Filler(
                                         (int) filler.Attributes["x"] * Tileset.TileSize,
                                         (int) filler.Attributes["y"] * Tileset.TileSize,
                                         (int) filler.Attributes["w"] * Tileset.TileSize,
-                                        (int) filler.Attributes["h"] * Tileset.TileSize
+                                        (int) filler.Attributes["h"] * Tileset.TileSize,
+                                        index++
                                     )
                                 );
                         }

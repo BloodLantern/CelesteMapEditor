@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
@@ -13,6 +14,8 @@ namespace Editor
     public class CelesteMod
     {
         public static readonly CelesteMod Empty = new();
+
+        public string NameAndVersion => $"{Name} v{(Version != null ? Version : VersionString)}";
 
         public string Name;
         public System.Version Version;
@@ -23,21 +26,55 @@ namespace Editor
         public readonly List<CelesteMod> Dependencies = new();
         public readonly List<CelesteMod> OptionalDependencies = new();
 
-        public List<string> GameplayAtlasEntries = new();
+        /// <summary>
+        /// The location of the .zip file or the directory.
+        /// </summary>
+        public string Location;
+        public bool IsDirectory;
+
+        public int Index = -1;
+
+        private bool enabled = false;
+        public bool Enabled
+        {
+            get
+            {
+                if (ForceEnabled)
+                    return true;
+                return enabled;
+            }
+            set => enabled = value;
+        }
+        public bool Preloaded = false;
+        public bool Loaded = false;
+
+        public bool ForceEnabled = false;
+
+        public Dictionary<string, Texture> GameplayAtlasEntries = new();
 
         public CelesteMod()
         {
         }
 
-        public CelesteMod(string name, System.Version version)
+        public CelesteMod(int index)
+        {
+            Index = index;
+        }
+
+        public CelesteMod(string name, System.Version version, int index)
         {
             Name = name;
             Version = version;
             VersionString = version.ToString();
+            Index = index;
+            ForceEnabled = true;
+            Loaded = true;
         }
 
         public void PreLoad(string path)
         {
+            Location = path;
+
             if (File.Exists(path))
             {
                 if (Path.GetExtension(path) != ".zip")
@@ -65,10 +102,14 @@ namespace Editor
                 Version = new();
                 VersionString = "[No everest.yaml provided]";
             }
+
+            Preloaded = true;
         }
 
         public void PreLoadZip(string path)
         {
+            IsDirectory = false;
+
             using ZipArchive archive = ZipFile.OpenRead(path);
 
             ZipArchiveEntry everestYaml = archive.GetEntry("everest.yaml") ?? archive.GetEntry("everest.yml");
@@ -81,15 +122,17 @@ namespace Editor
             const string gameplayPath = "Graphics/Atlases/Gameplay";
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                if (!entry.FullName.StartsWith(gameplayPath))
+                if (!entry.FullName.StartsWith(gameplayPath) || Path.GetExtension(entry.Name) != ".png")
                     continue;
 
-                GameplayAtlasEntries.Add(entry.FullName[(gameplayPath.Length + 1)..]);
+                GameplayAtlasEntries.Add(entry.FullName[(gameplayPath.Length + 1)..], null);
             }
         }
 
         public void PreLoadDirectory(string path)
         {
+            IsDirectory = true;
+
             string everestYaml = Path.Combine(path, "everest.yaml");
             if (File.Exists(everestYaml))
                 ReadYaml(File.OpenRead(everestYaml));
@@ -99,7 +142,7 @@ namespace Editor
                 return;
 
             foreach (string file in Directory.EnumerateFiles(gameplayAtlasPath, "*.png", SearchOption.AllDirectories))
-                GameplayAtlasEntries.Add(Path.GetDirectoryName(Path.GetRelativePath(gameplayAtlasPath, file)).Replace('\\', '/') + '/' + Path.GetFileNameWithoutExtension(file));
+                GameplayAtlasEntries.Add(Path.GetDirectoryName(Path.GetRelativePath(gameplayAtlasPath, file)).Replace('\\', '/') + '/' + Path.GetFileNameWithoutExtension(file), null);
         }
 
         public void ReadYaml(Stream file)
@@ -139,54 +182,107 @@ namespace Editor
 
                 if (dependenciesList != null)
                 {
-                    CelesteMod dep = new();
-                    foreach (KeyValuePair<YamlNode, YamlNode> dependency in (YamlMappingNode) ((YamlSequenceNode) entry.Value).Children[0])
+                    foreach (YamlNode dependency in (YamlSequenceNode) entry.Value)
                     {
-
-                        switch ((string) dependency.Key)
+                        CelesteMod dep = new();
+                        foreach (KeyValuePair<YamlNode, YamlNode> dependencyVal in (YamlMappingNode) dependency)
                         {
-                            case "Name":
-                                dep.Name = (string) dependency.Value;
-                                break;
+                            switch ((string) dependencyVal.Key)
+                            {
+                                case "Name":
+                                    dep.Name = (string) dependencyVal.Value;
+                                    break;
 
-                            case "Version":
-                                string value;
-                                if (dependency.Value.NodeType == YamlNodeType.Sequence)
-                                    value = (string) ((YamlSequenceNode) dependency.Value).Children[0];
-                                else
-                                    value = (string) dependency.Value;
+                                case "Version":
+                                    string value;
+                                    if (dependencyVal.Value.NodeType == YamlNodeType.Sequence)
+                                        value = (string) ((YamlSequenceNode) dependencyVal.Value).Children[0];
+                                    else
+                                        value = (string) dependencyVal.Value;
 
-                                if (!System.Version.TryParse(value, out dep.Version))
-                                    Logger.Log($"Invalid Celeste dependency mod version: {value}, ignoring", LogLevel.Warning);
-                                dep.VersionString = value;
-                                break;
+                                    if (!System.Version.TryParse(value, out dep.Version))
+                                        Logger.Log($"Invalid Celeste dependency mod version: {value}, ignoring", LogLevel.Warning);
+                                    dep.VersionString = value;
+                                    break;
+                            }
+                        }
+                        if (dep != Empty)
+                        {
+                            // If a dependency with the same name already exists, replace it if the new one has a higher version
+                            CelesteMod sameDep = dependenciesList.Find(m => m.Name == dep.Name);
+                            if (sameDep != null)
+                            {
+                                if (dep.Version > sameDep.Version)
+                                    dependenciesList.Remove(sameDep);
+                            }
+                            dependenciesList.Add(dep);
                         }
                     }
-
-                    if (!dep.Equals(Empty))
-                        dependenciesList.Add(dep);
+                    dependenciesList.Sort((a, b) => a.Name.CompareTo(b.Name));
                 }
             }
         }
 
-        public static void PreLoadAll(Session session)
+        /// <summary>
+        /// Requires the mod to be preloaded.
+        /// </summary>
+        public void Load()
+        {
+            if (IsDirectory)
+            {
+                foreach (string asset in GameplayAtlasEntries.Keys)
+                    GameplayAtlasEntries[asset] = new Texture(File.OpenRead(Path.Combine(Location, asset)), ".png", asset);
+            }
+            else
+            {
+                using ZipArchive archive = ZipFile.OpenRead(Location);
+
+                foreach (string asset in GameplayAtlasEntries.Keys)
+                    GameplayAtlasEntries[asset] = new Texture(archive.GetEntry("Graphics/Atlases/Gameplay/" + asset).Open(), ".png", asset);
+            }
+
+            Loaded = true;
+        }
+
+        public void Unload()
+        {
+            foreach (string asset in GameplayAtlasEntries.Keys)
+                GameplayAtlasEntries[asset] = null;
+
+            Loaded = false;
+        }
+
+        public static void PreLoadAll(Session session, ref float progress, float progressFactor)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            float oldProgress = progress;
+
             Logger.Log("Preloading Celeste mods...");
 
-            session.CelesteMods.Add(new CelesteMod("Everest", session.EverestVersion));
-            foreach (string path in Directory.EnumerateFileSystemEntries(session.CelesteModsDirectory))
+            // Getting a list instance here allows us to get the total number of entries
+            List<string> entries = new(Directory.EnumerateFileSystemEntries(session.CelesteModsDirectory));
+
+            int index = 0;
+            session.CelesteMods.Add(new CelesteMod("Celeste", session.CelesteVersion, index++));
+            session.CelesteMods.Add(new CelesteMod("Everest", session.EverestVersion, index++));
+            foreach (string path in entries)
             {
-                CelesteMod mod = new();
+                CelesteMod mod = new(index++);
                 mod.PreLoad(path);
 
-                if (!mod.Equals(Empty))
+                if (mod != Empty)
+                {
                     session.CelesteMods.Add(mod);
+                    progress += 1 / entries.Count * progressFactor / 2;
+                }
+                else
+                {
+                    index--;
+                }
             }
 
             Logger.Log($"{session.CelesteMods.Count} Celeste mods preloaded. Took {stopwatch.ElapsedMilliseconds}ms");
-            Logger.Log($"Current memory usage: 0x{GC.GetTotalMemory(true):X8}", LogLevel.Debug);
 
             stopwatch = Stopwatch.StartNew();
             Logger.Log("Setting up Celeste mod dependencies...");
@@ -197,25 +293,90 @@ namespace Editor
                 for (int depIndex = 0; depIndex < mod.Dependencies.Count; depIndex++)
                 {
                     CelesteMod dependency = mod.Dependencies[depIndex];
-                    CelesteMod celesteMod = session.CelesteMods.Find(m => m.Name == dependency.Name);
-                    if (celesteMod == null)
+                    CelesteMod loadedReference = session.CelesteMods.Find(m => m.Name == dependency.Name);
+
+                    if (loadedReference == null)
                     {
                         Logger.Log($"Celeste mod {mod.Name} requires {dependency.Name}, but it isn't installed.", LogLevel.Warning);
                         continue;
                     }
 
-                    if (celesteMod.Version < dependency.Version)
+                    if (loadedReference.Version < dependency.Version)
                     {
-                        Logger.Log($"Celeste mod {mod.Name} requires {dependency.Name} {dependency.VersionString} or newer, but {celesteMod.Name} {celesteMod.VersionString} is installed.", LogLevel.Warning);
+                        Logger.Log($"Celeste mod {mod.Name} requires {dependency.Name} {dependency.VersionString} or newer, but {loadedReference.Name} {loadedReference.VersionString} is installed.", LogLevel.Warning);
                         continue;
                     }
-                    mod.Dependencies[depIndex] = celesteMod;
+
+                    mod.Dependencies[depIndex] = loadedReference;
                 }
+                progress += 1 / session.CelesteMods.Count * progressFactor / 2;
             }
 
             Logger.Log($"Celeste mod dependencies set up. Took {stopwatch.ElapsedMilliseconds}ms");
-            Logger.Log($"Current memory usage: 0x{GC.GetTotalMemory(true):X8}", LogLevel.Debug);
+
+            progress = oldProgress + progressFactor;
         }
+
+        /// <summary>
+        /// Requires all mods to be preloaded. Avoid using this method because it is extremely slow.
+        /// Only load the necessary mods instead.
+        /// </summary>
+        /// <param name="session">The Session instance in which the mods are listed.</param>
+        public static void LoadAll(Session session)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            Logger.Log("Loading Celeste mods...");
+
+            foreach (CelesteMod mod in session.CelesteMods)
+            {
+                // If mod is Celeste or Everest there's nothing to load here
+                if (mod.ForceEnabled)
+                    continue;
+
+                mod.Load();
+            }
+
+            Logger.Log($"Celeste mods loaded. Took {stopwatch.ElapsedMilliseconds}ms");
+        }
+
+        public static void UnloadAll(Session session)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            Logger.Log("Unloading Celeste mods...");
+
+            foreach (CelesteMod mod in session.CelesteMods)
+            {
+                // If mod is Celeste or Everest there's nothing to unload here
+                if (mod.ForceEnabled)
+                    continue;
+
+                mod.Unload();
+            }
+
+            Logger.Log($"Celeste mods unloaded. Took {stopwatch.ElapsedMilliseconds}ms");
+        }
+
+        /// <summary>
+        /// Updates all mods status. This checks whether they are enabled
+        /// and loaded and loads or unloads them if necessary.
+        /// </summary>
+        public static void UpdateAll(Session session)
+        {
+            foreach (CelesteMod mod in session.CelesteMods)
+            {
+                if (mod.Enabled && !mod.Loaded)
+                    mod.Load();
+                else if (!mod.Enabled && mod.Loaded)
+                    mod.Unload();
+            }
+            GC.Collect();
+        }
+
+        public override string ToString() => Name;
+
+        public override int GetHashCode() => HashCode.Combine(Name, Version, VersionString, DLL, Dependencies, OptionalDependencies, GameplayAtlasEntries);
 
         public override bool Equals(object obj)
         {
@@ -225,6 +386,14 @@ namespace Editor
                    VersionString == mod.VersionString;
         }
 
-        public override int GetHashCode() => HashCode.Combine(Name, Version, VersionString, DLL, Dependencies, OptionalDependencies, GameplayAtlasEntries);
+        public static bool operator ==(CelesteMod left, CelesteMod right)
+        {
+            return EqualityComparer<CelesteMod>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(CelesteMod left, CelesteMod right)
+        {
+            return !(left == right);
+        }
     }
 }
