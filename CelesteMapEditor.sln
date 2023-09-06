@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapEditor", "MapEditor\MapEditor.csproj", "{9652F857-8444-429E-A073-82E35F4BDBA5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monogame.ImGuiNet", "..\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj", "{5B3B8EB3-1078-48FD-8982-71D250EADFED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monogame.ImGuiNet", "MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj", "{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B3B8EB3-1078-48FD-8982-71D250EADFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B3B8EB3-1078-48FD-8982-71D250EADFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B3B8EB3-1078-48FD-8982-71D250EADFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B3B8EB3-1078-48FD-8982-71D250EADFED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

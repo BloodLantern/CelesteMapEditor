@@ -41,7 +41,7 @@
     <PackageReference Include="YamlDotNet" Version="13.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
+    <ProjectReference Include="..\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
