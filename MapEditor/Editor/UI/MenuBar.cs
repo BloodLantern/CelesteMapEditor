@@ -1,7 +1,8 @@
 ﻿using Editor.Extensions;
 using ImGuiNET;
 using NativeFileDialogExtendedSharp;
-using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Editor.UI
 {
@@ -60,15 +61,29 @@ namespace Editor.UI
             }
         }
 
+        private static readonly IEnumerable<NfdFilter> OpenFileFilters = new List<NfdFilter>()
+        {
+            new() { Description = "Celeste Map Binary File", Specification = "bin" },
+            new() { Description = "Celeste Mod Compressed Folder", Specification = "zip" }
+        };
+
         private void FileMenuOpen()
         {
             if (ImGui.MenuItem("Open"))
             {
-                NfdDialogResult result = Nfd.FileOpen(new NfdFilter() { Description = "Celeste Map Binary File", Specification = "bin" }.Yield());
+                NfdDialogResult result = Nfd.FileOpen(OpenFileFilters);
                 switch (result.Status)
                 {
                     case NfdStatus.Ok:
-                        MapEditor.LoadMap(result.Path);
+                        switch (Path.GetExtension(result.Path).ToLower())
+                        {
+                            case ".bin":
+                                MapEditor.LoadMap(result.Path);
+                                break;
+                            case ".zip":
+                                MapEditor.LoadModZip(result.Path);
+                                break;
+                        }
                         break;
 
                     case NfdStatus.Error:

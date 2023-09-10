@@ -11,8 +11,6 @@ using MonoGame.Extended;
 using System.Diagnostics;
 using Editor.UI;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.ImGuiNet;
-using ImGuiNET;
 
 namespace Editor
 {
@@ -36,7 +34,8 @@ namespace Editor
         public SpriteBatch SpriteBatch;
         public RenderTarget2D GlobalRenderTarget;
 
-        public ImGuiRenderer ImGuiRenderer;
+        public ImRenderer ImGuiRenderer;
+        public ImRenderer ImGuiDebugConsoleRenderer;
 
         public readonly FrameCounter FrameCounter = new();
 
@@ -45,6 +44,7 @@ namespace Editor
 
         public MapViewer MapViewer;
 
+        public RenderTarget2D ImGuiRenderTarget;
         public MenuBar MenuBar;
         public LeftPanel LeftPanel;
         public ModDependencies ModDependencies;
@@ -75,7 +75,9 @@ namespace Editor
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             Logger.Log($"Initializing {nameof(MapEditor)}...");
-            ImGuiRenderer = new ImGuiRenderer(this);
+
+            ImGuiRenderer = new(this);
+            ImGuiDebugConsoleRenderer = new(this);
 
             Session = new(this);
 
@@ -91,6 +93,7 @@ namespace Editor
 
             GlobalRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
             LoadingRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
+            ImGuiRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
 
             Window.Title = WindowTitle;
 
@@ -99,7 +102,7 @@ namespace Editor
             base.Initialize();
             Logger.Log($"{nameof(MapEditor)} initialization complete. Took {stopwatch.ElapsedMilliseconds}ms");
 
-            Loading = new(
+            (Loading = new(
                 this,
                 (ref float progress, ref string resource) =>
                 {
@@ -141,11 +144,9 @@ namespace Editor
             )
             {
                 ShowRemainingTime = true
-            };
-            Loading.End += () =>
+            }).OnEnd += () =>
             {
                 MapViewer.InitializeCamera();
-                Coroutine.Start(Loading.FadeOutRoutine(Loading.FadeOutDuration));
                 CurrentState = State.Editor;
             };
         }
@@ -177,6 +178,9 @@ namespace Editor
                     if (keyboardState.WasKeyJustUp(Keys.F3))
                         Session.Config.DebugMode = !Session.Config.DebugMode;
 
+                    if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
+                        Loading = null;
+
                     break;
             }
 
@@ -190,15 +194,9 @@ namespace Editor
 
         protected override void Draw(GameTime time)
         {
+            GraphicsDevice.SetRenderTarget(ImGuiRenderTarget);
+            GraphicsDevice.Clear(Color.Transparent);
             ImGuiRenderer.BeforeLayout(time);
-
-            // Global RenderTarget
-            GraphicsDevice.SetRenderTarget(GlobalRenderTarget);
-            GraphicsDevice.Clear(Color.DarkSlateGray);
-
-            SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            MapViewer?.Render(SpriteBatch);
-            SpriteBatch.End();
 
             if (Loading == null)
             {
@@ -222,28 +220,54 @@ namespace Editor
                 SpriteBatch.End();
             }
 
+            ImGuiRenderer.AfterLayout();
+
+            // Global RenderTarget
+            GraphicsDevice.SetRenderTarget(GlobalRenderTarget);
+            GraphicsDevice.Clear(Color.DarkSlateGray);
+
+            SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            MapViewer?.Render(SpriteBatch);
+            SpriteBatch.End();
+
             // RenderTargets rendering
             GraphicsDevice.SetRenderTarget(null);
 
             SpriteBatch.Begin();
 
-            SpriteBatch.Draw(GlobalRenderTarget, Vector2.Zero, Color.White);
-
-            if (Loading != null)
-                SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
+            if (CurrentState == State.Editor)
+                SpriteBatch.Draw(GlobalRenderTarget, Vector2.Zero, Color.White);
+            if (Loading == null)
+            {
+                SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
+            }
+            else
+            {
+                // If we are loading something, draw ImGui on top of it
+                if (CurrentState == State.Loading)
+                {
+                    SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White);
+                    SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
+                }
+                // If we finished loading and are transitioning to the other scene, draw ImGui behind the loading screen
+                else
+                {
+                    SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
+                    SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
+                }
+            }
 
             // Frame counter
             FrameCounter.Render(SpriteBatch, Session, Loading == null ? LeftPanel : null);
 
             SpriteBatch.End();
 
-
+            ImGuiDebugConsoleRenderer.BeforeLayout(time);
             if (Session.Config.ShowDebugConsole)
                 DebugConsole.Render();
+            ImGuiDebugConsoleRenderer.AfterLayout();
             
             base.Draw(time);
-
-            ImGuiRenderer.AfterLayout();
         }
 
         protected override void EndRun()
@@ -273,6 +297,11 @@ namespace Editor
                 Window.Title += " - " + map.Area;
 
             return result;
+        }
+
+        public void LoadModZip(string path)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnWindowResize(object sender, EventArgs e) => MapViewer?.Camera.UpdateSize();

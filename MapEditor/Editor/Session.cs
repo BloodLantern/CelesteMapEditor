@@ -1,6 +1,7 @@
 ﻿using Editor.Celeste;
 using Editor.Logging;
 using Editor.Utils;
+using ImGuiNET;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil;
@@ -58,8 +59,15 @@ namespace Editor
 
             Config = Config.Load();
 
+            SetupImGuiContext(MapEditor.ImGuiRenderer);
+            SetupImGuiContext(MapEditor.ImGuiDebugConsoleRenderer);
+        }
+
+        private void SetupImGuiContext(ImRenderer renderer)
+        {
+            ImGui.SetCurrentContext(renderer.Context);
             ImGuiStyles.Setup(Config.UiStyle);
-            ImGuiStyles.SetupFont(this, MapEditor.ImGuiRenderer);
+            ImGuiStyles.SetupFont(this, renderer);
         }
 
         public void LoadContent(ContentManager content)
