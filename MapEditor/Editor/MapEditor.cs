@@ -34,7 +34,13 @@ namespace Editor
         public SpriteBatch SpriteBatch;
         public RenderTarget2D GlobalRenderTarget;
 
+        /// <summary>
+        /// Used to render the whole UI.
+        /// </summary>
         public ImRenderer ImGuiRenderer;
+        /// <summary>
+        /// Used when there is a loading screen to continue to display the debug console.
+        /// </summary>
         public ImRenderer ImGuiDebugConsoleRenderer;
 
         public readonly FrameCounter FrameCounter = new();
