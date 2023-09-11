@@ -198,16 +198,22 @@ namespace Editor
             GraphicsDevice.Clear(Color.Transparent);
             ImGuiRenderer.BeforeLayout(time);
 
-            if (Loading == null)
+            if (CurrentState == State.Editor)
             {
                 if (Session.Config.DebugMode)
-                    MapViewer?.RenderDebug();
+                    MapViewer.RenderDebug();
 
-                MenuBar?.Render(Session);
-                LeftPanel?.Render();
-                ModDependencies?.Render();
+                MenuBar.Render(Session);
+                LeftPanel.Render();
+                ModDependencies.Render();
             }
-            else
+
+            if (Loading == null)
+                DebugConsole.Render();
+
+            ImGuiRenderer.AfterLayout();
+
+            if (Loading != null)
             {
                 // Loading RenderTarget
                 bool darkStyle = Session.Config.UiStyle == ImGuiStyles.Style.Dark;
@@ -220,15 +226,16 @@ namespace Editor
                 SpriteBatch.End();
             }
 
-            ImGuiRenderer.AfterLayout();
-
             // Global RenderTarget
             GraphicsDevice.SetRenderTarget(GlobalRenderTarget);
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
-            SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            MapViewer?.Render(SpriteBatch);
-            SpriteBatch.End();
+            if (CurrentState == State.Editor)
+            {
+                SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                MapViewer.Render(SpriteBatch);
+                SpriteBatch.End();
+            }
 
             // RenderTargets rendering
             GraphicsDevice.SetRenderTarget(null);
@@ -237,43 +244,28 @@ namespace Editor
 
             if (CurrentState == State.Editor)
                 SpriteBatch.Draw(GlobalRenderTarget, Vector2.Zero, Color.White);
-            if (Loading == null)
-            {
-                SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
-            }
-            else
-            {
-                // If we are loading something, draw ImGui on top of it
-                if (CurrentState == State.Loading)
-                {
-                    SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White);
-                    SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
-                }
-                // If we finished loading and are transitioning to the other scene, draw ImGui behind the loading screen
-                else
-                {
-                    SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
-                    SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
-                }
-            }
 
-            // Frame counter
-            FrameCounter.Render(SpriteBatch, Session, Loading == null ? LeftPanel : null);
+            FrameCounter.Render(SpriteBatch, Session, CurrentState == State.Editor ? LeftPanel : null);
+
+            SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
+
+            if (Loading != null)
+                SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
 
             SpriteBatch.End();
 
-            ImGuiDebugConsoleRenderer.BeforeLayout(time);
-            if (Session.Config.ShowDebugConsole)
+            if (Loading != null && Session.Config.ShowDebugConsole)
+            {
+                ImGuiDebugConsoleRenderer.BeforeLayout(time);
                 DebugConsole.Render();
-            ImGuiDebugConsoleRenderer.AfterLayout();
+                ImGuiDebugConsoleRenderer.AfterLayout();
+            }
             
             base.Draw(time);
         }
 
         protected override void EndRun()
         {
-            base.EndRun();
-
             Session.Exit();
             Logger.Log($"Stopping {nameof(MapEditor)} instance...");
             Logger.EndLogging(Session.Config);
