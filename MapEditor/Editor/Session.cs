@@ -1,5 +1,4 @@
-﻿using Editor.Celeste;
-using Editor.Logging;
+﻿using Editor.Logging;
 using Editor.Utils;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -160,6 +159,12 @@ namespace Editor
             return true;
         }
 
+        /// <summary>
+        /// Function from Olympus: https://github.com/EverestAPI/Olympus/blob/9d5c3cbfc322aaf52e2557f715073b94966eda2a/sharp/CmdGetVersionString.cs#L35.
+        /// </summary>
+        /// <param name="activeCelesteVersion"></param>
+        /// <param name="activeEverestVersion"></param>
+        /// <returns></returns>
         public bool TryGetActiveCelesteVersion(out Version activeCelesteVersion, out Version activeEverestVersion)
         {
             activeCelesteVersion = activeEverestVersion = null;

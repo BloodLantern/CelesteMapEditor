@@ -1,4 +1,6 @@
 ﻿using ImGuiNET;
+using System;
+using System.Numerics;
 
 namespace Editor.UI
 {
@@ -33,14 +35,14 @@ namespace Editor.UI
                 ImGui.InputTextWithHint("##search", "Search...", ref searchText, 30);
 
                 float itemHeight = ImGui.GetItemRectSize().Y;
-                System.Numerics.Vector2 childSize = new(-1, ImGui.GetWindowHeight() - itemHeight * 2 - ImGui.GetStyle().ItemSpacing.Y - ImGui.GetFrameHeightWithSpacing());
+                Vector2 childSize = new(-1, ImGui.GetWindowHeight() - itemHeight * 2 - ImGui.GetStyle().ItemSpacing.Y - ImGui.GetFrameHeightWithSpacing());
                 if (modified)
                     childSize.Y -= itemHeight;
 
                 ImGui.BeginChild("List", childSize, false, ImGuiWindowFlags.AlwaysAutoResize);
                 foreach (CelesteMod mod in Session.CelesteMods)
                 {
-                    if (searchText == string.Empty || mod.Name.Contains(searchText, System.StringComparison.InvariantCultureIgnoreCase))
+                    if (searchText == string.Empty || mod.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
                         ModEntry(mod);
                 }
                 ImGui.EndChild();
