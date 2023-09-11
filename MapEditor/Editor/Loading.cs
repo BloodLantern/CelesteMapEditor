@@ -50,7 +50,7 @@ namespace Editor
 
         public float DrawAlpha = 0f;
 
-        public event Action End;
+        public event Action OnEnd;
 
         /// <summary>
         /// Creates a new instance of the <see cref="Loading"/> class, starting the
@@ -79,7 +79,7 @@ namespace Editor
             if (Started)
                 return;
 
-            Coroutine.Start(FadeInRoutine(FadeInDuration));
+            Coroutine.Start(FadeRoutine(FadeInDuration, 0f, 1f));
 
             StartTime = DateTime.Now;
             Started = true;
@@ -95,7 +95,9 @@ namespace Editor
 
             EndTime = DateTime.Now;
 
-            End.Invoke();
+            Coroutine.Start(FadeRoutine(FadeOutDuration, 1f, 0f));
+
+            OnEnd.Invoke();
         }
 
         public void Render(SpriteBatch spriteBatch, MapEditor mapEditor, Session session, GameTime time)
@@ -103,7 +105,7 @@ namespace Editor
             if (!Started)
                 return;
 
-            bool darkStyle = session.Config.UiStyle == Utils.ImGuiStyles.Style.Dark;
+            bool darkStyle = session.Config.UiStyle == ImGuiStyles.Style.Dark;
             Color drawColor = darkStyle ? Color.White : Color.Black;
             Vector2 center = mapEditor.WindowSize.ToVector2() / 2;
             Vector2 low = new(center.X, mapEditor.WindowSize.Y * 3/4);
@@ -158,30 +160,18 @@ namespace Editor
             lastTotalGameTime = time.TotalGameTime;
         }
 
-        public IEnumerator FadeInRoutine(float duration)
+        public IEnumerator FadeRoutine(float duration, float fromAlpha, float toAlpha)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                DrawAlpha = Calc.EaseLerp(0f, 1f, timer, duration, Ease.ExpoOut);
-
-                yield return null;
-            }
-        }
-
-        public IEnumerator FadeOutRoutine(float duration)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
-            {
-                DrawAlpha = Calc.EaseLerp(1f, 0f, timer, duration, Ease.SineIn);
+                DrawAlpha = Calc.EaseLerp(fromAlpha, toAlpha, timer, duration, Ease.ExpoOut);
 
                 yield return null;
             }
 
-            MapEditor.Loading = null;
+            DrawAlpha = toAlpha;
         }
     }
 }
