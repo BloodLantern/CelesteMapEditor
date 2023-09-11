@@ -154,6 +154,7 @@ namespace Editor
             {
                 MapViewer.InitializeCamera();
                 CurrentState = State.Editor;
+                LeftPanel.StartMoveInRoutine();
             };
         }
 

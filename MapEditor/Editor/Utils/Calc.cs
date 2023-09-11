@@ -1,14 +1,10 @@
 ﻿using Editor.Utils;
-using ImGuiNET;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Serialization;
-using static Editor.Utils.ImGuiStyles;
 
 namespace Editor
 {
