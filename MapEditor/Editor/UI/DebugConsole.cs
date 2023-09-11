@@ -4,7 +4,6 @@ using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 
 namespace Editor.UI
 {
@@ -33,7 +32,7 @@ namespace Editor.UI
             if (ImGui.Button("Scroll up"))
                 scroll = -1;
             ImGui.SameLine();
-            if (ImGui.Button("Scroll down") || Logger.LoggedLastFrame)
+            if (ImGui.Button("Scroll down") || Logger.LoggedLastFrame || ImGui.IsWindowAppearing())
                 scroll = 1;
 
             ImGui.BeginChild("Logs", new(-1), false, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);

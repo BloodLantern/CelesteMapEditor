@@ -30,6 +30,11 @@ namespace Editor.UI
             ImGui.Begin("#leftPanel", WindowFlags);
             Width = ImGui.GetWindowWidth();
 
+            if (ImGui.IsWindowAppearing())
+            {
+                // TODO Move in animation
+            }
+
             if (ImGui.BeginTabBar("#leftPanelTabBar"))
             {
                 if (ImGui.BeginTabItem("Room List"))
