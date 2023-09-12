@@ -9,12 +9,13 @@ namespace Editor.UI
     public class LeftPanel
     {
         private const float DefaultWidth = 200f;
-        private const ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse;
-        private const float StartingX = -DefaultWidth;
+        private const ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings;
         private const float EndingX = 0f;
-        private const float MoveInDuration = 1f;
+        private const float MoveInDuration = 0.5f;
+        private const string Title = "leftPanel";
 
-        public MapEditor MapEditor;
+        private readonly MapEditor mapEditor;
+        private readonly MenuBar menuBar;
 
         public LevelList LevelList;
         public ModExplorer ModExplorer;
@@ -23,20 +24,30 @@ namespace Editor.UI
 
         public LeftPanel(MapEditor mapEditor)
         {
-            MapEditor = mapEditor;
+            this.mapEditor = mapEditor;
+            menuBar = mapEditor.MenuBar;
             LevelList = new(mapEditor);
             ModExplorer = new(mapEditor);
         }
 
         public void Render()
         {
-            float windowHeight = MapEditor.WindowSize.Y - ImGui.GetFrameHeight();
+            float windowHeight = mapEditor.WindowSize.Y - menuBar.Size.Y;
             ImGui.SetNextWindowSizeConstraints(new(DefaultWidth, windowHeight), new(float.PositiveInfinity, windowHeight));
 
-            ImGui.Begin("#leftPanel", WindowFlags);
+            ImGui.Begin(Title, WindowFlags);
             Width = ImGui.GetWindowWidth();
 
-            if (ImGui.BeginTabBar("#leftPanelTabBar"))
+            if (ImGui.IsWindowAppearing())
+                StartMoveInRoutine();
+
+            if (ImGui.Button("Move"))
+                StartMoveInRoutine();
+
+            if (ImGui.Button("MoveMenuBar"))
+                menuBar.StartMoveInRoutine();
+
+            if (ImGui.BeginTabBar("leftPanelTabBar"))
             {
                 if (ImGui.BeginTabItem("Room List"))
                 {
@@ -56,20 +67,20 @@ namespace Editor.UI
             ImGui.End();
         }
 
-        public static void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(StartingX, EndingX, MoveInDuration));
+        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-Width, EndingX, MoveInDuration));
 
-        private static IEnumerator MoveInRoutine(float startingX, float endingX, float duration)
+        private IEnumerator MoveInRoutine(float startingX, float endingX, float duration)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                ImGui.SetWindowPos("#leftPanel", new(Calc.EaseLerp(startingX, endingX, timer, duration, Ease.QuadOut), ImGui.GetFrameHeight()));
+                ImGui.SetWindowPos(Title, new(Calc.EaseLerp(startingX, endingX, timer, duration, Ease.CubeOut), menuBar.Size.Y));
 
                 yield return null;
             }
 
-            ImGui.SetWindowPos("#leftPanel", new(endingX, ImGui.GetFrameHeight()));
+            ImGui.SetWindowPos(Title, new(endingX, menuBar.Size.Y));
         }
     }
 }

@@ -1,23 +1,33 @@
 ﻿using Editor.Extensions;
+using Editor.Utils;
 using ImGuiNET;
 using NativeFileDialogExtendedSharp;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 
 namespace Editor.UI
 {
     public class MenuBar
     {
-        public MapEditor MapEditor;
+        private const float MoveInDuration = 0.5f;
+
+        private readonly MapEditor mapEditor;
+        public Vector2 Size { get; private set; } = Vector2.One;
+        private float height = 1f;
 
         public MenuBar(MapEditor mapEditor)
         {
-            MapEditor = mapEditor;
+            this.mapEditor = mapEditor;
         }
 
         public void Render(Session session)
         {
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, height);
             ImGui.BeginMainMenuBar();
+            Size = ImGui.GetWindowSize();
 
             FileMenu(session.Config);
             EditMenu();
@@ -28,6 +38,7 @@ namespace Editor.UI
             HelpMenu();
 
             ImGui.EndMainMenuBar();
+            ImGui.PopStyleVar();
         }
 
         private void FileMenu(Config config)
@@ -78,10 +89,10 @@ namespace Editor.UI
                         switch (Path.GetExtension(result.Path).ToLower())
                         {
                             case ".bin":
-                                MapEditor.LoadMap(result.Path);
+                                mapEditor.LoadMap(result.Path);
                                 break;
                             case ".zip":
-                                MapEditor.LoadModZip(result.Path);
+                                mapEditor.LoadModZip(result.Path);
                                 break;
                         }
                         break;
@@ -106,7 +117,7 @@ namespace Editor.UI
                 }
 
                 if (mapToLoad != string.Empty)
-                    MapEditor.LoadMap(mapToLoad);
+                    mapEditor.LoadMap(mapToLoad);
 
                 ImGui.EndMenu();
             }
@@ -137,7 +148,7 @@ namespace Editor.UI
         {
             if (ImGui.MenuItem("Restart"))
             {
-                MapEditor.Restart();
+                mapEditor.Restart();
             }
         }
 
@@ -145,7 +156,7 @@ namespace Editor.UI
         {
             if (ImGui.MenuItem("Exit"))
             {
-                MapEditor.Exit();
+                mapEditor.Exit();
             }
         }
 
@@ -244,7 +255,7 @@ namespace Editor.UI
         private void ModMenuShowDependencies()
         {
             if (ImGui.MenuItem("Show dependencies"))
-                MapEditor.ModDependencies.Open = true;
+                mapEditor.ModDependencies.Open = true;
         }
 
         private void MapMenu()
@@ -361,6 +372,22 @@ namespace Editor.UI
             if (ImGui.MenuItem("About"))
             {
             }
+        }
+
+        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(this, float.Epsilon, 1f, MoveInDuration));
+
+        private IEnumerator MoveInRoutine(MenuBar menuBar, float startingHeight, float endingHeight, float duration)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
+            {
+                menuBar.height = Calc.EaseLerp(startingHeight, endingHeight, timer, duration, Ease.CubeOut);
+
+                yield return null;
+            }
+
+            menuBar.height = endingHeight;
         }
     }
 }

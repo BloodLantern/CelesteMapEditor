@@ -133,8 +133,8 @@ namespace Editor
                     progress += 0.1f;
 
                     resource = "Loading UI";
-                    MapViewer = new(this);
                     MenuBar = new(this);
+                    MapViewer = new(this);
                     LeftPanel = new(this);
                     ModDependencies = new(Session);
 
@@ -154,7 +154,6 @@ namespace Editor
             {
                 MapViewer.InitializeCamera();
                 CurrentState = State.Editor;
-                LeftPanel.StartMoveInRoutine();
             };
         }
 
@@ -207,10 +206,11 @@ namespace Editor
 
             if (CurrentState == State.Editor)
             {
+                MenuBar.Render(Session);
+
                 if (Session.Config.DebugMode)
                     MapViewer.RenderDebug();
 
-                MenuBar.Render(Session);
                 LeftPanel.Render();
                 ModDependencies.Render();
             }
@@ -252,12 +252,16 @@ namespace Editor
             if (CurrentState == State.Editor)
                 SpriteBatch.Draw(GlobalRenderTarget, Vector2.Zero, Color.White);
 
-            FrameCounter.Render(SpriteBatch, Session, CurrentState == State.Editor ? LeftPanel : null);
+            if (Loading == null)
+                FrameCounter.Render(SpriteBatch, Session, LeftPanel);
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
             if (Loading != null)
+            {
                 SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
+                FrameCounter.Render(SpriteBatch, Session, CurrentState == State.Editor ? LeftPanel : null);
+            }
 
             SpriteBatch.End();
 
