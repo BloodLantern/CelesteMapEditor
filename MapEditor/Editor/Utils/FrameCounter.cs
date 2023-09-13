@@ -37,7 +37,7 @@ namespace Editor.Utils
             TotalSeconds += deltaTime;
         }
 
-        public void Render(SpriteBatch spriteBatch, Session session, LeftPanel leftPanel)
-            => spriteBatch.DrawString(session.UbuntuRegularFont, $"FPS: {(int) AverageFramesPerSecond}", new Vector2((leftPanel != null ? leftPanel.Width : 0f) + 10f, 30f), Color.White);
+        public void Render(SpriteBatch spriteBatch, Session session, LeftPanel leftPanel, MenuBar menuBar)
+            => spriteBatch.DrawString(session.UbuntuRegularFont, $"FPS: {(int) AverageFramesPerSecond}", new Vector2((leftPanel != null ? (leftPanel.CurrentX + leftPanel.Width) : 0f) + 10f, menuBar != null ? menuBar.CurrentY + menuBar.Size.Y : 0f), Color.White);
     }
 }

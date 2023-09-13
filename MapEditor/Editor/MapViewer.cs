@@ -79,7 +79,7 @@ namespace Editor
 
         public void InitializeCamera()
         {
-            Camera = new(Vector2.Zero, float.Epsilon);
+            Camera = new(Vector2.Zero, 1e-6f);
             Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
         }
 

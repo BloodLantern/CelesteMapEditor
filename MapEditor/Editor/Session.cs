@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using MonoGame.ImGuiNet;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
@@ -59,12 +60,10 @@ namespace Editor
             Config = Config.Load();
 
             SetupImGuiContext(MapEditor.ImGuiRenderer);
-            SetupImGuiContext(MapEditor.ImGuiDebugConsoleRenderer);
         }
 
-        private void SetupImGuiContext(ImRenderer renderer)
+        private void SetupImGuiContext(ImGuiRenderer renderer)
         {
-            ImGui.SetCurrentContext(renderer.Context);
             ImGuiStyles.Setup(Config.UiStyle);
             ImGuiStyles.SetupFont(this, renderer);
         }

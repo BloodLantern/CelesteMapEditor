@@ -11,6 +11,8 @@ using MonoGame.Extended;
 using System.Diagnostics;
 using Editor.UI;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.ImGuiNet;
+using ImGuiNET;
 
 namespace Editor
 {
@@ -37,11 +39,7 @@ namespace Editor
         /// <summary>
         /// Used to render the whole UI.
         /// </summary>
-        public ImRenderer ImGuiRenderer;
-        /// <summary>
-        /// Used when there is a loading screen to continue to display the debug console.
-        /// </summary>
-        public ImRenderer ImGuiDebugConsoleRenderer;
+        public ImGuiRenderer ImGuiRenderer;
 
         public readonly FrameCounter FrameCounter = new();
 
@@ -83,7 +81,6 @@ namespace Editor
             Logger.Log($"Initializing {nameof(MapEditor)}...");
 
             ImGuiRenderer = new(this);
-            ImGuiDebugConsoleRenderer = new(this);
 
             Session = new(this);
 
@@ -185,7 +182,15 @@ namespace Editor
                         Session.Config.DebugMode = !Session.Config.DebugMode;
 
                     if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
+                    {
+                        LeftPanel.Visible = true;
+                        LeftPanel.StartMoveInRoutine();
+
+                        MenuBar.Visible = true;
+                        MenuBar.StartMoveInRoutine();
+
                         Loading = null;
+                    }
 
                     break;
             }
@@ -204,6 +209,9 @@ namespace Editor
             GraphicsDevice.Clear(Color.Transparent);
             ImGuiRenderer.BeforeLayout(time);
 
+            if (Loading != null)
+                ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 1f - Loading.DrawAlpha);
+
             if (CurrentState == State.Editor)
             {
                 MenuBar.Render(Session);
@@ -215,7 +223,10 @@ namespace Editor
                 ModDependencies.Render();
             }
 
-            if (Loading == null)
+            if (Loading != null)
+                ImGui.PopStyleVar();
+
+            if (Session.Config.ShowDebugConsole)
                 DebugConsole.Render();
 
             ImGuiRenderer.AfterLayout();
@@ -252,25 +263,14 @@ namespace Editor
             if (CurrentState == State.Editor)
                 SpriteBatch.Draw(GlobalRenderTarget, Vector2.Zero, Color.White);
 
-            if (Loading == null)
-                FrameCounter.Render(SpriteBatch, Session, LeftPanel);
+            if (Loading != null)
+                SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
+
+            FrameCounter.Render(SpriteBatch, Session, LeftPanel, MenuBar);
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
-            if (Loading != null)
-            {
-                SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
-                FrameCounter.Render(SpriteBatch, Session, CurrentState == State.Editor ? LeftPanel : null);
-            }
-
             SpriteBatch.End();
-
-            if (Loading != null && Session.Config.ShowDebugConsole)
-            {
-                ImGuiDebugConsoleRenderer.BeforeLayout(time);
-                DebugConsole.Render();
-                ImGuiDebugConsoleRenderer.AfterLayout();
-            }
             
             base.Draw(time);
         }

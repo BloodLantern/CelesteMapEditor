@@ -20,6 +20,9 @@ namespace Editor.UI
         public LevelList LevelList;
         public ModExplorer ModExplorer;
 
+        public float CurrentX { get; private set; } = -DefaultWidth;
+        public bool Visible = false;
+
         public float Width { get; private set; } = DefaultWidth;
 
         public LeftPanel(MapEditor mapEditor)
@@ -32,20 +35,14 @@ namespace Editor.UI
 
         public void Render()
         {
+            if (!Visible)
+                return;
+
             float windowHeight = mapEditor.WindowSize.Y - menuBar.Size.Y;
             ImGui.SetNextWindowSizeConstraints(new(DefaultWidth, windowHeight), new(float.PositiveInfinity, windowHeight));
 
             ImGui.Begin(Title, WindowFlags);
             Width = ImGui.GetWindowWidth();
-
-            if (ImGui.IsWindowAppearing())
-                StartMoveInRoutine();
-
-            if (ImGui.Button("Move"))
-                StartMoveInRoutine();
-
-            if (ImGui.Button("MoveMenuBar"))
-                menuBar.StartMoveInRoutine();
 
             if (ImGui.BeginTabBar("leftPanelTabBar"))
             {
@@ -75,12 +72,12 @@ namespace Editor.UI
 
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                ImGui.SetWindowPos(Title, new(Calc.EaseLerp(startingX, endingX, timer, duration, Ease.CubeOut), menuBar.Size.Y));
+                ImGui.SetWindowPos(Title, new(CurrentX = Calc.EaseLerp(startingX, endingX, timer, duration, Ease.CubeOut), menuBar.Size.Y + menuBar.CurrentY));
 
                 yield return null;
             }
 
-            ImGui.SetWindowPos(Title, new(endingX, menuBar.Size.Y));
+            ImGui.SetWindowPos(Title, new(CurrentX = endingX, menuBar.Size.Y + menuBar.CurrentY));
         }
     }
 }

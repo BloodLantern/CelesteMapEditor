@@ -13,10 +13,21 @@ namespace Editor.UI
     public class MenuBar
     {
         private const float MoveInDuration = 0.5f;
+        private const float DefaultHeight = 30f;
+        private const string Title = "menuBar";
 
         private readonly MapEditor mapEditor;
         public Vector2 Size { get; private set; } = Vector2.One;
-        private float height = 1f;
+        public float CurrentY { get; private set; } = -DefaultHeight;
+
+        public bool Visible = false;
+
+        private readonly ImGuiWindowFlags flags =
+            ImGuiWindowFlags.NoDecoration |
+            ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse |
+            ImGuiWindowFlags.NoSavedSettings |
+            ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoBackground |
+            ImGuiWindowFlags.MenuBar;
 
         public MenuBar(MapEditor mapEditor)
         {
@@ -25,10 +36,17 @@ namespace Editor.UI
 
         public void Render(Session session)
         {
-            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, height);
-            ImGui.BeginMainMenuBar();
+            if (!Visible)
+                return;
+
+            ImGuiViewportPtr viewport = ImGui.GetMainViewport();
+            ImGui.SetNextWindowPos(new(viewport.Pos.X, viewport.Pos.Y + CurrentY));
+            ImGui.SetNextWindowSize(new(viewport.Size.X, ImGui.GetFrameHeight()));
+
+            ImGui.Begin(Title, flags);
             Size = ImGui.GetWindowSize();
 
+            ImGui.BeginMenuBar();
             FileMenu(session.Config);
             EditMenu();
             ViewMenu();
@@ -36,9 +54,9 @@ namespace Editor.UI
             MapMenu();
             RoomMenu();
             HelpMenu();
+            ImGui.EndMenuBar();
 
-            ImGui.EndMainMenuBar();
-            ImGui.PopStyleVar();
+            ImGui.End();
         }
 
         private void FileMenu(Config config)
@@ -374,20 +392,20 @@ namespace Editor.UI
             }
         }
 
-        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(this, float.Epsilon, 1f, MoveInDuration));
+        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-DefaultHeight, 0f, MoveInDuration));
 
-        private IEnumerator MoveInRoutine(MenuBar menuBar, float startingHeight, float endingHeight, float duration)
+        private IEnumerator MoveInRoutine(float startingY, float endingY, float duration)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                menuBar.height = Calc.EaseLerp(startingHeight, endingHeight, timer, duration, Ease.CubeOut);
+                CurrentY = Calc.EaseLerp(startingY, endingY, timer, duration, Ease.CubeOut);
 
                 yield return null;
             }
 
-            menuBar.height = endingHeight;
+            CurrentY = endingY;
         }
     }
 }
