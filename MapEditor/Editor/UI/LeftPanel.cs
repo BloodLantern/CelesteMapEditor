@@ -38,7 +38,8 @@ namespace Editor.UI
             if (!Visible)
                 return;
 
-            float windowHeight = mapEditor.WindowSize.Y - menuBar.Size.Y;
+            ImGuiViewportPtr viewport = ImGui.GetMainViewport();
+            float windowHeight = viewport.Pos.Y + menuBar.CurrentY + viewport.Size.Y - menuBar.Size.Y;
             ImGui.SetNextWindowSizeConstraints(new(DefaultWidth, windowHeight), new(float.PositiveInfinity, windowHeight));
 
             ImGui.Begin(Title, WindowFlags);
