@@ -57,7 +57,7 @@ namespace Editor
         public Loading Loading;
         public RenderTarget2D LoadingRenderTarget;
 
-        public Point WindowSize => new(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+        public Point WindowSize => GraphicsDevice.PresentationParameters.Bounds.Size;
 
         public MapEditor()
         {
@@ -307,7 +307,14 @@ namespace Editor
             throw new NotImplementedException();
         }
 
-        private void OnWindowResize(object sender, EventArgs e) => MapViewer?.Camera.UpdateSize();
+        private void OnWindowResize(object sender, EventArgs e)
+        {
+            GlobalRenderTarget = new(GraphicsDevice, WindowSize.X, WindowSize.Y);
+            LoadingRenderTarget = new(GraphicsDevice, WindowSize.X, WindowSize.Y);
+            ImGuiRenderTarget = new(GraphicsDevice, WindowSize.X, WindowSize.Y);
+
+            MapViewer?.Camera.UpdateSize();
+        }
 
         private void OnFileDrop(object sender, FileDropEventArgs e)
         {
