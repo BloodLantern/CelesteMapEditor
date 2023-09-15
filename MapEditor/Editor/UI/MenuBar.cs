@@ -39,9 +39,8 @@ namespace Editor.UI
             if (!Visible)
                 return;
 
-            ImGuiViewportPtr viewport = ImGui.GetMainViewport();
-            ImGui.SetNextWindowPos(new(viewport.Pos.X, viewport.Pos.Y + CurrentY));
-            ImGui.SetNextWindowSize(new(viewport.Size.X, ImGui.GetFrameHeight()));
+            ImGui.SetNextWindowPos(new(0, CurrentY));
+            ImGui.SetNextWindowSize(new(ImGui.GetMainViewport().Size.X, ImGui.GetFrameHeight()));
 
             ImGui.Begin(Title, flags);
             Size = ImGui.GetWindowSize();

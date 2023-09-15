@@ -1,8 +1,10 @@
 ﻿using Editor.Extensions;
 using Editor.Utils;
 using ImGuiNET;
+using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace Editor.UI
 {
@@ -23,7 +25,7 @@ namespace Editor.UI
         public float CurrentX { get; private set; } = -DefaultWidth;
         public bool Visible = false;
 
-        public float Width { get; private set; } = DefaultWidth;
+        public Vector2 Size { get; private set; } = new(DefaultWidth, 1f);
 
         public LeftPanel(MapEditor mapEditor)
         {
@@ -39,11 +41,11 @@ namespace Editor.UI
                 return;
 
             ImGuiViewportPtr viewport = ImGui.GetMainViewport();
-            float windowHeight = viewport.Pos.Y + menuBar.CurrentY + viewport.Size.Y - menuBar.Size.Y;
+            float windowHeight = viewport.Size.Y - menuBar.CurrentY - menuBar.Size.Y;
             ImGui.SetNextWindowSizeConstraints(new(DefaultWidth, windowHeight), new(float.PositiveInfinity, windowHeight));
 
             ImGui.Begin(Title, WindowFlags);
-            Width = ImGui.GetWindowWidth();
+            Size = ImGui.GetWindowSize();
 
             if (ImGui.BeginTabBar("leftPanelTabBar"))
             {
@@ -65,7 +67,7 @@ namespace Editor.UI
             ImGui.End();
         }
 
-        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-Width, EndingX, MoveInDuration));
+        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-Size.X, EndingX, MoveInDuration));
 
         private IEnumerator MoveInRoutine(float startingX, float endingX, float duration)
         {

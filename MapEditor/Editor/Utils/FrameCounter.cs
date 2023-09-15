@@ -38,6 +38,6 @@ namespace Editor.Utils
         }
 
         public void Render(SpriteBatch spriteBatch, Session session, LeftPanel leftPanel, MenuBar menuBar)
-            => spriteBatch.DrawString(session.UbuntuRegularFont, $"FPS: {(int) AverageFramesPerSecond}", new Vector2((leftPanel != null ? (leftPanel.CurrentX + leftPanel.Width) : 0f) + 10f, menuBar != null ? menuBar.CurrentY + menuBar.Size.Y : 0f), Color.White);
+            => spriteBatch.DrawString(session.UbuntuRegularFont, $"FPS: {(int) AverageFramesPerSecond}", new Vector2((leftPanel != null ? (leftPanel.CurrentX + leftPanel.Size.X) : 0f) + 10f, menuBar != null ? menuBar.CurrentY + menuBar.Size.Y : 0f), Color.White);
     }
 }
