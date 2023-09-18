@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Editor.Logging
@@ -91,6 +92,9 @@ namespace Editor.Logging
 
             // Remove all the logs below the minimum log level
             LogEntries = LogEntries.FindAll(log => (byte) GetLevel(log) >= (byte) config.LogLevel);
+
+            if (LogEntries.Count == 0)
+                return;
 
             AddLogsToLatestFile();
 

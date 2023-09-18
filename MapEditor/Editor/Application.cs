@@ -266,7 +266,8 @@ namespace Editor
             if (Loading != null)
                 SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
 
-            FrameCounter.Render(SpriteBatch, Session, LeftPanel, MenuBar);
+            if (Session.Config.ShowAverageFps)
+                FrameCounter.Render(SpriteBatch, Session, LeftPanel, MenuBar);
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
