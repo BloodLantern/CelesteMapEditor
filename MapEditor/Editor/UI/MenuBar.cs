@@ -16,7 +16,7 @@ namespace Editor.UI
         private const float DefaultHeight = 30f;
         private const string Title = "menuBar";
 
-        private readonly MapEditor mapEditor;
+        private readonly Application app;
         public Vector2 Size { get; private set; } = Vector2.One;
         public float CurrentY { get; private set; } = -DefaultHeight;
 
@@ -29,9 +29,9 @@ namespace Editor.UI
             ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoBackground |
             ImGuiWindowFlags.MenuBar;
 
-        public MenuBar(MapEditor mapEditor)
+        public MenuBar(Application app)
         {
-            this.mapEditor = mapEditor;
+            this.app = app;
         }
 
         public void Render(Session session)
@@ -106,10 +106,10 @@ namespace Editor.UI
                         switch (Path.GetExtension(result.Path).ToLower())
                         {
                             case ".bin":
-                                mapEditor.LoadMap(result.Path);
+                                app.LoadMap(result.Path);
                                 break;
                             case ".zip":
-                                mapEditor.LoadModZip(result.Path);
+                                app.LoadModZip(result.Path);
                                 break;
                         }
                         break;
@@ -134,7 +134,7 @@ namespace Editor.UI
                 }
 
                 if (mapToLoad != string.Empty)
-                    mapEditor.LoadMap(mapToLoad);
+                    app.LoadMap(mapToLoad);
 
                 ImGui.EndMenu();
             }
@@ -165,7 +165,7 @@ namespace Editor.UI
         {
             if (ImGui.MenuItem("Restart"))
             {
-                mapEditor.Restart();
+                app.Restart();
             }
         }
 
@@ -173,7 +173,7 @@ namespace Editor.UI
         {
             if (ImGui.MenuItem("Exit"))
             {
-                mapEditor.Exit();
+                app.Exit();
             }
         }
 
@@ -272,7 +272,7 @@ namespace Editor.UI
         private void ModMenuShowDependencies()
         {
             if (ImGui.MenuItem("Show dependencies"))
-                mapEditor.ModDependencies.Open = true;
+                app.ModDependencies.Open = true;
         }
 
         private void MapMenu()

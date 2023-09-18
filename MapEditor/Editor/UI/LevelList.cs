@@ -5,13 +5,13 @@ namespace Editor.UI
 {
     public class LevelList
     {
-        public MapEditor MapEditor;
+        public Application App;
         public MapViewer MapViewer;
 
-        public LevelList(MapEditor mapEditor)
+        public LevelList(Application app)
         {
-            MapEditor = mapEditor;
-            MapViewer = MapEditor.MapViewer;
+            App = app;
+            MapViewer = App.MapViewer;
         }
 
         private bool roomsCheckbox = true;

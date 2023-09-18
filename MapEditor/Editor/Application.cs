@@ -16,7 +16,7 @@ using ImGuiNET;
 
 namespace Editor
 {
-    public class MapEditor : Game
+    public class Application : Game
     {
         public enum State
         {
@@ -24,7 +24,7 @@ namespace Editor
             Loading
         }
 
-        public static MapEditor Instance { get; private set; }
+        public static Application Instance { get; private set; }
 
         public readonly Version Version = new(0, 1, 0, 0);
         private const string BaseWindowTitle = "CelesteMapEditor";
@@ -59,13 +59,13 @@ namespace Editor
 
         public Point WindowSize => GraphicsDevice.PresentationParameters.Bounds.Size;
 
-        public MapEditor()
+        public Application()
         {
             if (Instance != null)
-                throw new InvalidOperationException($"There should be only one {nameof(MapEditor)} instance.");
+                throw new InvalidOperationException($"There should be only one {nameof(Application)} instance.");
             Instance = this;
 
-            Logger.Log($"Starting {nameof(MapEditor)} instance...");
+            Logger.Log($"Starting {nameof(Application)} instance...");
 
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -78,7 +78,7 @@ namespace Editor
         protected override void Initialize()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            Logger.Log($"Initializing {nameof(MapEditor)}...");
+            Logger.Log($"Initializing {nameof(Application)}...");
 
             ImGuiRenderer = new(this);
 
@@ -103,7 +103,7 @@ namespace Editor
             Logger.Log($"Working directory: {Directory.GetCurrentDirectory()}");
 
             base.Initialize();
-            Logger.Log($"{nameof(MapEditor)} initialization complete. Took {stopwatch.ElapsedMilliseconds}ms");
+            Logger.Log($"{nameof(Application)} initialization complete. Took {stopwatch.ElapsedMilliseconds}ms");
 
             (Loading = new(
                 this,
@@ -278,7 +278,7 @@ namespace Editor
         protected override void EndRun()
         {
             Session.Exit();
-            Logger.Log($"Stopping {nameof(MapEditor)} instance...");
+            Logger.Log($"Stopping {nameof(Application)} instance...");
             Logger.EndLogging(Session.Config);
         }
 
@@ -313,7 +313,7 @@ namespace Editor
             LoadingRenderTarget = new(GraphicsDevice, WindowSize.X, WindowSize.Y);
             ImGuiRenderTarget = new(GraphicsDevice, WindowSize.X, WindowSize.Y);
 
-            MapViewer?.Camera.UpdateSize();
+            MapViewer?.Camera.OnResize();
         }
 
         private void OnFileDrop(object sender, FileDropEventArgs e)
@@ -329,7 +329,7 @@ namespace Editor
 
         public void Restart()
         {
-            Logger.Log($"Restarting {nameof(MapEditor)}...");
+            Logger.Log($"Restarting {nameof(Application)}...");
 
             Process.Start(Environment.ProcessPath);
 

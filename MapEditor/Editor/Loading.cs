@@ -15,7 +15,7 @@ namespace Editor
     {
         public delegate void LoadingFunc(ref float progressVar, ref string resourceName);
 
-        public MapEditor MapEditor;
+        public Application App;
 
         private float progress = 0;
         public float Progress => progress;
@@ -63,9 +63,9 @@ namespace Editor
         /// <param name="startNow">
         /// Whether to start the loading function now or wait for a call to <see cref="StartAsync"/>
         /// </param>
-        public Loading(MapEditor mapEditor, LoadingFunc func, bool startNow = true)
+        public Loading(Application app, LoadingFunc func, bool startNow = true)
         {
-            MapEditor = mapEditor;
+            App = app;
             this.func = func;
             if (startNow)
                 StartAsync();
@@ -100,15 +100,15 @@ namespace Editor
             OnEnd.Invoke();
         }
 
-        public void Render(SpriteBatch spriteBatch, MapEditor mapEditor, Session session, GameTime time)
+        public void Render(SpriteBatch spriteBatch, Application app, Session session, GameTime time)
         {
             if (!Started)
                 return;
 
             bool darkStyle = session.Config.UiStyle == ImGuiStyles.Style.Dark;
             Color drawColor = darkStyle ? Color.White : Color.Black;
-            Vector2 center = mapEditor.WindowSize.ToVector2() / 2;
-            Vector2 low = new(center.X, mapEditor.WindowSize.Y * 3/4);
+            Vector2 center = app.WindowSize.ToVector2() / 2;
+            Vector2 low = new(center.X, app.WindowSize.Y * 3/4);
 
             if (Progress >= 1f)
                 spriteBatch.DrawCircle(center, LoadingCircleRadius, LoadingCircleResolution, drawColor, LoadingCircleThickness);

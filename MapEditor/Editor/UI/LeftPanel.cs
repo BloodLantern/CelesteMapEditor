@@ -16,7 +16,7 @@ namespace Editor.UI
         private const float MoveInDuration = 0.5f;
         private const string Title = "leftPanel";
 
-        private readonly MapEditor mapEditor;
+        private readonly Application app;
         private readonly MenuBar menuBar;
 
         public LevelList LevelList;
@@ -27,12 +27,12 @@ namespace Editor.UI
 
         public Vector2 Size { get; private set; } = new(DefaultWidth, 1f);
 
-        public LeftPanel(MapEditor mapEditor)
+        public LeftPanel(Application app)
         {
-            this.mapEditor = mapEditor;
-            menuBar = mapEditor.MenuBar;
-            LevelList = new(mapEditor);
-            ModExplorer = new(mapEditor);
+            this.app = app;
+            menuBar = app.MenuBar;
+            LevelList = new(app);
+            ModExplorer = new(app);
         }
 
         public void Render()

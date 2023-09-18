@@ -121,11 +121,16 @@ namespace Editor
             Zoom = targetZoom;
         }
 
-        public void UpdateSize() => Size = ZoomToSize(Zoom);
+        public void OnResize()
+        {
+            Vector2 oldSize = Size;
+            Size = ZoomToSize(Zoom);
+            Position -= (Size - oldSize) / 2;
+        }
 
-        public static Vector2 ZoomToSize(float zoom) => MapEditor.Instance.WindowSize.ToVector2() / zoom;
+        public static Vector2 ZoomToSize(float zoom) => Application.Instance.WindowSize.ToVector2() / zoom;
 
-        public static float SizeToZoom(Vector2 size) => MapEditor.Instance.WindowSize.ToVector2().Length() / size.Length();
+        public static float SizeToZoom(Vector2 size) => Application.Instance.WindowSize.ToVector2().Length() / size.Length();
 
         public Vector2 MapToWindow(Vector2 position) => (position - Position) * Zoom;
 

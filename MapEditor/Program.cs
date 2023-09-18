@@ -1,1 +1,1 @@
-﻿new Editor.MapEditor().Run();
+﻿new Editor.Application().Run();

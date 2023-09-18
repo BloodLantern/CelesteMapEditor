@@ -138,7 +138,7 @@ namespace Editor
         {
             if (string.IsNullOrEmpty(Name))
             {
-                Image = new(MapEditor.Instance.GraphicsDevice, Size.X, Size.Y);
+                Image = new(Application.Instance.GraphicsDevice, Size.X, Size.Y);
                 // Set the texture to be filled with 'color'
                 Color[] data = new Color[Size.X * Size.Y];
                 for (int i = 0; i < data.Length; i++)
@@ -220,14 +220,14 @@ namespace Editor
                     }
 
                     Size = new Point(width, height);
-                    Image = new(MapEditor.Instance.GraphicsDevice, width, height);
+                    Image = new(Application.Instance.GraphicsDevice, width, height);
                     Image.SetData(buffer, 0, totalSize);
                     break;
 
                 case ".png":
                     try
                     {
-                        Image = Texture2D.FromStream(MapEditor.Instance.Graphics.GraphicsDevice, stream);
+                        Image = Texture2D.FromStream(Application.Instance.Graphics.GraphicsDevice, stream);
                         int elementCount = Image.Width * Image.Height;
                         Color[] data = new Color[elementCount];
                         Image.GetData(data, 0, elementCount);

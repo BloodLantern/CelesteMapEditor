@@ -45,7 +45,7 @@ namespace Editor
         }
 
         public Session Session;
-        public MapEditor MapEditor;
+        public Application App;
         public Map CurrentMap;
         public Camera Camera;
 
@@ -69,10 +69,10 @@ namespace Editor
         private Layers renderedLayers = Layers.All;
         private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
 
-        public MapViewer(MapEditor mapEditor)
+        public MapViewer(Application app)
         {
-            MapEditor = mapEditor;
-            Session = mapEditor.Session;
+            App = app;
+            Session = app.Session;
 
             playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
         }
@@ -121,7 +121,7 @@ namespace Editor
             }
             
             // If the click started inside the window
-            if (clickStartPosition.HasValue && new RectangleF(Point.Zero, MapEditor.WindowSize).Contains(clickStartPosition.Value))
+            if (clickStartPosition.HasValue && new RectangleF(Point.Zero, App.WindowSize).Contains(clickStartPosition.Value))
             {
                 if (Dragging)
                     dragDelta = (mouse.Position - clickStartPosition.Value).ToVector2() / Camera.Zoom;

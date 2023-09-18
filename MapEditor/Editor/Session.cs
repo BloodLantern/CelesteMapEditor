@@ -21,7 +21,7 @@ namespace Editor
 
         private static readonly string OlympusConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Olympus", "config.json");
         
-        public MapEditor MapEditor;
+        public Application App;
         public Config Config;
 
         public string CelesteDirectory;
@@ -47,19 +47,19 @@ namespace Editor
 
         public List<CelesteMod> CelesteMods = new();
 
-        public Session(MapEditor mapEditor)
+        public Session(Application app)
         {
             if (Current != null)
                 throw new InvalidOperationException("The Session class can only be instantiated once.");
             Current = this;
 
-            MapEditor = mapEditor;
+            App = app;
 
-            ContentDirectory = MapEditor.Content.RootDirectory;
+            ContentDirectory = App.Content.RootDirectory;
 
             Config = Config.Load();
 
-            SetupImGuiContext(MapEditor.ImGuiRenderer);
+            SetupImGuiContext(App.ImGuiRenderer);
         }
 
         private void SetupImGuiContext(ImGuiRenderer renderer)

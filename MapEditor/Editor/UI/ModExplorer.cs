@@ -2,9 +2,9 @@
 {
     public class ModExplorer
     {
-        private MapEditor MapEditor;
+        private Application App;
 
-        public ModExplorer(MapEditor mapEditor) => MapEditor = mapEditor;
+        public ModExplorer(Application app) => App = app;
 
         public void Render()
         {
