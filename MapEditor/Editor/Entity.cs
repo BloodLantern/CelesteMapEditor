@@ -64,9 +64,10 @@ namespace Editor
         public virtual Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
         public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
         public virtual Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
-        public virtual Vector2 Center => AbsolutePosition + Size.ToVector2() / 2;
+        public Vector2 Center => AbsolutePosition + Size.ToVector2() / 2;
 
-        public RectangleF Bounds => new(AbsolutePosition, Size);
+        public RectangleF Bounds => new(Position, Size);
+        public RectangleF AbsoluteBounds => new(AbsolutePosition, Size);
 
         public Entity(EntityData data, Level level)
         {
@@ -97,12 +98,12 @@ namespace Editor
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
-            => spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), Color.Red, camera.GetLineThickness());
+            => spriteBatch.DrawRectangle(camera.MapToWindow(AbsoluteBounds), Color.Red, camera.GetLineThickness());
 
         public virtual void DebugInfo()
         {
             ImGui.Text($"Name: '{Name}'");
-            ImGui.Text($"Bounds: {Bounds}");
+            ImGui.Text($"Bounds: {AbsoluteBounds}");
             int attributeCount = EntityData.Attributes.Count;
             ImGui.Text($"Attribute count: {attributeCount}");
             if (attributeCount > 0 && ImGui.TreeNode("Attributes"))

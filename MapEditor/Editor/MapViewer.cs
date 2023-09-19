@@ -49,11 +49,6 @@ namespace Editor
         public Map CurrentMap;
         public Camera Camera;
 
-        private Point2? cameraStartPosition;
-        private Point? clickStartPosition;
-        private bool Dragging => cameraStartPosition.HasValue && clickStartPosition.HasValue;
-        private Vector2 dragDelta;
-
         private List<Level> visibleLevels = new();
         private List<Filler> visibleFillers = new();
         private readonly List<Entity> visibleEntities = new();
@@ -64,7 +59,7 @@ namespace Editor
         public static readonly Vector2 PlayerSpawnOffset = new(-PlayerSpawnSize.X / 2, -PlayerSpawnSize.Y);
         private readonly Texture playerSpawnSprite;
 
-        private Entity selectedEntity;
+        private Selection<Entity> selection;
 
         private Layers renderedLayers = Layers.All;
         private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
@@ -79,8 +74,10 @@ namespace Editor
 
         public void InitializeCamera()
         {
-            Camera = new(Vector2.Zero, 1e-6f);
+            Camera = new(App, Vector2.Zero, 1e-6f);
             Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
+
+            selection = new(this);
         }
 
         public void Update(MouseStateExtended mouse, KeyboardStateExtended keyboard)
@@ -109,32 +106,9 @@ namespace Editor
 
         private void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
-            if (mouse.IsButtonUp(Session.Config.CameraMoveButton))
-            {
-                cameraStartPosition = null;
-                clickStartPosition = null;
-            }
-            else if (!Dragging)
-            {
-                cameraStartPosition = Camera.Position;
-                clickStartPosition = mouse.Position;
-            }
-            
-            // If the click started inside the window
-            if (clickStartPosition.HasValue && new RectangleF(Point.Zero, App.WindowSize).Contains(clickStartPosition.Value))
-            {
-                if (Dragging)
-                    dragDelta = (mouse.Position - clickStartPosition.Value).ToVector2() / Camera.Zoom;
+            Camera.HandleInputs(mouse, keyboard);
 
-                if (cameraStartPosition.HasValue)
-                    Camera.Position = cameraStartPosition.Value - dragDelta;
-            }
-
-            if (mouse.WasButtonJustDown(Session.Config.SelectButton))
-                selectedEntity = GetEntityAt(Camera.WindowToMap(mouse.Position).ToVector2());
-
-            if (mouse.DeltaScrollWheelValue != 0)
-                Camera.ZoomTo(mouse.Position.ToVector2(), Camera.TargetZoom * MathF.Pow(Session.Config.ZoomFactor, -mouse.DeltaScrollWheelValue / 120));
+            selection.HandleInputs(mouse, keyboard);
         }
 
         public Level GetLevelAt(Vector2 mapPosition)
@@ -151,10 +125,21 @@ namespace Editor
         {
             foreach (Entity entity in visibleEntities)
             {
-                if (entity.Bounds.Contains(mapPosition))
+                if (entity.AbsoluteBounds.Contains(mapPosition))
                     return entity;
             }
             return null;
+        }
+
+        public List<Entity> GetEntitiesIn(RectangleF mapArea)
+        {
+            List<Entity> result = new();
+            foreach (Entity entity in visibleEntities)
+            {
+                if (mapArea.Intersects(entity.AbsoluteBounds))
+                    result.Add(entity);
+            }
+            return result;
         }
 
         public void Render(GameTime time, SpriteBatch spriteBatch)
@@ -171,7 +156,7 @@ namespace Editor
             if (renderedLayers.HasFlag(Layers.PlayerSpawns))
             {
                 foreach (Vector2 playerSpawn in visiblePlayerSpawns)
-                RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
+                    RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
             }
 
             if (renderedLayers.HasFlag(Layers.Entities))
@@ -192,8 +177,7 @@ namespace Editor
                     trigger.Render(spriteBatch, Camera);
             }
 
-            if (selectedEntity != null)
-                spriteBatch.DrawRectangle(Camera.MapToWindow(selectedEntity.Bounds), Color.Lerp(Session.Config.EntitySelectionBoundsColorMin, Session.Config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f)), Camera.GetLineThickness());
+            selection.Render(time, spriteBatch);
 
             // TODO Draw filler tiles
 
@@ -291,14 +275,23 @@ namespace Editor
 
             ImGui.Separator();
 
-            if (selectedEntity != null && ImGui.TreeNode("Selected entity"))
+            if (!selection.Empty() && ImGui.TreeNode("Selected entities"))
             {
-                ImGui.Text($"Name: {selectedEntity.Name}");
-                ImGui.Text($"Level position: {selectedEntity.Position}");
-                ImGui.Text($"Absolute position: {selectedEntity.AbsolutePosition}");
-                ImGui.Text($"Relative position: {selectedEntity.AbsolutePosition - Camera.Position}");
-                ImGui.Text($"Origin: {selectedEntity.EntityData.Origin}");
-                ImGui.Text($"Size: {selectedEntity.Size}");
+                for (int i = 0; i < selection.Count; i++)
+                {
+                    if (ImGui.TreeNode($"{i}"))
+                    {
+                        Entity entity = selection[i];
+                        ImGui.Text($"Name: {entity.Name}");
+                        ImGui.Text($"Level position: {entity.Position}");
+                        ImGui.Text($"Absolute position: {entity.AbsolutePosition}");
+                        ImGui.Text($"Relative position: {entity.AbsolutePosition - Camera.Position}");
+                        ImGui.Text($"Origin: {entity.EntityData.Origin}");
+                        ImGui.Text($"Size: {entity.Size}");
+
+                        ImGui.TreePop();
+                    }
+                }
 
                 ImGui.TreePop();
             }
@@ -319,7 +312,7 @@ namespace Editor
                                 Camera.MoveTo(entity.Center);
                             else
                                 Camera.ZoomTo(Camera.MapToWindow(entity.Center), 3f);
-                            selectedEntity = entity;
+                            selection.SelectOnly(entity);
                         }
 
                         entity.DebugInfo();

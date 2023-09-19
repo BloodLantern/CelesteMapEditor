@@ -117,7 +117,7 @@ namespace Editor
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
             => spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), EditorColor, camera.GetLineThickness());
 
-        public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.Bounds));
+        public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.AbsoluteBounds));
 
         public List<Vector2> GetVisiblePlayerSpawns(RectangleF cameraBounds)
             => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn + MapViewer.PlayerSpawnOffset, MapViewer.PlayerSpawnSize)));

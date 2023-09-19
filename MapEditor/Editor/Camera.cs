@@ -2,6 +2,7 @@
 using Editor.Utils;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
+using MonoGame.Extended.Input;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -37,12 +38,23 @@ namespace Editor
             }
         }
 
-        public Camera(Vector2 centerPosition, float zoom = DefaultZoom)
+        private Vector2? cameraStartPosition;
+        private Point? cameraMoveClickStartPosition;
+        private bool Dragging => cameraStartPosition.HasValue && cameraMoveClickStartPosition.HasValue;
+        private Vector2 dragDelta;
+
+        public Application app;
+        public Config config;
+
+        public Camera(Application app, Vector2 centerPosition, float zoom = DefaultZoom)
         {
             Vector2 size = ZoomToSize(zoom);
             Bounds = new(centerPosition - size / 2, size);
             TargetZoom = this.zoom = zoom;
             TargetPosition = Position;
+
+            this.app = app;
+            config = app.Session.Config;
         }
 
         public bool IsMoving() => Coroutine.IsRunningAndNotEmpty(moveRoutineGuid);
@@ -121,6 +133,33 @@ namespace Editor
             Zoom = targetZoom;
         }
 
+        public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        {
+            if (mouse.IsButtonUp(config.CameraMoveButton))
+            {
+                cameraStartPosition = null;
+                cameraMoveClickStartPosition = null;
+            }
+            else if (!Dragging)
+            {
+                cameraStartPosition = Position;
+                cameraMoveClickStartPosition = mouse.Position;
+            }
+
+            // If the click started inside the window
+            if (cameraMoveClickStartPosition.HasValue && new RectangleF(Point.Zero, app.WindowSize).Contains(cameraMoveClickStartPosition.Value))
+            {
+                if (Dragging)
+                    dragDelta = (mouse.Position - cameraMoveClickStartPosition.Value).ToVector2() / Zoom;
+
+                if (cameraStartPosition.HasValue)
+                    Position = cameraStartPosition.Value - dragDelta;
+            }
+
+            if (mouse.DeltaScrollWheelValue != 0)
+                ZoomTo(mouse.Position.ToVector2(), TargetZoom * MathF.Pow(config.ZoomFactor, -mouse.GetDeltaScrollWheel()));
+        }
+
         public void OnResize()
         {
             Vector2 oldSize = Size;
@@ -141,6 +180,8 @@ namespace Editor
         public RectangleF MapToWindow(RectangleF bounds) => new(MapToWindow((Vector2) bounds.Position), MapToWindow(bounds.Size));
 
         public Vector2 WindowToMap(Vector2 position) => position / Zoom + Position;
+
+        public RectangleF WindowToMap(RectangleF bounds) => new(WindowToMap((Vector2) bounds.Position), WindowToMap(bounds.Size));
 
         public Point WindowToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
 

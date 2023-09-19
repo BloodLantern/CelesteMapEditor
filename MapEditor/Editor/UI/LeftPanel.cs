@@ -43,6 +43,7 @@ namespace Editor.UI
             ImGuiViewportPtr viewport = ImGui.GetMainViewport();
             float windowHeight = viewport.Size.Y - menuBar.CurrentY - menuBar.Size.Y;
             ImGui.SetNextWindowSizeConstraints(new(DefaultWidth, windowHeight), new(float.PositiveInfinity, windowHeight));
+            ImGui.SetNextWindowPos(new(CurrentX, menuBar.Size.Y + menuBar.CurrentY));
 
             ImGui.Begin(Title, WindowFlags);
             Size = ImGui.GetWindowSize();
@@ -75,12 +76,12 @@ namespace Editor.UI
 
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                ImGui.SetWindowPos(Title, new(CurrentX = Calc.EaseLerp(startingX, endingX, timer, duration, Ease.CubeOut), menuBar.Size.Y + menuBar.CurrentY));
+                CurrentX = Calc.EaseLerp(startingX, endingX, timer, duration, Ease.CubeOut);
 
                 yield return null;
             }
 
-            ImGui.SetWindowPos(Title, new(CurrentX = endingX, menuBar.Size.Y + menuBar.CurrentY));
+            CurrentX = endingX;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Editor.Utils;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -155,5 +156,7 @@ namespace Editor
         public static bool BetweenInterval(float val, float interval) => val % (interval * 2) > interval;
 
         public static bool OnInterval(float val, float prevVal, float interval) => (int) (prevVal / interval) != (int) (val / interval);
+
+        public static Vector2 Abs(Vector2 vec) => new(MathF.Abs(vec.X), MathF.Abs(vec.Y));
     }
 }
