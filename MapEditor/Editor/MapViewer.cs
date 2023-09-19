@@ -157,7 +157,7 @@ namespace Editor
             return null;
         }
 
-        public void Render(SpriteBatch spriteBatch)
+        public void Render(GameTime time, SpriteBatch spriteBatch)
         {
             if (CurrentMap == null)
                 return;
@@ -192,6 +192,9 @@ namespace Editor
                     trigger.Render(spriteBatch, Camera);
             }
 
+            if (selectedEntity != null)
+                spriteBatch.DrawRectangle(Camera.MapToWindow(selectedEntity.Bounds), Color.Lerp(Session.Config.EntitySelectionBoundsColorMin, Session.Config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f)), Camera.GetLineThickness());
+
             // TODO Draw filler tiles
 
             if (renderedDebugLayers.HasFlag(DebugLayers.LevelBounds))
@@ -200,13 +203,10 @@ namespace Editor
                     level.RenderDebug(spriteBatch, Camera);
             }
 
-            if (Session.Config.DebugMode)
+            if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
             {
-                if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
-                {
-                    foreach (Entity entity in visibleEntities)
-                        entity.RenderDebug(spriteBatch, Camera);
-                }
+                foreach (Entity entity in visibleEntities)
+                    entity.RenderDebug(spriteBatch, Camera);
             }
 
             if (renderedDebugLayers.HasFlag(DebugLayers.FillerBounds))
@@ -291,14 +291,16 @@ namespace Editor
 
             ImGui.Separator();
 
-            if (selectedEntity != null)
+            if (selectedEntity != null && ImGui.TreeNode("Selected entity"))
             {
-                ImGui.Text($"Selected entity name: {selectedEntity.Name}");
-                ImGui.Text($"Selected entity level position: {selectedEntity.Position}");
-                ImGui.Text($"Selected entity absolute position: {selectedEntity.AbsolutePosition}");
-                ImGui.Text($"Selected entity relative position: {selectedEntity.AbsolutePosition - Camera.Position}");
-                ImGui.Text($"Selected entity origin: {selectedEntity.EntityData.Origin}");
-                ImGui.Text($"Selected entity size: {selectedEntity.Size}");
+                ImGui.Text($"Name: {selectedEntity.Name}");
+                ImGui.Text($"Level position: {selectedEntity.Position}");
+                ImGui.Text($"Absolute position: {selectedEntity.AbsolutePosition}");
+                ImGui.Text($"Relative position: {selectedEntity.AbsolutePosition - Camera.Position}");
+                ImGui.Text($"Origin: {selectedEntity.EntityData.Origin}");
+                ImGui.Text($"Size: {selectedEntity.Size}");
+
+                ImGui.TreePop();
             }
 
             ImGui.Text($"Visible levels: {visibleLevels.Count}");
@@ -311,6 +313,15 @@ namespace Editor
                     Entity entity = visibleEntities[i];
                     if (ImGui.TreeNode($"{i}. {entity}"))
                     {
+                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                        {
+                            if (Camera.Zoom == 3f)
+                                Camera.MoveTo(entity.Center);
+                            else
+                                Camera.ZoomTo(Camera.MapToWindow(entity.Center), 3f);
+                            selectedEntity = entity;
+                        }
+
                         entity.DebugInfo();
 
                         ImGui.TreePop();

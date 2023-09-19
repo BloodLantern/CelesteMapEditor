@@ -251,7 +251,7 @@ namespace Editor
             if (CurrentState == State.Editor)
             {
                 SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-                MapViewer.Render(SpriteBatch);
+                MapViewer.Render(time, SpriteBatch);
                 SpriteBatch.End();
             }
 

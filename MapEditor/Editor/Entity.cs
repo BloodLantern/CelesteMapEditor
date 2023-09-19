@@ -64,6 +64,7 @@ namespace Editor
         public virtual Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
         public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
         public virtual Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
+        public virtual Vector2 Center => AbsolutePosition + Size.ToVector2() / 2;
 
         public RectangleF Bounds => new(AbsolutePosition, Size);
 

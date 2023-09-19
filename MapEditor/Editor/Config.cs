@@ -1,5 +1,6 @@
 ﻿using Editor.Logging;
 using Editor.Utils;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended.Input;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,9 @@ namespace Editor
 
         public MouseButton CameraMoveButton = MouseButton.Middle;
         public MouseButton SelectButton = MouseButton.Left;
+
+        public Color EntitySelectionBoundsColorMin = Color.DarkMagenta;
+        public Color EntitySelectionBoundsColorMax = Color.Magenta;
 
         public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
 
