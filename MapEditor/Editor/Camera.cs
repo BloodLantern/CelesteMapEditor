@@ -181,9 +181,11 @@ namespace Editor
 
         public Vector2 WindowToMap(Vector2 position) => position / Zoom + Position;
 
-        public RectangleF WindowToMap(RectangleF bounds) => new(WindowToMap((Vector2) bounds.Position), WindowToMap(bounds.Size));
-
         public Point WindowToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
+
+        public Vector2 WindowToMap(Size2 size) => size / Zoom;
+
+        public RectangleF WindowToMap(RectangleF bounds) => new(WindowToMap((Vector2) bounds.Position), WindowToMap(bounds.Size));
 
         public float GetLineThickness() => Math.Max(Zoom, 1f);
 

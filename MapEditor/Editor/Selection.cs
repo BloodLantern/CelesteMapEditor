@@ -15,6 +15,7 @@ namespace Editor
     {
         private RectangleF area;
         private Vector2 clickStart;
+        private readonly List<T> areaList = new();
         private readonly List<T> list = new();
 
         private readonly MapViewer mapViewer;
@@ -58,11 +59,26 @@ namespace Editor
                     else
                         area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(clickStart - mousePos));
 
-                    mapViewer.GetEntitiesIn(camera.WindowToMap(area)).ForEach(e => { if (!list.Contains(e)) list.Add((T) e); });
+                    list.RemoveAll(x => areaList.Contains(x));
+
+                    List<Entity> entities = mapViewer.GetEntitiesIn(camera.WindowToMap(area));
+                    entities.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
+                    for (int i = 0; i < areaList.Count; i++)
+                    {
+                        T e = areaList[i];
+                        if (!entities.Contains(e))
+                        {
+                            areaList.Remove(e);
+                            i--;
+                        }
+                    }
+
+                    list.AddRange(areaList);
                 }
                 else
                 {
                     area = new();
+                    areaList.Clear();
                 }
             }
 
@@ -72,17 +88,15 @@ namespace Editor
 
         public void Render(GameTime time, SpriteBatch spriteBatch)
         {
+            Color color = Color.Lerp(config.EntitySelectionBoundsColorMin, config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f));
+
             foreach (T entity in list)
-                spriteBatch.DrawRectangle(
-                    camera.MapToWindow(entity.AbsoluteBounds),
-                    Color.Lerp(config.EntitySelectionBoundsColorMin, config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f)),
-                    camera.GetLineThickness()
-                );
+                spriteBatch.DrawRectangle(camera.MapToWindow(entity.AbsoluteBounds), color, camera.GetLineThickness());
 
             if (!area.IsEmpty)
             {
                 spriteBatch.FillRectangle(area, config.EntitySelectionBoundsColorMin * 0.5f);
-                spriteBatch.DrawRectangle(area, config.EntitySelectionBoundsColorMax * 0.5f, camera.GetLineThickness());
+                spriteBatch.DrawRectangle(area, config.EntitySelectionBoundsColorMax * 0.5f, 2f);
             }
         }
 
