@@ -59,7 +59,7 @@ namespace Editor
                     else
                         area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(clickStart - mousePos));
 
-                    list.RemoveAll(x => areaList.Contains(x));
+                    Deselect(areaList);
 
                     List<Entity> entities = mapViewer.GetEntitiesIn(camera.WindowToMap(area));
                     entities.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
@@ -73,7 +73,7 @@ namespace Editor
                         }
                     }
 
-                    list.AddRange(areaList);
+                    Select(areaList);
                 }
                 else
                 {
@@ -84,6 +84,9 @@ namespace Editor
 
             if (mouse.WasButtonJustUp(config.SelectButton))
                 area = new();
+
+            if (keyboard.WasKeyJustUp(config.DeselectKey))
+                DeselectAll();
         }
 
         public void Render(GameTime time, SpriteBatch spriteBatch)
@@ -102,8 +105,26 @@ namespace Editor
 
         public void Select(T entity)
         {
-            if (entity != null)
+            if (entity != null && !list.Contains(entity))
                 list.Add(entity);
+        }
+
+        public void Select(IEnumerable<T> entities)
+        {
+            foreach (T entity in entities)
+                Select(entity);
+        }
+
+        public void Deselect(T entity)
+        {
+            if (entity != null)
+                list.Remove(entity);
+        }
+
+        public void Deselect(IEnumerable<T> entities)
+        {
+            foreach (T entity in entities)
+                Deselect(entity);
         }
 
         public void SelectOnly(T entity)
@@ -111,6 +132,8 @@ namespace Editor
             list.Clear();
             Select(entity);
         }
+
+        public void DeselectAll() => list.Clear();
 
         public bool Empty() => list.Empty();
 
