@@ -123,7 +123,7 @@ namespace Editor
         public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.AbsoluteBounds));
 
         public List<PlayerSpawn> GetVisiblePlayerSpawns(RectangleF cameraBounds)
-            => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn.Position + PlayerSpawn.Offset, PlayerSpawn.SizeConst)));
+            => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn.AbsolutePosition, PlayerSpawn.SizeConst)));
 
         public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.Bounds));
     }

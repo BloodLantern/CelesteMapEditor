@@ -89,10 +89,11 @@ namespace Editor
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
             => spriteBatch.DrawRectangle(camera.MapToWindow(AbsoluteBounds), Color.Red, camera.GetLineThickness());
 
-        public virtual void DebugInfo()
+        public override void DebugInfo()
         {
+            base.DebugInfo();
+
             ImGui.Text($"Name: '{Name}'");
-            ImGui.Text($"Bounds: {AbsoluteBounds}");
             int attributeCount = EntityData.Attributes.Count;
             ImGui.Text($"Attribute count: {attributeCount}");
             if (attributeCount > 0 && ImGui.TreeNode("Attributes"))

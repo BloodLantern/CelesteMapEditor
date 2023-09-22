@@ -5,26 +5,22 @@ using MonoGame.Extended;
 
 namespace Editor
 {
-    public class Trigger
+    public class Trigger : MapObject
     {
         public static readonly Color DefaultColor = Color.MediumPurple;
 
         public readonly EntityData EntityData;
-        public readonly Level Level;
 
         public string Name => EntityData.Name;
         public readonly string DisplayName;
 
-        public Vector2 Position => EntityData.Position;
-        public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
-        public virtual Point Size => EntityData.Size;
-
-        public RectangleF Bounds => new(AbsolutePosition, Size);
+        public override Vector2 Position => EntityData.Position;
+        public override Point Size => EntityData.Size;
 
         public Trigger(EntityData data, Level level)
+            : base(level)
         {
             EntityData = data;
-            Level = level;
 
             DisplayName = Calc.HumanizeString(Name);
         }
@@ -63,8 +59,8 @@ namespace Editor
                 str = DisplayName.Substring(strIndex, strLength);
             }*/
 
-            //spriteBatch.FillRectangle(camera.MapToWindow(Bounds), DefaultColor);
-            spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), DefaultColor, camera.GetLineThickness());
+            //spriteBatch.FillRectangle(camera.MapToWindow(AbsoluteBounds), DefaultColor);
+            spriteBatch.DrawRectangle(camera.MapToWindow(AbsoluteBounds), DefaultColor, camera.GetLineThickness());
         }
     }
 }

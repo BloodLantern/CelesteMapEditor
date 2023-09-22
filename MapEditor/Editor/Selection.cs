@@ -10,13 +10,12 @@ using System.Linq;
 
 namespace Editor
 {
-    public class Selection<T> : IEnumerable<T>
-        where T : MapObject
+    public class Selection : IEnumerable<MapObject>
     {
         private RectangleF area;
         private Vector2 clickStart;
-        private readonly List<T> areaList = new();
-        private readonly List<T> list = new();
+        private readonly List<MapObject> areaList = new();
+        private readonly List<MapObject> list = new();
 
         private readonly MapViewer mapViewer;
         private readonly Config config;
@@ -41,7 +40,7 @@ namespace Editor
 
                 if (!keyboard.IsShiftDown())
                 {
-                    T obj = (T) mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
+                    MapObject obj = mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
 
                     if (keyboard.IsControlDown())
                         Select(obj);
@@ -61,12 +60,18 @@ namespace Editor
 
                     Deselect(areaList);
 
-                    var entitiesInRectangle = mapViewer.GetObjectsInArea(camera.WindowToMap(area));
-                    entitiesInRectangle.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
+                    List<MapObject> objectsInRectangle = mapViewer.GetObjectsInArea(camera.WindowToMap(area));
+
+                    foreach (MapObject obj in objectsInRectangle)
+                    {
+                        if (!areaList.Contains(obj))
+                            areaList.Add(obj);
+                    }
+
                     for (int i = 0; i < areaList.Count; )
                     {
-                        T obj = areaList[i];
-                        if (!entitiesInRectangle.Contains(obj))
+                        MapObject obj = areaList[i];
+                        if (!objectsInRectangle.Contains(obj))
                             areaList.Remove(obj);
                         else
                             i++;
@@ -92,8 +97,8 @@ namespace Editor
         {
             Color color = Color.Lerp(config.EntitySelectionBoundsColorMin, config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f));
 
-            foreach (T entity in list)
-                spriteBatch.DrawRectangle(camera.MapToWindow(entity.AbsoluteBounds), color, camera.GetLineThickness());
+            foreach (MapObject obj in list)
+                spriteBatch.DrawRectangle(camera.MapToWindow(obj.AbsoluteBounds), color, camera.GetLineThickness());
 
             if (!area.IsEmpty)
             {
@@ -102,41 +107,41 @@ namespace Editor
             }
         }
 
-        public void Select(T entity)
+        public void Select(MapObject obj)
         {
-            if (entity != null && !list.Contains(entity))
-                list.Add(entity);
+            if (obj != null && !list.Contains(obj))
+                list.Add(obj);
         }
 
-        public void Select(IEnumerable<T> entities)
+        public void Select(IEnumerable<MapObject> entities)
         {
-            foreach (T entity in entities)
-                Select(entity);
+            foreach (MapObject obj in entities)
+                Select(obj);
         }
 
-        public void Deselect(T entity)
+        public void Deselect(MapObject obj)
         {
-            if (entity != null)
-                list.Remove(entity);
+            if (obj != null)
+                list.Remove(obj);
         }
 
-        public void Deselect(IEnumerable<T> entities)
+        public void Deselect(IEnumerable<MapObject> entities)
         {
-            foreach (T entity in entities)
-                Deselect(entity);
+            foreach (MapObject obj in entities)
+                Deselect(obj);
         }
 
-        public void SelectOnly(T entity)
+        public void SelectOnly(MapObject obj)
         {
             list.Clear();
-            Select(entity);
+            Select(obj);
         }
 
         public void DeselectAll() => list.Clear();
 
         public bool Empty() => list.Empty();
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<MapObject> GetEnumerator()
         {
             return list.GetEnumerator();
         }
@@ -146,6 +151,6 @@ namespace Editor
             return list.GetEnumerator();
         }
 
-        public T this[int index] => list[index];
+        public MapObject this[int index] => list[index];
     }
 }

@@ -157,7 +157,7 @@ namespace Editor.Celeste
                         foreach (BinaryPacker.Element entity in child.Children)
                         {
                             if (entity.Name == "player")
-                                PlayerSpawns.Add(new Vector2(Bounds.X + Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Bounds.Y + Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
+                                PlayerSpawns.Add(new Vector2(Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
                             else if (entity.Name is "strawberry" or "snowberry")
                                 Strawberries++;
                             else if (entity.Name == "shard")

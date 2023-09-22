@@ -9,17 +9,17 @@ namespace Editor
 {
     public class PlayerSpawn : MapObject
     {
-        // Need to name this differently because of MapObject.Size
         public static readonly Point SizeConst = new(13, 17);
         public static readonly Vector2 Offset = new(-SizeConst.X / 2, -SizeConst.Y);
         private static Texture Sprite;
 
-        public PlayerSpawn(Level level, Vector2 offset) : base(level, offset)
+        public override Point Size => SizeConst;
+
+        public PlayerSpawn(Level level, Vector2 offset) : base(level, offset + Offset)
         {
-            Size = SizeConst;
         }
 
-        public void Render(SpriteBatch spriteBatch, Camera camera) => Sprite.Render(spriteBatch, camera, Position + Offset);
+        public void Render(SpriteBatch spriteBatch, Camera camera) => Sprite.Render(spriteBatch, camera, AbsolutePosition);
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
             => spriteBatch.DrawRectangle(

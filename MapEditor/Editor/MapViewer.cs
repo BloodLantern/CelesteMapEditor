@@ -34,9 +34,9 @@ namespace Editor
         {
             None            = 0b00000000,
             LevelBounds     = 0b00000001,
-            FillerBounds    = 0b00000010,
-            EntityBounds    = 0b00000100,
-            Unused1         = 0b00001000,
+            EntityBounds    = 0b00000010,
+            FillerBounds    = 0b00000100,
+            PlayerSpawns    = 0b00001000,
             Unused2         = 0b00010000,
             Unused3         = 0b00100000,
             Unused4         = 0b01000000,
@@ -56,7 +56,7 @@ namespace Editor
         private readonly List<Trigger> visibleTriggers = new();
         private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
 
-        private Selection<MapObject> selection;
+        private Selection selection;
 
         private Layers renderedLayers = Layers.All;
         private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
@@ -98,7 +98,7 @@ namespace Editor
             }
 
             visibleObjects.AddRange(visibleEntities);
-            visibleTriggers.AddRange(visibleTriggers);
+            visibleObjects.AddRange(visibleTriggers);
             visibleObjects.AddRange(visiblePlayerSpawns);
 
             ImGuiIOPtr imGuiIO = ImGui.GetIO();
@@ -191,6 +191,12 @@ namespace Editor
                     level.RenderDebug(spriteBatch, Camera);
             }
 
+            if (renderedDebugLayers.HasFlag(DebugLayers.PlayerSpawns))
+            {
+                foreach (PlayerSpawn spawn in visiblePlayerSpawns)
+                    spawn.RenderDebug(spriteBatch, Camera);
+            }
+
             if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
             {
                 foreach (Entity entity in visibleEntities)
@@ -226,12 +232,8 @@ namespace Editor
             if (ImGui.TreeNode("Layers"))
             {
                 int renderedLayersInt = (int) renderedLayers;
-                ImGui.CheckboxFlags("Level background", ref renderedLayersInt, (int) Layers.LevelBackground);
-                ImGui.CheckboxFlags("Level foreground", ref renderedLayersInt, (int) Layers.LevelForeground);
-                ImGui.CheckboxFlags("Fillers", ref renderedLayersInt, (int) Layers.Fillers);
-                ImGui.CheckboxFlags("Entities", ref renderedLayersInt, (int) Layers.Entities);
-                ImGui.CheckboxFlags("Triggers", ref renderedLayersInt, (int) Layers.Triggers);
-                ImGui.CheckboxFlags("Player spawns", ref renderedLayersInt, (int) Layers.PlayerSpawns);
+                foreach (Layers layer in Enum.GetValues(typeof(Layers)))
+                    ImGui.CheckboxFlags(layer.ToString(), ref renderedLayersInt, (int) layer);
                 renderedLayers = (Layers) renderedLayersInt;
 
                 ImGui.TreePop();
@@ -240,9 +242,8 @@ namespace Editor
             if (ImGui.TreeNode("Debug layers"))
             {
                 int renderedDebugLayersInt = (int) renderedDebugLayers;
-                ImGui.CheckboxFlags("Level bounds", ref renderedDebugLayersInt, (int) DebugLayers.LevelBounds);
-                ImGui.CheckboxFlags("Filler bounds", ref renderedDebugLayersInt, (int) DebugLayers.FillerBounds);
-                ImGui.CheckboxFlags("Entity bounds", ref renderedDebugLayersInt, (int) DebugLayers.EntityBounds);
+                foreach (DebugLayers layer in Enum.GetValues(typeof(DebugLayers)))
+                    ImGui.CheckboxFlags(layer.ToString(), ref renderedDebugLayersInt, (int) layer);
                 renderedDebugLayers = (DebugLayers) renderedDebugLayersInt;
 
                 ImGui.TreePop();
@@ -292,23 +293,24 @@ namespace Editor
             ImGui.Text($"Visible levels: {visibleLevels.Count}");
             ImGui.Text($"Visible fillers: {visibleFillers.Count}");
             ImGui.Text($"Visible entities: {visibleEntities.Count}");
-            if (ImGui.TreeNode($"Visible entities list"))
+            ImGui.Text($"Visible objects: {visibleObjects.Count}");
+            if (ImGui.TreeNode($"Visible objects list"))
             {
-                for (int i = 0; i < visibleEntities.Count; i++)
+                for (int i = 0; i < visibleObjects.Count; i++)
                 {
-                    Entity entity = visibleEntities[i];
-                    if (ImGui.TreeNode($"{i}. {entity}"))
+                    MapObject obj = visibleObjects[i];
+                    if (ImGui.TreeNode($"{i}. {obj}"))
                     {
                         if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                         {
                             if (Camera.Zoom == 3f)
-                                Camera.MoveTo(entity.Center);
+                                Camera.MoveTo(obj.Center);
                             else
-                                Camera.ZoomTo(Camera.MapToWindow(entity.Center), 3f);
-                            selection.SelectOnly(entity);
+                                Camera.ZoomTo(Camera.MapToWindow(obj.Center), 3f);
+                            selection.SelectOnly(obj);
                         }
 
-                        entity.DebugInfo();
+                        obj.DebugInfo();
 
                         ImGui.TreePop();
                     }

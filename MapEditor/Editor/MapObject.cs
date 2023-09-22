@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Editor.Celeste;
+using ImGuiNET;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
 namespace Editor
@@ -23,5 +25,7 @@ namespace Editor
         public MapObject(Level level) => Level = level;
 
         public MapObject(Level level, Vector2 offset) : this(level) => Position = offset;
+
+        public virtual void DebugInfo() => ImGui.Text($"Absolute bounds: {AbsoluteBounds}");
     }
 }
