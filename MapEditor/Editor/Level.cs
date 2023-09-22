@@ -30,7 +30,7 @@ namespace Editor
         public readonly List<Decal> BackgroundDecals = new();
         public readonly Color EditorColor;
 
-        public List<Vector2> PlayerSpawns => LevelData.PlayerSpawns;
+        public List<PlayerSpawn> PlayerSpawns { get; private set; } = new();
         public Rectangle Bounds => LevelData.Bounds;
         public Point Position => Bounds.Location;
         public Point Size => Bounds.Size;
@@ -47,6 +47,9 @@ namespace Editor
         public Level(LevelData data)
         {
             LevelData = data;
+
+            foreach (Vector2 spawn in LevelData.PlayerSpawns)
+                PlayerSpawns.Add(new PlayerSpawn(this, spawn));
 
             foreach (EntityData entityData in LevelData.Entities)
             {
@@ -119,8 +122,8 @@ namespace Editor
 
         public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.AbsoluteBounds));
 
-        public List<Vector2> GetVisiblePlayerSpawns(RectangleF cameraBounds)
-            => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn + MapViewer.PlayerSpawnOffset, MapViewer.PlayerSpawnSize)));
+        public List<PlayerSpawn> GetVisiblePlayerSpawns(RectangleF cameraBounds)
+            => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn.Position + PlayerSpawn.Offset, PlayerSpawn.SizeConst)));
 
         public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.Bounds));
     }

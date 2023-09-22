@@ -8,7 +8,7 @@ using ImGuiNET;
 
 namespace Editor
 {
-    public class Entity
+    public class Entity : MapObject
     {
         private static readonly Dictionary<string, Texture> textureLookupTable = new()
         {
@@ -51,28 +51,17 @@ namespace Editor
         };
 
         public readonly EntityData EntityData;
-        public readonly Level Level;
 
         public Texture Texture;
 
         public string Name => EntityData.Name;
-        /// <summary>
-        /// The position relative to the level this Entity is in.
-        /// This needs to be virtual as some entities like <see cref="Entities.JumpThru"/>s
-        /// need to override this so that it is only <see cref="EntityData.Position"/>.
-        /// </summary>
-        public virtual Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
-        public Vector2 AbsolutePosition => Level.Position.ToVector2() + Position;
-        public virtual Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
-        public Vector2 Center => AbsolutePosition + Size.ToVector2() / 2;
-
-        public RectangleF Bounds => new(Position, Size);
-        public RectangleF AbsoluteBounds => new(AbsolutePosition, Size);
+        public override Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
+        public override Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
 
         public Entity(EntityData data, Level level)
+            : base(level)
         {
             EntityData = data;
-            Level = level;
         }
 
         public virtual void UpdateTexture()

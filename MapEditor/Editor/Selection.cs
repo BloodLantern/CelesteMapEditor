@@ -11,7 +11,7 @@ using System.Linq;
 namespace Editor
 {
     public class Selection<T> : IEnumerable<T>
-        where T : Entity
+        where T : MapObject
     {
         private RectangleF area;
         private Vector2 clickStart;
@@ -41,12 +41,12 @@ namespace Editor
 
                 if (!keyboard.IsShiftDown())
                 {
-                    T entity = (T) mapViewer.GetEntityAt(camera.WindowToMap(mouse.Position).ToVector2());
+                    T obj = (T) mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
 
                     if (keyboard.IsControlDown())
-                        Select(entity);
+                        Select(obj);
                     else
-                        SelectOnly(entity);
+                        SelectOnly(obj);
                 }
             }
 
@@ -61,13 +61,13 @@ namespace Editor
 
                     Deselect(areaList);
 
-                    List<Entity> entitiesInRectangle = mapViewer.GetEntitiesInArea(camera.WindowToMap(area));
+                    var entitiesInRectangle = mapViewer.GetObjectsInArea(camera.WindowToMap(area));
                     entitiesInRectangle.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
                     for (int i = 0; i < areaList.Count; )
                     {
-                        T e = areaList[i];
-                        if (!entitiesInRectangle.Contains(e))
-                            areaList.Remove(e);
+                        T obj = areaList[i];
+                        if (!entitiesInRectangle.Contains(obj))
+                            areaList.Remove(obj);
                         else
                             i++;
                     }

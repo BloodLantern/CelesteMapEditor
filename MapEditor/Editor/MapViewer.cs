@@ -51,15 +51,12 @@ namespace Editor
 
         private List<Level> visibleLevels = new();
         private List<Filler> visibleFillers = new();
+        private readonly List<MapObject> visibleObjects = new();
         private readonly List<Entity> visibleEntities = new();
         private readonly List<Trigger> visibleTriggers = new();
-        private readonly List<Vector2> visiblePlayerSpawns = new();
+        private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
 
-        public static readonly Point PlayerSpawnSize = new(13, 17);
-        public static readonly Vector2 PlayerSpawnOffset = new(-PlayerSpawnSize.X / 2, -PlayerSpawnSize.Y);
-        private readonly Texture playerSpawnSprite;
-
-        private Selection<Entity> selection;
+        private Selection<MapObject> selection;
 
         private Layers renderedLayers = Layers.All;
         private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
@@ -69,7 +66,7 @@ namespace Editor
             App = app;
             Session = app.Session;
 
-            playerSpawnSprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, PlayerSpawnSize.X, PlayerSpawnSize.Y);
+            PlayerSpawn.SetupSprite();
         }
 
         public void InitializeCamera()
@@ -87,15 +84,22 @@ namespace Editor
 
             visibleLevels = CurrentMap.GetVisibleLevels(Camera.Bounds);
             visibleFillers = CurrentMap.GetVisibleFillers(Camera.Bounds);
+
+            visibleObjects.Clear();
             visibleEntities.Clear();
             visibleTriggers.Clear();
             visiblePlayerSpawns.Clear();
+
             foreach (Level level in visibleLevels)
             {
                 visibleEntities.AddRange(level.GetVisibleEntities(Camera.Bounds));
                 visibleTriggers.AddRange(level.GetVisibleTriggers(Camera.Bounds));
                 visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(Camera.Bounds));
             }
+
+            visibleObjects.AddRange(visibleEntities);
+            visibleTriggers.AddRange(visibleTriggers);
+            visibleObjects.AddRange(visiblePlayerSpawns);
 
             ImGuiIOPtr imGuiIO = ImGui.GetIO();
             if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
@@ -121,23 +125,23 @@ namespace Editor
             return null;
         }
 
-        public Entity GetEntityAt(Vector2 mapPosition)
+        public MapObject GetObjectAt(Vector2 mapPosition)
         {
-            foreach (Entity entity in visibleEntities)
+            foreach (MapObject obj in visibleObjects)
             {
-                if (entity.AbsoluteBounds.Contains(mapPosition))
-                    return entity;
+                if (obj.AbsoluteBounds.Contains(mapPosition))
+                    return obj;
             }
             return null;
         }
 
-        public List<Entity> GetEntitiesInArea(RectangleF mapArea)
+        public List<MapObject> GetObjectsInArea(RectangleF mapArea)
         {
-            List<Entity> result = new();
-            foreach (Entity entity in visibleEntities)
+            List<MapObject> result = new();
+            foreach (MapObject obj in visibleObjects)
             {
-                if (mapArea.Intersects(entity.AbsoluteBounds))
-                    result.Add(entity);
+                if (mapArea.Intersects(obj.AbsoluteBounds))
+                    result.Add(obj);
             }
             return result;
         }
@@ -155,8 +159,8 @@ namespace Editor
 
             if (renderedLayers.HasFlag(Layers.PlayerSpawns))
             {
-                foreach (Vector2 playerSpawn in visiblePlayerSpawns)
-                    RenderPlayerSpawn(spriteBatch, Camera, playerSpawn);
+                foreach (PlayerSpawn playerSpawn in visiblePlayerSpawns)
+                    playerSpawn.Render(spriteBatch, Camera);
             }
 
             if (renderedLayers.HasFlag(Layers.Entities))
@@ -200,16 +204,6 @@ namespace Editor
             }
         }
 
-        public void RenderPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
-            => playerSpawnSprite.Render(spriteBatch, camera, position + PlayerSpawnOffset);
-
-        public void RenderDebugPlayerSpawn(SpriteBatch spriteBatch, Camera camera, Vector2 position)
-            => spriteBatch.DrawRectangle(
-                new RectangleF(camera.MapToWindow(position + PlayerSpawnOffset), PlayerSpawnSize.Mul(camera.Zoom)),
-                Color.DarkGreen,
-                Math.Max(camera.Zoom, 1f)
-            );
-
         public void RenderDebugFiller(SpriteBatch spriteBatch, Camera camera, Rectangle filler)
             => spriteBatch.DrawRectangle(
                 new RectangleF(Camera.MapToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
@@ -222,7 +216,6 @@ namespace Editor
             MouseStateExtended mouseState = MouseExtended.GetState();
             Point mousePosition = mouseState.Position;
             Point mouseMapPosition = Camera.WindowToMap(mousePosition);
-            Entity hoveredEntity = GetEntityAt(mouseMapPosition.ToVector2());
             Level hoveredLevel = GetLevelAt(mouseMapPosition.ToVector2());
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
@@ -275,21 +268,21 @@ namespace Editor
 
             ImGui.Separator();
 
-            if (!selection.Empty() && ImGui.TreeNode("Selected entities"))
+            if (!selection.Empty() && ImGui.TreeNode("Selected objects"))
             {
                 for (int i = 0; i < selection.Count; i++)
                 {
-                    if (ImGui.TreeNode($"{i}"))
+                    if (selection.Count == 1 || ImGui.TreeNode($"{i}"))
                     {
-                        Entity entity = selection[i];
-                        ImGui.Text($"Name: {entity.Name}");
-                        ImGui.Text($"Level position: {entity.Position}");
-                        ImGui.Text($"Absolute position: {entity.AbsolutePosition}");
-                        ImGui.Text($"Relative position: {entity.AbsolutePosition - Camera.Position}");
-                        ImGui.Text($"Origin: {entity.EntityData.Origin}");
-                        ImGui.Text($"Size: {entity.Size}");
+                        MapObject obj = selection[i];
+                        ImGui.Text($"Type: {obj.GetType()}");
+                        ImGui.Text($"Level position: {obj.Position}");
+                        ImGui.Text($"Absolute position: {obj.AbsolutePosition}");
+                        ImGui.Text($"Relative position: {obj.AbsolutePosition - Camera.Position}");
+                        ImGui.Text($"Size: {obj.Size}");
 
-                        ImGui.TreePop();
+                        if (selection.Count > 1)
+                            ImGui.TreePop();
                     }
                 }
 
