@@ -131,7 +131,7 @@ namespace Editor
             return null;
         }
 
-        public List<Entity> GetEntitiesIn(RectangleF mapArea)
+        public List<Entity> GetEntitiesInArea(RectangleF mapArea)
         {
             List<Entity> result = new();
             foreach (Entity entity in visibleEntities)

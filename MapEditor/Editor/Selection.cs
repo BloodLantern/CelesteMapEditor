@@ -61,16 +61,15 @@ namespace Editor
 
                     Deselect(areaList);
 
-                    List<Entity> entities = mapViewer.GetEntitiesIn(camera.WindowToMap(area));
-                    entities.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
-                    for (int i = 0; i < areaList.Count; i++)
+                    List<Entity> entitiesInRectangle = mapViewer.GetEntitiesInArea(camera.WindowToMap(area));
+                    entitiesInRectangle.ForEach(e => { if (!areaList.Contains(e)) areaList.Add((T) e); });
+                    for (int i = 0; i < areaList.Count; )
                     {
                         T e = areaList[i];
-                        if (!entities.Contains(e))
-                        {
+                        if (!entitiesInRectangle.Contains(e))
                             areaList.Remove(e);
-                            i--;
-                        }
+                        else
+                            i++;
                     }
 
                     Select(areaList);
