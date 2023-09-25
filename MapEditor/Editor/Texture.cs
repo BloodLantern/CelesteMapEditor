@@ -272,17 +272,22 @@ namespace Editor
             => Render(spriteBatch, camera, offset, color, new Vector2(scale));
 
         public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset, Color color, Vector2 scale)
-            => spriteBatch.Draw(
-                Image,
-                camera.MapToWindow(offset + Offset),
-                ClipRect,
-                color,
-                Rotation,
-                Origin - DrawOffset.ToVector2(),
-                scale * camera.Zoom,
-                SpriteEffects.None,
-                0f
-            );
+        {
+            if ((Size.ToVector2() * camera.Zoom).Length() < 1f)
+                return;
+
+            spriteBatch.Draw(
+                        Image,
+                        camera.MapToWindow(offset + Offset),
+                        ClipRect,
+                        color,
+                        Rotation,
+                        Origin - DrawOffset.ToVector2(),
+                        scale * camera.Zoom,
+                        SpriteEffects.None,
+                        0f
+                    );
+        }
 
         public static void AllocateBuffers()
         {

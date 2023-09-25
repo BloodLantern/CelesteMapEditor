@@ -153,7 +153,7 @@ namespace Editor
             return char.ToUpperInvariant(str[0]) + str[1..];
         }
 
-        public static bool BetweenInterval(float val, float interval) => val % (interval * 2) > interval;
+        public static bool BetweenInterval(float val, float interval) => val % (interval * 2f) > interval;
 
         public static bool OnInterval(float val, float prevVal, float interval) => (int) (prevVal / interval) != (int) (val / interval);
 

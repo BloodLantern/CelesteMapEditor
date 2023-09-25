@@ -77,7 +77,7 @@ namespace Editor
             selection = new(this);
         }
 
-        public void Update(MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        public void Update(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             if (CurrentMap == null)
                 return;
@@ -105,14 +105,14 @@ namespace Editor
             if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
                 return;
 
-            HandleInputs(mouse, keyboard);
+            HandleInputs(time, mouse, keyboard);
         }
 
-        private void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        private void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             Camera.HandleInputs(mouse, keyboard);
 
-            selection.HandleInputs(mouse, keyboard);
+            selection.HandleInputs(time, mouse, keyboard);
         }
 
         public Level GetLevelAt(Vector2 mapPosition)
@@ -217,7 +217,7 @@ namespace Editor
                 Math.Max(camera.Zoom, 1f)
             );
 
-        public void RenderDebug()
+        public void RenderDebug(GameTime time)
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
             Point mousePosition = mouseState.Position;
@@ -320,6 +320,7 @@ namespace Editor
             }
 
             ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
+            ImGui.Text($"Total time: {time.TotalGameTime}");
             ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsole);
             ImGui.Checkbox("Show average fps", ref Session.Config.ShowAverageFps);
             if (ImGui.Button("Test logging"))

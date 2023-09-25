@@ -119,7 +119,7 @@ namespace Editor
         private IEnumerator ZoomRoutine(float targetZoom, float duration)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-
+            // TODO Fix zooming a lot at the same time gives an impression of lag
             TargetZoom = targetZoom;
             float oldZoom = Zoom;
 

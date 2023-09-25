@@ -41,8 +41,6 @@ namespace Editor
         /// </summary>
         public ImGuiRenderer ImGuiRenderer;
 
-        public readonly FrameCounter FrameCounter = new();
-
         public Session Session;
         public State CurrentState = State.Loading;
 
@@ -58,6 +56,10 @@ namespace Editor
         public RenderTarget2D LoadingRenderTarget;
 
         public Point WindowSize => GraphicsDevice.PresentationParameters.Bounds.Size;
+
+        public int FPS { get; private set; }
+
+        private float lastTotalTime = 0f;
 
         public Application()
         {
@@ -175,7 +177,7 @@ namespace Editor
                 case State.Editor:
                     KeyboardStateExtended keyboardState = KeyboardExtended.GetState();
 
-                    MapViewer.Update(MouseExtended.GetState(), keyboardState);
+                    MapViewer.Update(time, MouseExtended.GetState(), keyboardState);
 
                     // Toggle debug mode with F3
                     if (keyboardState.WasKeyJustUp(Keys.F3))
@@ -196,9 +198,11 @@ namespace Editor
             }
 
             Coroutine.UpdateAll(time);
+            float totalTime = (float) time.TotalGameTime.TotalSeconds;
+            if (Calc.OnInterval(totalTime, lastTotalTime, 1f))
+                FPS = (int) MathF.Round(1f / time.GetElapsedSeconds());
+            lastTotalTime = totalTime;
             Logger.UpdateLogsAsync();
-
-            FrameCounter.Update(time.GetElapsedSeconds());
 
             base.Update(time);
         }
@@ -217,7 +221,7 @@ namespace Editor
                 MenuBar.Render(Session);
 
                 if (Session.Config.DebugMode)
-                    MapViewer.RenderDebug();
+                    MapViewer.RenderDebug(time);
 
                 LeftPanel.Render();
                 ModDependencies.Render();
@@ -267,7 +271,13 @@ namespace Editor
                 SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
 
             if (Session.Config.ShowAverageFps)
-                FrameCounter.Render(SpriteBatch, Session, LeftPanel, MenuBar);
+                SpriteBatch.DrawString(
+                    Session.UbuntuRegularFont,
+                    $"FPS: {FPS}",
+                    new Vector2((LeftPanel != null ? (LeftPanel.CurrentX + LeftPanel.Size.X) : 0f) + 10f,
+                    MenuBar != null ? MenuBar.CurrentY + MenuBar.Size.Y : 0f),
+                    Color.White
+                );
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 

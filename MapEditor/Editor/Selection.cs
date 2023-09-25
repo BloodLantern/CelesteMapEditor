@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Input;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Editor
 {
@@ -16,12 +14,15 @@ namespace Editor
         private Vector2 clickStart;
         private readonly List<MapObject> areaList = new();
         private readonly List<MapObject> list = new();
+        private List<MapObject> clickStartList = new();
 
         private readonly MapViewer mapViewer;
         private readonly Config config;
         private readonly Camera camera;
 
         public int Count => list.Count;
+
+        private float selectionClickDuration = 0f;
 
         public Selection(MapViewer mapViewer)
         {
@@ -30,27 +31,28 @@ namespace Editor
             camera = mapViewer.Camera;
         }
 
-        public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
+        public void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             Vector2 mousePos = mouse.Position.ToVector2();
+            MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
 
             if (mouse.WasButtonJustDown(config.SelectButton))
             {
+                selectionClickDuration = 0f;
                 clickStart = mouse.Position.ToVector2();
+                clickStartList = new(list);
 
                 if (!keyboard.IsShiftDown())
                 {
-                    MapObject obj = mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
-
                     if (keyboard.IsControlDown())
-                        Select(obj);
-                    else
-                        SelectOnly(obj);
+                        Select(objectUnderMouse);
                 }
             }
 
             if (mouse.IsButtonDown(config.SelectButton))
             {
+                selectionClickDuration += time.GetElapsedSeconds();
+
                 if (keyboard.IsShiftDown())
                 {
                     if (area.IsEmpty)
@@ -79,6 +81,11 @@ namespace Editor
 
                     Select(areaList);
                 }
+                else if (objectUnderMouse != null)
+                {
+                    foreach (MapObject mapObject in list)
+                        mapObject.Position += camera.WindowToMap(mouse.DeltaPosition.ToVector2());
+                }
                 else
                 {
                     area = new();
@@ -87,7 +94,13 @@ namespace Editor
             }
 
             if (mouse.WasButtonJustUp(config.SelectButton))
+            {
                 area = new();
+
+                // If we clicked for a short amount of time and we didn't shift, select only the object under the mouse
+                if (selectionClickDuration < 0.35f && !keyboard.IsShiftDown())
+                    SelectOnly(mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2()));
+            }
 
             if (keyboard.WasKeyJustUp(config.DeselectKey))
                 DeselectAll();
