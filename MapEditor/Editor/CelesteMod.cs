@@ -252,29 +252,33 @@ namespace Editor
             Loaded = false;
         }
 
-        public static void PreLoadAll(Session session, ref float progress, float progressFactor)
+        public static void PreLoadAll(Session session, Loading loading, float progressFactor)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            float oldProgress = progress;
+            float oldProgress = loading.Progress;
+            float progressFactorOnTwo = progressFactor / 2f;
 
             Logger.Log("Preloading Celeste mods...");
 
             // Getting a list instance here allows us to get the total number of entries
             List<string> entries = new(Directory.EnumerateFileSystemEntries(session.CelesteModsDirectory));
+            float entriesCountInverse = 1f / entries.Count;
 
             int index = 0;
             session.CelesteMods.Add(new CelesteMod("Celeste", session.CelesteVersion, index++));
             session.CelesteMods.Add(new CelesteMod("Everest", session.EverestVersion, index++));
             foreach (string path in entries)
             {
+                loading.CurrentSubText = Path.GetRelativePath(session.CelesteModsDirectory, path);
+
                 CelesteMod mod = new(index++);
                 mod.PreLoad(path);
 
                 if (mod != Empty)
                 {
                     session.CelesteMods.Add(mod);
-                    progress += 1 / entries.Count * progressFactor / 2;
+                    loading.Progress += entriesCountInverse * progressFactorOnTwo;
                 }
                 else
                 {
@@ -282,7 +286,11 @@ namespace Editor
                 }
             }
 
+            loading.CurrentSubText = string.Empty;
+
             Logger.Log($"{session.CelesteMods.Count} Celeste mods preloaded. Took {stopwatch.ElapsedMilliseconds}ms");
+
+            float celesteModsCountInverse = 1f / session.CelesteMods.Count;
 
             stopwatch = Stopwatch.StartNew();
             Logger.Log("Setting up Celeste mod dependencies...");
@@ -309,12 +317,12 @@ namespace Editor
 
                     mod.Dependencies[depIndex] = loadedReference;
                 }
-                progress += 1 / session.CelesteMods.Count * progressFactor / 2;
+                loading.Progress += celesteModsCountInverse * progressFactorOnTwo;
             }
 
             Logger.Log($"Celeste mod dependencies set up. Took {stopwatch.ElapsedMilliseconds}ms");
 
-            progress = oldProgress + progressFactor;
+            loading.Progress = oldProgress + progressFactor;
         }
 
         /// <summary>

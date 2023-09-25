@@ -16,13 +16,14 @@ namespace Editor.Celeste
 
         public readonly Dictionary<string, Texture> Textures = new(StringComparer.OrdinalIgnoreCase);
 
-        public static void LoadVanillaAtlases(string celesteGraphicsDirectory)
+        public static void LoadVanillaAtlases(string celesteGraphicsDirectory, Loading loading, float progressFactor)
         {
             Logger.Log("Loading atlases");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             Texture.AllocateBuffers();
-            Gameplay = LoadAtlasWithMeta(Path.Combine(celesteGraphicsDirectory, "Atlases", "Gameplay"));
+            Gameplay = LoadAtlasWithMeta(Path.Combine(celesteGraphicsDirectory, "Atlases", "Gameplay"), loading, progressFactor);
+            loading.CurrentSubText = string.Empty;
             Texture.DeallocateBuffers();
 
             Logger.Log($"Finished loading atlases. Took {stopwatch.ElapsedMilliseconds}ms");
@@ -33,9 +34,11 @@ namespace Editor.Celeste
         /// </summary>
         /// <param name="path">The path to the meta file.</param>
         /// <returns>The loaded Atlas.</returns>
-        private static Atlas LoadAtlasWithMeta(string path)
+        private static Atlas LoadAtlasWithMeta(string path, Loading loading, float progressFactor)
         {
-            using FileStream fileStream = File.OpenRead(path + ".meta");
+            string filePath = path + ".meta";
+            loading.CurrentSubText = filePath;
+            using FileStream fileStream = File.OpenRead(filePath);
             BinaryReader reader = new(fileStream);
 
             reader.ReadInt32();
@@ -44,15 +47,19 @@ namespace Editor.Celeste
 
             Atlas result = new();
             short atlasCount = reader.ReadInt16();
+            float atlasCountInverse = 1f / atlasCount;
             for (int i = 0; i < atlasCount; i++)
             {
                 string dataFileName = reader.ReadString();
+                loading.CurrentSubText = dataFileName;
                 Texture parentTexture = new(Session.Current.CelesteContentDirectory, Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, dataFileName + ".data"));
 
                 short childCount = reader.ReadInt16();
+                float childCountInverse = 1f / childCount;
                 for (int j = 0; j < childCount; j++)
                 {
                     string texturePath = reader.ReadString().Replace('\\', '/');
+                    loading.CurrentSubText = texturePath;
 
                     Point clipPosition = new(reader.ReadInt16(), reader.ReadInt16());
                     Point clipSize = new(reader.ReadInt16(), reader.ReadInt16());
@@ -61,6 +68,7 @@ namespace Editor.Celeste
                     Point textureSize = new(reader.ReadInt16(), reader.ReadInt16());
 
                     result.Textures[texturePath] = new Texture(parentTexture, new Rectangle(clipPosition, clipSize), offset, textureSize);
+                    loading.Progress += progressFactor * atlasCountInverse * childCountInverse;
                 }
             }
 

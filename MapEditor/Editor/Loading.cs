@@ -13,15 +13,14 @@ namespace Editor
 {
     public class Loading
     {
-        public delegate void LoadingFunc(ref float progressVar, ref string resourceName);
+        public delegate void LoadingFunc(Loading loading);
 
         public Application App;
 
-        private float progress = 0;
-        public float Progress => progress;
+        public float Progress = 0f;
 
-        private string currentResource = string.Empty;
-        public string CurrentResource => currentResource;
+        public string CurrentText = string.Empty;
+        public string CurrentSubText = string.Empty;
 
         public DateTime StartTime { get; private set; }
         public DateTime? EndTime { get; private set; } = null;
@@ -44,7 +43,7 @@ namespace Editor
         public bool ShowLoadingString = false;
         public string LoadingString = "Loading";
 
-        private TimeSpan? lastTotalGameTime = null;
+        private float? lastTotalGameTime = null;
         private TimeSpan elapsedTime;
         private TimeSpan timeLeft;
 
@@ -57,7 +56,7 @@ namespace Editor
         /// loading process if <paramref name="startNow"/> is <see langword="true"/>.
         /// </summary>
         /// <param name="func">
-        /// The loading function. It can write to the current progress and
+        /// The loading function. It can write to the current Progress and
         /// current resource params to display the current loading information.
         /// </param>
         /// <param name="startNow">
@@ -88,10 +87,10 @@ namespace Editor
                 () =>
                 {
                     Thread.CurrentThread.Name = "Loader Thread";
-                    func(ref progress, ref currentResource);
+                    func(this);
                 }
             );
-            progress = 1f;
+            Progress = 1f;
 
             EndTime = DateTime.Now;
 
@@ -109,14 +108,15 @@ namespace Editor
             Color drawColor = darkStyle ? Color.White : Color.Black;
             Vector2 center = app.WindowSize.ToVector2() / 2;
             Vector2 low = new(center.X, app.WindowSize.Y * 3/4);
+            float totalTime = (float) time.TotalGameTime.TotalSeconds;
 
             if (Progress >= 1f)
                 spriteBatch.DrawCircle(center, LoadingCircleRadius, LoadingCircleResolution, drawColor, LoadingCircleThickness);
             else
-                spriteBatch.DrawArc(center, LoadingCircleRadius, LoadingCircleResolution, LoadingCircleStartingAngle, progress * MathHelper.TwoPi, drawColor, LoadingCircleThickness);
+                spriteBatch.DrawArc(center, LoadingCircleRadius, LoadingCircleResolution, LoadingCircleStartingAngle, Progress * MathHelper.TwoPi, drawColor, LoadingCircleThickness);
             
-            string progressString = progress.ToString(ProgressFormat);
-            spriteBatch.DrawString(session.UbuntuRegularFont, progressString, center - session.UbuntuRegularFont.MeasureString(progressString) / 2, drawColor);
+            string ProgressString = Progress.ToString(ProgressFormat);
+            spriteBatch.DrawString(session.UbuntuRegularFont, ProgressString, center - session.UbuntuRegularFont.MeasureString(ProgressString) / 2, drawColor);
 
             if (ShowLoadingString)
             {
@@ -125,17 +125,24 @@ namespace Editor
             }
 
             Vector2 drawOffset = Vector2.Zero;
-            if (currentResource != string.Empty)
+            if (CurrentText != string.Empty)
             {
-                Vector2 currentResourceStringSize = session.UbuntuRegularFont.MeasureString(currentResource);
-                spriteBatch.DrawString(session.UbuntuRegularFont, currentResource, low - currentResourceStringSize / 2f, drawColor);
-                drawOffset.Y += currentResourceStringSize.Y;
+                Vector2 currentTextStringSize = session.UbuntuRegularFont.MeasureString(CurrentText);
+                spriteBatch.DrawString(session.UbuntuRegularFont, CurrentText, low - currentTextStringSize / 2f + drawOffset, drawColor);
+                drawOffset.Y += currentTextStringSize.Y;
+
+                if (CurrentSubText != string.Empty)
+                {
+                    Vector2 currentSubTextStringSize = session.UbuntuRegularFont.MeasureString(CurrentSubText);
+                    spriteBatch.DrawString(session.UbuntuRegularFont, CurrentSubText, low - currentSubTextStringSize / 2f + drawOffset, drawColor);
+                    drawOffset.Y += currentSubTextStringSize.Y;
+                }
             }
 
-            if (lastTotalGameTime.HasValue && (Calc.OnInterval((float) time.TotalGameTime.TotalSeconds, (float) lastTotalGameTime.Value.TotalSeconds, 1f) || Ended))
+            if (lastTotalGameTime.HasValue && (Calc.OnInterval(totalTime, lastTotalGameTime.Value, 1f) || Ended))
             {
                 elapsedTime = (EndTime ?? DateTime.Now) - StartTime;
-                if (progress > 0f)
+                if (Progress > 0f)
                     timeLeft = (DateTime.Now - StartTime) / Progress * (1f - Progress);
             }
 
@@ -157,7 +164,7 @@ namespace Editor
                 drawOffset.Y += elapsedTimeStringSize.Y;
             }
 
-            lastTotalGameTime = time.TotalGameTime;
+            lastTotalGameTime = totalTime;
         }
 
         public IEnumerator FadeRoutine(float duration, float fromAlpha, float toAlpha)

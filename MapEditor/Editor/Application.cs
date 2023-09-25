@@ -109,40 +109,46 @@ namespace Editor
 
             (Loading = new(
                 this,
-                (ref float progress, ref string resource) =>
+                (Loading loading) =>
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
                     Logger.Log($"Beginning startup loading...");
 
-                    resource = "Loading Celeste version and paths";
+                    loading.CurrentText = "Loading Celeste version and paths";
                     if (!Session.TryLoad())
                         Exit();
-                    progress += 0.1f;
+                    loading.Progress += 0.1f;
 
-                    resource = "Preloading Celeste mods";
+                    const float celesteModsPreLoadProgressFactor = 0.4f;
                     if (Session.EverestVersion != null)
-                        CelesteMod.PreLoadAll(Session, ref progress, 0.4f);
+                    {
+                        loading.CurrentText = "Preloading Celeste mods";
+                        CelesteMod.PreLoadAll(Session, loading, celesteModsPreLoadProgressFactor);
+                    }
+                    else
+                    {
+                        loading.Progress += celesteModsPreLoadProgressFactor;
+                    }
 
-                    resource = "Loading vanilla atlases";
-                    Atlas.LoadVanillaAtlases(Session.CelesteGraphicsDirectory);
-                    progress += 0.3f;
-                    resource = "Loading vanilla autotilers";
+                    loading.CurrentText = "Loading vanilla atlases";
+                    Atlas.LoadVanillaAtlases(Session.CelesteGraphicsDirectory, loading, 0.3f);
+                    loading.CurrentText = "Loading vanilla autotilers";
                     Autotiler.LoadAutotilers(Session.CelesteGraphicsDirectory);
-                    progress += 0.1f;
+                    loading.Progress += 0.1f;
 
-                    resource = "Loading UI";
+                    loading.CurrentText = "Loading UI";
                     MenuBar = new(this);
                     MapViewer = new(this);
                     LeftPanel = new(this);
                     ModDependencies = new(Session);
 
-                    progress += 0.05f;
+                    loading.Progress += 0.05f;
 
-                    resource = "Loading map";
+                    loading.CurrentText = "Loading map";
                     if (Session.Config.LastEditedFiles.Count > 0)
                         MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
-                    progress += 0.05f;
+                    loading.Progress += 0.05f;
 
                     Logger.Log($"Startup loading complete. Took {stopwatch.ElapsedMilliseconds}ms");
                 }
