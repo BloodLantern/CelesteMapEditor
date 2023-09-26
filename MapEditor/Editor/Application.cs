@@ -26,7 +26,7 @@ namespace Editor
 
         public static Application Instance { get; private set; }
 
-        public readonly Version Version = new(0, 1, 0, 0);
+        public readonly Version Version = new(0, 1, 0);
         private const string BaseWindowTitle = "CelesteMapEditor";
         private const int BaseWindowWidth = 1280;
         private const int BaseWindowHeight = 720;
@@ -59,7 +59,7 @@ namespace Editor
 
         public int FPS { get; private set; }
 
-        private float lastTotalTime = 0f;
+        private float lastTotalGameTime = 0f;
 
         public Application()
         {
@@ -72,7 +72,7 @@ namespace Editor
             Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-
+            
             Window.ClientSizeChanged += OnWindowResize;
             Window.FileDrop += OnFileDrop;
         }
@@ -205,9 +205,9 @@ namespace Editor
 
             Coroutine.UpdateAll(time);
             float totalTime = (float) time.TotalGameTime.TotalSeconds;
-            if (Calc.OnInterval(totalTime, lastTotalTime, 1f))
+            if (Calc.OnInterval(totalTime, lastTotalGameTime, 1f))
                 FPS = (int) MathF.Round(1f / time.GetElapsedSeconds());
-            lastTotalTime = totalTime;
+            lastTotalGameTime = totalTime;
             Logger.UpdateLogsAsync();
 
             base.Update(time);

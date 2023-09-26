@@ -39,6 +39,7 @@ namespace Editor
         public bool ShowAverageFps = false;
 
         public bool AutoLoadLastEditedMap = true;
+        public bool AlwaysPreLoadAllMods = false;
         public bool RoomSelectionWarp = true;
         public bool ShowHitboxes = false;
 

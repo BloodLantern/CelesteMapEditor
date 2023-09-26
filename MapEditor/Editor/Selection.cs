@@ -14,7 +14,7 @@ namespace Editor
         private Vector2 clickStart;
         private readonly List<MapObject> areaList = new();
         private readonly List<MapObject> list = new();
-        private List<MapObject> clickStartList = new();
+        private List<MapObject> clickStartList;
 
         private readonly MapViewer mapViewer;
         private readonly Config config;
@@ -35,11 +35,12 @@ namespace Editor
         {
             Vector2 mousePos = mouse.Position.ToVector2();
             MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
+            Vector2 mouseDragDelta = mousePos - clickStart;
 
             if (mouse.WasButtonJustDown(config.SelectButton))
             {
                 selectionClickDuration = 0f;
-                clickStart = mouse.Position.ToVector2();
+                clickStart = mousePos;
                 clickStartList = new(list);
 
                 if (!keyboard.IsShiftDown())
@@ -58,7 +59,7 @@ namespace Editor
                     if (area.IsEmpty)
                         area = new(mouse.Position, new());
                     else
-                        area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(clickStart - mousePos));
+                        area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(mouseDragDelta));
 
                     Deselect(areaList);
 
@@ -83,8 +84,8 @@ namespace Editor
                 }
                 else if (objectUnderMouse != null)
                 {
-                    foreach (MapObject mapObject in list)
-                        mapObject.Position += camera.WindowToMap(mouse.DeltaPosition.ToVector2());
+                    for (int i = 0; i < clickStartList.Count; i++)
+                        list[i].Position = clickStartList[i].Position + camera.WindowToMap(mouseDragDelta);
                 }
                 else
                 {
@@ -96,10 +97,11 @@ namespace Editor
             if (mouse.WasButtonJustUp(config.SelectButton))
             {
                 area = new();
+                clickStartList.Clear();
 
                 // If we clicked for a short amount of time and we didn't shift, select only the object under the mouse
                 if (selectionClickDuration < 0.35f && !keyboard.IsShiftDown())
-                    SelectOnly(mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2()));
+                    SelectOnly(mapViewer.GetObjectAt(camera.WindowToMap(mousePos)));
             }
 
             if (keyboard.WasKeyJustUp(config.DeselectKey))
