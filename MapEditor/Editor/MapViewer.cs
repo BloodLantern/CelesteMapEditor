@@ -1,6 +1,7 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
 using Editor.Logging;
+using Editor.Objects;
 using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -55,6 +56,8 @@ namespace Editor
         private readonly List<Entity> visibleEntities = new();
         private readonly List<Trigger> visibleTriggers = new();
         private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
+        private readonly List<Tile> visibleForegroundTiles = new();
+        private readonly List<Tile> visibleBackgroundTiles = new();
 
         private Selection selection;
 
@@ -85,27 +88,47 @@ namespace Editor
             visibleLevels = CurrentMap.GetVisibleLevels(Camera.Bounds);
             visibleFillers = CurrentMap.GetVisibleFillers(Camera.Bounds);
 
-            visibleObjects.Clear();
-            visibleEntities.Clear();
-            visibleTriggers.Clear();
-            visiblePlayerSpawns.Clear();
+            ClearObjectLists();
 
+            RectangleF cameraBounds = Camera.Bounds;
             foreach (Level level in visibleLevels)
-            {
-                visibleEntities.AddRange(level.GetVisibleEntities(Camera.Bounds));
-                visibleTriggers.AddRange(level.GetVisibleTriggers(Camera.Bounds));
-                visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(Camera.Bounds));
-            }
+                AddLevelObjectsToLists(level, cameraBounds);
 
-            visibleObjects.AddRange(visibleEntities);
-            visibleObjects.AddRange(visibleTriggers);
-            visibleObjects.AddRange(visiblePlayerSpawns);
+            AddObjectsToMainList();
 
             ImGuiIOPtr imGuiIO = ImGui.GetIO();
             if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
                 return;
 
             HandleInputs(time, mouse, keyboard);
+        }
+
+        private void ClearObjectLists()
+        {
+            visibleObjects.Clear();
+            visibleEntities.Clear();
+            visibleTriggers.Clear();
+            visiblePlayerSpawns.Clear();
+            visibleForegroundTiles.Clear();
+            visibleBackgroundTiles.Clear();
+        }
+
+        private void AddLevelObjectsToLists(Level level, RectangleF cameraBounds)
+        {
+            visibleEntities.AddRange(level.GetVisibleEntities(cameraBounds));
+            visibleTriggers.AddRange(level.GetVisibleTriggers(cameraBounds));
+            visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(cameraBounds));
+            visibleForegroundTiles.AddRange(level.GetVisibleForegroundTiles(cameraBounds));
+            visibleBackgroundTiles.AddRange(level.GetVisibleBackgroundTiles(cameraBounds));
+        }
+
+        private void AddObjectsToMainList()
+        {
+            visibleObjects.AddRange(visibleEntities);
+            visibleObjects.AddRange(visibleTriggers);
+            visibleObjects.AddRange(visiblePlayerSpawns);
+            visibleObjects.AddRange(visibleForegroundTiles);
+            visibleObjects.AddRange(visibleBackgroundTiles);
         }
 
         private void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)

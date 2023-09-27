@@ -208,13 +208,14 @@ namespace Editor
         /// <param name="data">The level tilemap data string.</param>
         /// <returns>A TileGrid with all its tiles set.</returns>
         public TileGrid GenerateLevel(
+            Level level,
             int tilesX,
             int tilesY,
             string data)
         {
             Regex lineSeparator = new("\\n|\\r|\\r\\n|\\n\\r");
 
-            TileGrid result = new(tilesX, tilesY);
+            TileGrid result = new(level, tilesX, tilesY);
 
             // Read tilemap data into a char array
             string[] tileLines = lineSeparator.Split(data);
@@ -247,7 +248,7 @@ namespace Editor
                         }
                     }
 
-                    result.Tiles[x, y] = terrainType.GetTileFromMask(mask);
+                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask));
                 }
             }
 

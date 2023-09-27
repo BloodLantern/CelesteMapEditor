@@ -4,7 +4,9 @@ using MonoGame;
 using Editor.Celeste;
 using System.Collections.Generic;
 using MonoGame.Extended;
-using Editor.Entities;
+using Editor.Objects.Entities;
+using Editor.Objects;
+using System;
 
 namespace Editor
 {
@@ -85,8 +87,8 @@ namespace Editor
             foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
                 bgSpinner.UpdateTexture();
 
-            ForegroundTiles = Autotiler.ForegroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.ForegroundTiles);
-            BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
+            ForegroundTiles = Autotiler.ForegroundTiles.GenerateLevel(this, data.TileBounds.Width, data.TileBounds.Height, LevelData.ForegroundTiles);
+            BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(this, data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
 
             foreach (DecalData decalData in data.FgDecals)
                 ForegroundDecals.Add(new Decal(decalData));
@@ -126,5 +128,23 @@ namespace Editor
             => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn.AbsolutePosition, PlayerSpawn.SizeConst)));
 
         public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.Bounds));
+
+        public List<Tile> GetVisibleForegroundTiles(RectangleF cameraBounds)
+        {
+            List<Tile> result = new();
+            foreach (Tile tile in ForegroundTiles.Tiles)
+                if (cameraBounds.Intersects(tile.Bounds))
+                    result.Add(tile);
+            return result;
+        }
+
+        public List<Tile> GetVisibleBackgroundTiles(RectangleF cameraBounds)
+        {
+            List<Tile> result = new();
+            foreach (Tile tile in BackgroundTiles.Tiles)
+                if (cameraBounds.Intersects(tile.Bounds))
+                    result.Add(tile);
+            return result;
+        }
     }
 }

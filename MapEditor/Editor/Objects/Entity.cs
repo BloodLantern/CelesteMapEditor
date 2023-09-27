@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MonoGame.Extended;
 using ImGuiNET;
 
-namespace Editor
+namespace Editor.Objects
 {
     public class Entity : MapObject
     {
@@ -59,7 +59,7 @@ namespace Editor
         public override Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
 
         public Entity(EntityData data, Level level)
-            : base(level)
+            : base(level, MapObjectType.Entity)
         {
             EntityData = data;
         }

@@ -189,6 +189,7 @@ namespace Editor
                     if (keyboardState.WasKeyJustUp(Keys.F3))
                         Session.Config.DebugMode = !Session.Config.DebugMode;
 
+                    // On loading state change
                     if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
                     {
                         LeftPanel.Visible = true;

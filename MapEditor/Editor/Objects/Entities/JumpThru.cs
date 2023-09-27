@@ -3,7 +3,7 @@ using Editor.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Editor.Entities
+namespace Editor.Objects.Entities
 {
     public class JumpThru : Entity
     {

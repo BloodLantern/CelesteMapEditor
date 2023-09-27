@@ -5,7 +5,7 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
-namespace Editor.Entities
+namespace Editor.Objects.Entities
 {
     public class Spikes : Entity
     {
@@ -18,10 +18,10 @@ namespace Editor.Entities
         }
 
         private const string TentacleType = "tentacles";
-        private static readonly string spikesTextureBaseName = "danger/spikes/{type}_{direction}";
+        private static readonly string spikesTextureBaseName = "danger/spikes/";
 
         public readonly Directions Direction;
-        public readonly string Type;
+        public readonly string SpikeType;
         public readonly int Length;
         private readonly List<Texture> textures = new();
 
@@ -29,7 +29,7 @@ namespace Editor.Entities
 
         public Spikes(EntityData data, Level level) : base(data, level)
         {
-            Type = EntityData.Attr("type", "default");
+            SpikeType = EntityData.Attr("type", "default");
             switch (Name[6..].ToLower())
             {
                 case "up":
@@ -55,12 +55,12 @@ namespace Editor.Entities
 
         public override void UpdateTexture()
         {
-            if (Type == TentacleType)
+            if (SpikeType == TentacleType)
             {
                 return;
             }
 
-            Texture = Atlas.Gameplay[spikesTextureBaseName.Replace("{type}", Type).Replace("{direction}", Direction.ToString()) + "00"];
+            Texture = Atlas.Gameplay[spikesTextureBaseName + SpikeType + '_' + Direction.ToString() + "00"];
             for (int i = 0; i < Length / Tileset.TileSize; i++)
             {
                 Texture texture = new(Texture);

@@ -3,7 +3,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
-namespace Editor
+namespace Editor.Objects
 {
     public class MapObject
     {
@@ -20,11 +20,17 @@ namespace Editor
         public RectangleF Bounds => new(Position, Size);
         public RectangleF AbsoluteBounds => new(AbsolutePosition, Size);
 
+        public readonly MapObjectType Type;
+
         public readonly Level Level;
 
-        public MapObject(Level level) => Level = level;
+        public MapObject(Level level, MapObjectType type = MapObjectType.Object)
+        {
+            Level = level;
+            Type = type;
+        }
 
-        public MapObject(Level level, Vector2 offset) : this(level) => Position = offset;
+        public MapObject(Level level, Vector2 offset, MapObjectType type = MapObjectType.Object) : this(level, type) => Position = offset;
 
         public virtual void DebugInfo() => ImGui.Text($"Absolute bounds: {AbsoluteBounds}");
     }

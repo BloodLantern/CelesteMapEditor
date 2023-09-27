@@ -3,7 +3,7 @@ using Editor.Extensions;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace Editor.Entities
+namespace Editor.Objects.Entities
 {
     public class Spinner : Entity
     {

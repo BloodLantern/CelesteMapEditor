@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame;
 using MonoGame.Extended;
 
-namespace Editor
+namespace Editor.Objects
 {
     public class PlayerSpawn : MapObject
     {
@@ -15,7 +15,7 @@ namespace Editor
 
         public override Point Size => SizeConst;
 
-        public PlayerSpawn(Level level, Vector2 offset) : base(level, offset + Offset)
+        public PlayerSpawn(Level level, Vector2 offset) : base(level, offset + Offset, MapObjectType.PlayerSpawn)
         {
         }
 
