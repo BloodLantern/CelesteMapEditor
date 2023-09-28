@@ -1,10 +1,9 @@
 ﻿using Editor.Celeste;
-using Editor.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
-namespace Editor
+namespace Editor.Objects
 {
     public class Trigger : MapObject
     {

@@ -127,14 +127,20 @@ namespace Editor
         public List<PlayerSpawn> GetVisiblePlayerSpawns(RectangleF cameraBounds)
             => PlayerSpawns.FindAll(spawn => cameraBounds.Intersects(new(spawn.AbsolutePosition, PlayerSpawn.SizeConst)));
 
-        public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.Bounds));
+        public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.AbsoluteBounds));
 
         public List<Tile> GetVisibleForegroundTiles(RectangleF cameraBounds)
         {
             List<Tile> result = new();
             foreach (Tile tile in ForegroundTiles.Tiles)
+            {
+                if (tile == null)
+                    continue;
+
                 if (cameraBounds.Intersects(tile.Bounds))
                     result.Add(tile);
+            }
+
             return result;
         }
 
@@ -142,8 +148,14 @@ namespace Editor
         {
             List<Tile> result = new();
             foreach (Tile tile in BackgroundTiles.Tiles)
+            {
+                if (tile == null)
+                    continue;
+
                 if (cameraBounds.Intersects(tile.Bounds))
-                    result.Add(tile);
+                        result.Add(tile);
+            }
+
             return result;
         }
     }
