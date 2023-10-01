@@ -16,7 +16,7 @@ namespace Editor
     public class MapViewer
     {
         [Flags]
-        private enum Layers : byte
+        public enum Layers : byte
         {
             None            = 0b00000000,
             LevelForeground = 0b00000001,
@@ -31,7 +31,7 @@ namespace Editor
         }
 
         [Flags]
-        private enum DebugLayers : byte
+        public enum DebugLayers : byte
         {
             None            = 0b00000000,
             LevelBounds     = 0b00000001,

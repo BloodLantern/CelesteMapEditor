@@ -1,12 +1,13 @@
 ﻿namespace Editor.UI
 {
-    public class ModExplorer
+    public class ModExplorer : UIComponent
     {
-        private Application App;
+        public ModExplorer(Application app)
+            : base(app, RenderingCall.None)
+        {
+        }
 
-        public ModExplorer(Application app) => App = app;
-
-        public void Render()
+        public override void Render()
         {
         }
     }

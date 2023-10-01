@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Editor.UI
 {
-    public class ModDependencies
+    public class ModDependencies : UIComponent
     {
         public Session Session;
         public bool Open = false;
@@ -14,6 +14,7 @@ namespace Editor.UI
         private string searchText = string.Empty;
 
         public ModDependencies(Session session)
+            : base(session.App, RenderingCall.StateEditor)
         {
             Session = session;
             enabledMods = new bool[Session.CelesteMods.Count];
@@ -21,7 +22,7 @@ namespace Editor.UI
                 enabledMods[i] = Session.CelesteMods[i].Enabled;
         }
 
-        public void Render()
+        public override void Render()
         {
             if (!wasOpen && Open)
                 ImGui.SetNextWindowFocus();

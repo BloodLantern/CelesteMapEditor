@@ -10,17 +10,18 @@ using System.Numerics;
 
 namespace Editor.UI
 {
-    public class MenuBar
+    public class MenuBar : UIComponent
     {
         private const float MoveInDuration = 0.5f;
         private const float DefaultHeight = 30f;
         private const string Title = "menuBar";
 
-        private readonly Application app;
         public Vector2 Size { get; private set; } = Vector2.One;
         public float CurrentY { get; private set; } = -DefaultHeight;
 
         public bool Visible = false;
+
+        private ModDependencies modDependencies;
 
         private readonly ImGuiWindowFlags flags =
             ImGuiWindowFlags.NoDecoration |
@@ -30,11 +31,17 @@ namespace Editor.UI
             ImGuiWindowFlags.MenuBar;
 
         public MenuBar(Application app)
+            : this(app, app.UIManager.FindComponent<ModDependencies>())
         {
-            this.app = app;
         }
 
-        public void Render(Session session)
+        public MenuBar(Application app, ModDependencies modDependencies)
+            : base(app, RenderingCall.StateEditor)
+        {
+            this.modDependencies = modDependencies;
+        }
+
+        public override void Render()
         {
             if (!Visible)
                 return;
@@ -46,7 +53,7 @@ namespace Editor.UI
             Size = ImGui.GetWindowSize();
 
             ImGui.BeginMenuBar();
-            FileMenu(session.Config);
+            FileMenu(app.Session.Config);
             EditMenu();
             ViewMenu();
             ModMenu();
@@ -272,7 +279,7 @@ namespace Editor.UI
         private void ModMenuShowDependencies()
         {
             if (ImGui.MenuItem("Show dependencies"))
-                app.ModDependencies.Open = true;
+                modDependencies.Open = true;
         }
 
         private void MapMenu()

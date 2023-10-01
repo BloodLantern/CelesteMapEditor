@@ -47,10 +47,9 @@ namespace Editor
         public MapViewer MapViewer;
 
         public RenderTarget2D ImGuiRenderTarget;
-        public MenuBar MenuBar;
-        public LeftPanel LeftPanel;
-        public ModDependencies ModDependencies;
-        public DebugConsole DebugConsole;
+        private LeftPanel leftPanel;
+        private MenuBar menuBar;
+        public UIManager UIManager;
 
         public Loading Loading;
         public RenderTarget2D LoadingRenderTarget;
@@ -86,7 +85,8 @@ namespace Editor
 
             Session = new(this);
 
-            DebugConsole = new(Session);
+            UIManager = new(this);
+            UIManager.AddComponent(new DebugConsole(Session));
 
             Window.AllowUserResizing = true;
             Graphics.PreferredBackBufferWidth = BaseWindowWidth;
@@ -138,10 +138,19 @@ namespace Editor
                     loading.Progress += 0.1f;
 
                     loading.CurrentText = "Loading UI";
-                    MenuBar = new(this);
                     MapViewer = new(this);
-                    LeftPanel = new(this);
-                    ModDependencies = new(Session);
+
+                    ModDependencies modDependencies;
+                    UIManager.AddRange(new UIComponent[]
+                        {
+                            // ModDependencies must be instantiated before MenuBar
+                            modDependencies = new ModDependencies(Session),
+                            // MenuBar must be instantiated before LeftPanel
+                            menuBar = new MenuBar(this, modDependencies),
+                            leftPanel = new LeftPanel(this, menuBar),
+                            new LayerSelection(this)
+                        }
+                    );
 
                     loading.Progress += 0.05f;
 
@@ -192,11 +201,11 @@ namespace Editor
                     // On loading state change
                     if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
                     {
-                        LeftPanel.Visible = true;
-                        LeftPanel.StartMoveInRoutine();
+                        leftPanel.Visible = true;
+                        leftPanel.StartMoveInRoutine();
 
-                        MenuBar.Visible = true;
-                        MenuBar.StartMoveInRoutine();
+                        menuBar.Visible = true;
+                        menuBar.StartMoveInRoutine();
 
                         Loading = null;
                     }
@@ -220,25 +229,28 @@ namespace Editor
             GraphicsDevice.Clear(Color.Transparent);
             ImGuiRenderer.BeforeLayout(time);
 
+            UIManager.RenderComponents(RenderingCall.BeforeEverything);
+
             if (Loading != null)
                 ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 1f - Loading.DrawAlpha);
 
-            if (CurrentState == State.Editor)
+            switch (CurrentState)
             {
-                MenuBar.Render(Session);
+                case State.Editor:
+                    UIManager.RenderComponents(RenderingCall.StateEditor);
 
-                if (Session.Config.DebugMode)
-                    MapViewer.RenderDebug(time);
-
-                LeftPanel.Render();
-                ModDependencies.Render();
+                    if (Session.Config.DebugMode)
+                        MapViewer.RenderDebug(time);
+                    break;
+                case State.Loading:
+                    UIManager.RenderComponents(RenderingCall.StateLoading);
+                    break;
             }
 
             if (Loading != null)
                 ImGui.PopStyleVar();
 
-            if (Session.Config.ShowDebugConsole)
-                DebugConsole.Render();
+            UIManager.RenderComponents(RenderingCall.AfterEverything);
 
             ImGuiRenderer.AfterLayout();
 
@@ -281,8 +293,8 @@ namespace Editor
                 SpriteBatch.DrawString(
                     Session.UbuntuRegularFont,
                     $"FPS: {FPS}",
-                    new Vector2((LeftPanel != null ? (LeftPanel.CurrentX + LeftPanel.Size.X) : 0f) + 10f,
-                    MenuBar != null ? MenuBar.CurrentY + MenuBar.Size.Y : 0f),
+                    new Vector2((leftPanel != null ? (leftPanel.CurrentX + leftPanel.Size.X) : 0f) + 10f,
+                    menuBar != null ? menuBar.CurrentY + menuBar.Size.Y : 0f),
                     Color.White
                 );
 

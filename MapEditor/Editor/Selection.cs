@@ -157,15 +157,9 @@ namespace Editor
 
         public bool Empty() => list.Empty();
 
-        public IEnumerator<MapObject> GetEnumerator()
-        {
-            return list.GetEnumerator();
-        }
+        public IEnumerator<MapObject> GetEnumerator() => list.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return list.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => list.GetEnumerator();
 
         public MapObject this[int index] => list[index];
     }

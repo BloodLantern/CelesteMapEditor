@@ -7,15 +7,18 @@ using System;
 
 namespace Editor.UI
 {
-    public class DebugConsole
+    public class DebugConsole : UIComponent
     {
         public LogLevel LogLevel = LogLevel.Debug;
         public Session Session;
 
-        public DebugConsole(Session session) => Session = session;
+        public DebugConsole(Session session) : base(session.App, RenderingCall.AfterEverything) => Session = session;
 
-        public void Render()
+        public override void Render()
         {
+            if (!Session.Config.ShowDebugConsole)
+                return;
+
             ImGui.Begin("Debug console", ImGuiWindowFlags.NoFocusOnAppearing);
 
             if (ImGui.BeginCombo("Log level", LogLevel.ToString()))

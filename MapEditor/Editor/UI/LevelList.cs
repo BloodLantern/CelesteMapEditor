@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 namespace Editor.UI
 {
-    public class LevelList
+    public class LevelList : UIComponent
     {
         public Application App;
         public MapViewer MapViewer;
 
         public LevelList(Application app)
+            : base(app, RenderingCall.None)
         {
             App = app;
             MapViewer = App.MapViewer;
@@ -18,7 +19,7 @@ namespace Editor.UI
         private bool fillersCheckbox = true;
         private bool fillerRoomsCheckbox = true;
 
-        public void Render()
+        public override void Render()
         {
             if (MapViewer.CurrentMap == null)
                 return;

@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace Editor.UI
 {
-    public class LeftPanel
+    public class LeftPanel : UIComponent
     {
         private const float DefaultWidth = 200f;
         private const ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings;
@@ -16,7 +16,6 @@ namespace Editor.UI
         private const float MoveInDuration = 0.5f;
         private const string Title = "leftPanel";
 
-        private readonly Application app;
         private readonly MenuBar menuBar;
 
         public LevelList LevelList;
@@ -28,14 +27,19 @@ namespace Editor.UI
         public Vector2 Size { get; private set; } = new(DefaultWidth, 1f);
 
         public LeftPanel(Application app)
+            : this(app, app.UIManager.FindComponent<MenuBar>())
         {
-            this.app = app;
-            menuBar = app.MenuBar;
+        }
+
+        public LeftPanel(Application app, MenuBar menuBar)
+            : base(app, RenderingCall.StateEditor)
+        {
+            this.menuBar = menuBar;
             LevelList = new(app);
             ModExplorer = new(app);
         }
 
-        public void Render()
+        public override void Render()
         {
             if (!Visible)
                 return;
