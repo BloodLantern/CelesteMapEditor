@@ -14,7 +14,7 @@ namespace Editor.UI
         private string searchText = string.Empty;
 
         public ModDependencies(Session session)
-            : base(session.App, RenderingCall.StateEditor)
+            : base(RenderingCall.StateEditor)
         {
             Session = session;
             enabledMods = new bool[Session.CelesteMods.Count];

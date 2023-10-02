@@ -22,12 +22,15 @@ namespace Editor.UI
         public bool Visible = false;
 
         private ModDependencies modDependencies;
+        private readonly Application app;
 
-        private readonly ImGuiWindowFlags flags =
+        private const ImGuiWindowFlags WindowFlags =
             ImGuiWindowFlags.NoDecoration |
-            ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse |
+            ImGuiWindowFlags.NoMove |
+            ImGuiWindowFlags.NoScrollWithMouse |
             ImGuiWindowFlags.NoSavedSettings |
-            ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoBackground |
+            ImGuiWindowFlags.NoBringToFrontOnFocus |
+            ImGuiWindowFlags.NoBackground |
             ImGuiWindowFlags.MenuBar;
 
         public MenuBar(Application app)
@@ -36,8 +39,9 @@ namespace Editor.UI
         }
 
         public MenuBar(Application app, ModDependencies modDependencies)
-            : base(app, RenderingCall.StateEditor)
+            : base(RenderingCall.StateEditor)
         {
+            this.app = app;
             this.modDependencies = modDependencies;
         }
 
@@ -49,7 +53,7 @@ namespace Editor.UI
             ImGui.SetNextWindowPos(new(0, CurrentY));
             ImGui.SetNextWindowSize(new(ImGui.GetMainViewport().Size.X, ImGui.GetFrameHeight()));
 
-            ImGui.Begin(Title, flags);
+            ImGui.Begin(Title, WindowFlags);
             Size = ImGui.GetWindowSize();
 
             ImGui.BeginMenuBar();

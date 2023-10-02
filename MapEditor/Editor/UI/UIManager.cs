@@ -8,10 +8,7 @@ namespace Editor.UI
         public readonly List<UIComponent> Components = new();
         private Application app;
 
-        public UIManager(Application app)
-        {
-            this.app = app;
-        }
+        public UIManager(Application app) => this.app = app;
 
         public void AddComponent(UIComponent component) => Components.Add(component);
 

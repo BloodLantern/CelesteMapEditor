@@ -20,10 +20,9 @@ namespace Editor
         public string LastEditedFile => LastEditedFiles.Count > 0 ? LastEditedFiles[0] : null;
 
         /// <summary>
-        /// Only effective if Vsync is off.
+        /// Only effective if Vsync is off and is not <see cref="TimeSpan.Zero"/>.
         /// </summary>
         public TimeSpan MapViewerRefreshRate = new(0, 0, 0, 0, 16);
-        public bool UseMapViewerRefreshRate = true;
         public bool Vsync = false;
 
         public bool DebugMode = false;
@@ -60,6 +59,10 @@ namespace Editor
 
         private void FirstTimeSetup()
         {
+#if WINDOWS
+            if (!Calc.ShouldSystemUseDarkMode())
+                UiStyle = ImGuiStyles.Style.Light;
+#endif
         }
 
         /// <summary>

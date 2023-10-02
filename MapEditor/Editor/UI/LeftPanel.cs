@@ -1,7 +1,6 @@
 ﻿using Editor.Extensions;
 using Editor.Utils;
 using ImGuiNET;
-using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Numerics;
@@ -11,7 +10,14 @@ namespace Editor.UI
     public class LeftPanel : UIComponent
     {
         private const float DefaultWidth = 200f;
-        private const ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings;
+        private const ImGuiWindowFlags WindowFlags =
+            ImGuiWindowFlags.AlwaysAutoResize |
+            ImGuiWindowFlags.NoBringToFrontOnFocus |
+            ImGuiWindowFlags.NoTitleBar |
+            ImGuiWindowFlags.NoMove |
+            ImGuiWindowFlags.NoFocusOnAppearing |
+            ImGuiWindowFlags.NoCollapse |
+            ImGuiWindowFlags.NoSavedSettings;
         private const float EndingX = 0f;
         private const float MoveInDuration = 0.5f;
         private const string Title = "leftPanel";
@@ -32,10 +38,10 @@ namespace Editor.UI
         }
 
         public LeftPanel(Application app, MenuBar menuBar)
-            : base(app, RenderingCall.StateEditor)
+            : base(RenderingCall.StateEditor)
         {
             this.menuBar = menuBar;
-            LevelList = new(app);
+            LevelList = new(app.MapViewer);
             ModExplorer = new(app);
         }
 

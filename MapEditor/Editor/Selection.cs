@@ -15,7 +15,7 @@ namespace Editor
         private Vector2 clickStart;
         private readonly List<MapObject> areaList = new();
         private readonly List<MapObject> list = new();
-        private List<MapObject> clickStartList;
+        private List<MapObject> clickStartList = new();
 
         private readonly MapViewer mapViewer;
         private readonly Config config;

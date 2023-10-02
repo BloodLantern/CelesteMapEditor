@@ -3,7 +3,7 @@
     public class ModExplorer : UIComponent
     {
         public ModExplorer(Application app)
-            : base(app, RenderingCall.None)
+            : base(RenderingCall.None)
         {
         }
 

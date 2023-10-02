@@ -24,7 +24,9 @@ namespace Editor.Celeste
         }
 
         /// <summary>
-        /// Tries to load the area <see cref="ID"/> and <see cref="Mode"/> using the map file name.
+        /// Tries to load the <see cref="ID"/> and the <see cref="Mode"/> using the map file name.
+        /// Also checks if the file is located in <see cref="Session.CelesteContentDirectory"/> and
+        /// sets the <see cref="Campaign"/> to the vanilla one if it is the case.
         /// </summary>
         /// <param name="filePath">The map file path to try to load values from.</param>
         public void TryLoadFromFileName(string filePath)
@@ -88,7 +90,9 @@ namespace Editor.Celeste
 
             // Check if the map is a vanilla one
             if (Directory.GetParent(filePath)?.Parent?.FullName == Session.Current.CelesteContentDirectory)
+            {
                 Campaign = VanillaCampaign;
+            }
         }
 
         public override readonly bool Equals(object obj) => obj is AreaKey && this == obj as AreaKey?;

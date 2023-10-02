@@ -5,15 +5,9 @@ namespace Editor.UI
 {
     public class LevelList : UIComponent
     {
-        public Application App;
-        public MapViewer MapViewer;
+        private MapViewer mapViewer;
 
-        public LevelList(Application app)
-            : base(app, RenderingCall.None)
-        {
-            App = app;
-            MapViewer = App.MapViewer;
-        }
+        public LevelList(MapViewer mapViewer) : base(RenderingCall.None) => this.mapViewer = mapViewer;
 
         private bool roomsCheckbox = true;
         private bool fillersCheckbox = true;
@@ -21,7 +15,7 @@ namespace Editor.UI
 
         public override void Render()
         {
-            if (MapViewer.CurrentMap == null)
+            if (mapViewer.CurrentMap == null)
                 return;
 
             List<Level> levels = GetLevels(false);
@@ -82,18 +76,18 @@ namespace Editor.UI
                 {
                     ImGui.Selectable(level.Name, ref level.Selected, ImGuiSelectableFlags.AllowDoubleClick);
                     if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                        MapViewer.Camera.MoveTo(level.Center);
+                        mapViewer.Camera.MoveTo(level.Center);
                 }
                 else if (o is Filler filler)
                 {
                     ImGui.Selectable(filler.DisplayName, ref filler.Selected, ImGuiSelectableFlags.AllowDoubleClick);
                     if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                        MapViewer.Camera.MoveTo(filler.Center.ToVector2());
+                        mapViewer.Camera.MoveTo(filler.Center.ToVector2());
                 }
             }
         }
 
-        private List<Level> GetLevels(bool filler) => MapViewer.CurrentMap.Levels.FindAll(l => l.Filler == filler);
-        private List<Filler> GetFillers() => MapViewer.CurrentMap.Fillers;
+        private List<Level> GetLevels(bool filler) => mapViewer.CurrentMap.Levels.FindAll(l => l.Filler == filler);
+        private List<Filler> GetFillers() => mapViewer.CurrentMap.Fillers;
     }
 }

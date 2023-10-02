@@ -27,7 +27,7 @@ namespace Editor
         public static Application Instance { get; private set; }
 
         public readonly Version Version = new(0, 1, 0);
-        private const string BaseWindowTitle = "CelesteMapEditor";
+        private const string BaseWindowTitle = "Celeste Map Editor";
         private const int BaseWindowWidth = 1280;
         private const int BaseWindowHeight = 720;
         public string WindowTitle => $"{BaseWindowTitle} v{Version.ToString(3)}";
@@ -92,8 +92,16 @@ namespace Editor
             Graphics.PreferredBackBufferWidth = BaseWindowWidth;
             Graphics.PreferredBackBufferHeight = BaseWindowHeight;
             Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
-            TargetElapsedTime = Session.Config.MapViewerRefreshRate;
-            IsFixedTimeStep = Session.Config.UseMapViewerRefreshRate;
+            if (Session.Config.MapViewerRefreshRate != TimeSpan.Zero)
+            {
+                TargetElapsedTime = Session.Config.MapViewerRefreshRate;
+                IsFixedTimeStep = true;
+            }
+            else
+            {
+                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 16);
+                IsFixedTimeStep = false;
+            }
             Graphics.ApplyChanges();
 
             GlobalRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
@@ -135,11 +143,13 @@ namespace Editor
                     Atlas.LoadVanillaAtlases(Session.CelesteGraphicsDirectory, loading, 0.3f);
                     loading.CurrentText = "Loading vanilla autotilers";
                     Autotiler.LoadAutotilers(Session.CelesteGraphicsDirectory);
-                    loading.Progress += 0.1f;
+                    loading.Progress += 0.05f;
+
+                    loading.CurrentText = "Loading map viewer";
+                    MapViewer = new(this);
+                    loading.Progress += 0.05f;
 
                     loading.CurrentText = "Loading UI";
-                    MapViewer = new(this);
-
                     ModDependencies modDependencies;
                     UIManager.AddRange(new UIComponent[]
                         {
@@ -354,7 +364,15 @@ namespace Editor
             if (e.Files.Length != 1)
                 return;
 
-            LoadMap(e.Files[0]);
+            switch (Path.GetExtension(e.Files[0]))
+            {
+                case ".bin":
+                    LoadMap(e.Files[0]);
+                    break;
+                case ".zip":
+                    LoadModZip(e.Files[0]);
+                    break;
+            }
         }
 
         public void Restart()

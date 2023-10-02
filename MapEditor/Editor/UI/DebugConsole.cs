@@ -12,7 +12,7 @@ namespace Editor.UI
         public LogLevel LogLevel = LogLevel.Debug;
         public Session Session;
 
-        public DebugConsole(Session session) : base(session.App, RenderingCall.AfterEverything) => Session = session;
+        public DebugConsole(Session session) : base(RenderingCall.AfterEverything) => Session = session;
 
         public override void Render()
         {
