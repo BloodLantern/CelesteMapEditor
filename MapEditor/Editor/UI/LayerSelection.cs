@@ -8,10 +8,11 @@ namespace Editor.UI
         private enum LayerType : byte
         {
             Rendering,
-            Selection
+            Selection,
+            Count
         }
 
-        private const int LayerTypes = 2;
+        private const int LayerTypes = (int) LayerType.Count;
 
         private readonly MapViewer.Layers[] selectedLayers = new MapViewer.Layers[LayerTypes];
         private MapViewer.DebugLayers selectedDebugLayers;
@@ -25,7 +26,7 @@ namespace Editor.UI
 
         public override void Render()
         {
-            ImGui.Begin("Layers", ImGuiWindowFlags.AlwaysAutoResize);
+            ImGui.Begin("Layers");
 
             LayerType[] types = Enum.GetValues<LayerType>();
             for (int i = 0; i < LayerTypes; i++)
@@ -36,7 +37,7 @@ namespace Editor.UI
                     currentLayerType &= ~(LayerType) i;
             }
 
-            ImGui.BeginChild("layerFlags");
+            ImGui.BeginChild("layerFlags", new(ImGui.GetContentRegionAvail().X  * 0.5f, - 1), true, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);
             int selectedLayersInt = (int) selectedLayers[(int) currentLayerType];
             foreach (MapViewer.Layers layer in Enum.GetValues<MapViewer.Layers>())
                 ImGui.CheckboxFlags(layer.ToString(), ref selectedLayersInt, (int) layer);
@@ -46,7 +47,7 @@ namespace Editor.UI
             if (currentLayerType == LayerType.Rendering)
             {
                 ImGui.SameLine();
-                ImGui.BeginChild("layerDebugFlags");
+                ImGui.BeginChild("layerDebugFlags", new(-1), true, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);
                 int selectedDebugLayersInt = (int) selectedDebugLayers;
                 foreach (MapViewer.DebugLayers layer in Enum.GetValues<MapViewer.DebugLayers>())
                     ImGui.CheckboxFlags(layer.ToString(), ref selectedDebugLayersInt, (int) layer);

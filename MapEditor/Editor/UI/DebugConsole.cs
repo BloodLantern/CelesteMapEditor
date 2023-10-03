@@ -44,14 +44,13 @@ namespace Editor.UI
                 ImGui.SetScrollHereY(0f);
 
             // Show the current logs
-            Color color = Color.White;
             foreach (string log in Logger.LogEntries.ToArray())
             {
                 LogLevel level = Logger.GetLevel(log);
                 if ((byte) level < (byte) LogLevel)
                     continue;
 
-                color = level switch
+                Color color = level switch
                 {
                     LogLevel.Debug => Color.LightBlue,
                     LogLevel.Info => Color.LightGreen,

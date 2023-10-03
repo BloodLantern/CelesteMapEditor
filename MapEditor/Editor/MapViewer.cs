@@ -240,6 +240,7 @@ namespace Editor
                 Math.Max(camera.Zoom, 1f)
             );
 
+        private bool showImGuiDemoWindow = false;
         public void RenderDebug(GameTime time)
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -358,6 +359,10 @@ namespace Editor
                 }
                 ImGui.EndCombo();
             }
+
+            ImGui.Checkbox("Show ImGui demo window", ref showImGuiDemoWindow);
+            if (showImGuiDemoWindow)
+                ImGui.ShowDemoWindow();
 
             ImGui.End();
         }
