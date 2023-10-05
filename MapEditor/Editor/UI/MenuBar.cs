@@ -21,8 +21,9 @@ namespace Editor.UI
 
         public bool Visible = false;
 
-        private ModDependencies modDependencies;
         private readonly Application app;
+        private readonly ModDependencies modDependencies;
+        private readonly LayerSelection layerSelection;
 
         private const ImGuiWindowFlags WindowFlags =
             ImGuiWindowFlags.NoDecoration |
@@ -33,16 +34,12 @@ namespace Editor.UI
             ImGuiWindowFlags.NoBackground |
             ImGuiWindowFlags.MenuBar;
 
-        public MenuBar(Application app)
-            : this(app, app.UIManager.FindComponent<ModDependencies>())
-        {
-        }
-
-        public MenuBar(Application app, ModDependencies modDependencies)
+        public MenuBar(Application app, ModDependencies modDependencies, LayerSelection layerSelection)
             : base(RenderingCall.StateEditor)
         {
             this.app = app;
             this.modDependencies = modDependencies;
+            this.layerSelection = layerSelection;
         }
 
         public override void Render()
@@ -266,6 +263,7 @@ namespace Editor.UI
         {
             if (ImGui.BeginMenu("View"))
             {
+                ImGui.MenuItem("Layer Selection", "", ref layerSelection.WindowOpen);
                 ImGui.EndMenu();
             }
         }

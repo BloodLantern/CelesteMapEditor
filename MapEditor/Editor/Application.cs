@@ -151,14 +151,15 @@ namespace Editor
 
                     loading.CurrentText = "Loading UI";
                     ModDependencies modDependencies;
+                    LayerSelection layerSelection;
                     UIManager.AddRange(new UIComponent[]
                         {
                             // ModDependencies must be instantiated before MenuBar
                             modDependencies = new ModDependencies(Session),
+                            layerSelection = new LayerSelection(this),
                             // MenuBar must be instantiated before LeftPanel
-                            menuBar = new MenuBar(this, modDependencies),
-                            leftPanel = new LeftPanel(this, menuBar),
-                            new LayerSelection(this)
+                            menuBar = new MenuBar(this, modDependencies, layerSelection),
+                            leftPanel = new LeftPanel(this, menuBar)
                         }
                     );
 
