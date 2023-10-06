@@ -318,7 +318,11 @@ namespace Editor
 
         protected override void EndRun()
         {
+            UIManager.SaveComponents();
+
+            // Save config
             Session.Exit();
+
             Logger.Log($"Stopping {nameof(Application)} instance...");
             Logger.EndLogging(Session.Config);
         }

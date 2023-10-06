@@ -7,19 +7,23 @@ using System;
 
 namespace Editor.UI
 {
-    public class DebugConsole : UIComponent
+    public class DebugConsole : UIComponent, ICloseable
     {
         public LogLevel LogLevel = LogLevel.Debug;
         public Session Session;
+
+        private bool windowOpen = false;
+
+        public bool WindowOpen { get => windowOpen; set => windowOpen = value; }
 
         public DebugConsole(Session session) : base(RenderingCall.AfterEverything) => Session = session;
 
         public override void Render()
         {
-            if (!Session.Config.ShowDebugConsole)
+            if (!windowOpen)
                 return;
 
-            ImGui.Begin("Debug console", ImGuiWindowFlags.NoFocusOnAppearing);
+            ImGui.Begin("Debug console", ref windowOpen, ImGuiWindowFlags.NoFocusOnAppearing);
 
             if (ImGui.BeginCombo("Log level", LogLevel.ToString()))
             {
@@ -72,6 +76,20 @@ namespace Editor.UI
             ImGui.EndChild();
 
             ImGui.End();
+        }
+
+        public override void Save(Config config)
+        {
+            base.Save(config);
+
+            config.ShowDebugConsoleWindow = windowOpen;
+        }
+
+        public override void Load(Config config)
+        {
+            base.Load(config);
+
+            windowOpen = config.ShowDebugConsoleWindow;
         }
     }
 }
