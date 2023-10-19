@@ -150,7 +150,7 @@ namespace Editor
 
         public static string HumanizeString(string str)
         {
-            str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value.ToLowerInvariant());
+            str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value);
             return char.ToUpperInvariant(str[0]) + str[1..];
         }
 

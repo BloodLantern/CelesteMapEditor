@@ -34,8 +34,10 @@ namespace Editor
         /// Lowest log level for log files.
         /// </summary>
         public LogLevel LogLevel = LogLevel.Error;
-        public bool ShowDebugConsole = false;
         public bool ShowAverageFps = false;
+
+        public bool ShowDebugConsoleWindow = false;
+        public bool ShowLayerSelectionWindow = true;
 
         public bool AutoLoadLastEditedMap = true;
         public bool AlwaysPreLoadAllMods = false;

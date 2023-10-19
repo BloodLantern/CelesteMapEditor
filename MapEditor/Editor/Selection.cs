@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Input;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -62,7 +63,7 @@ namespace Editor
                     else
                         area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(mouseDragDelta));
 
-                    Deselect(areaList);
+                    DeselectRange(areaList);
 
                     List<MapObject> objectsInRectangle = mapViewer.GetObjectsInArea(camera.WindowToMap(area));
 
@@ -81,7 +82,7 @@ namespace Editor
                             i++;
                     }
 
-                    Select(areaList);
+                    SelectRange(areaList);
                 }
                 else if (objectUnderMouse != null)
                 {
@@ -129,7 +130,7 @@ namespace Editor
                 list.Add(obj);
         }
 
-        public void Select(IEnumerable<MapObject> entities)
+        public void SelectRange(IEnumerable<MapObject> entities)
         {
             foreach (MapObject obj in entities)
                 Select(obj);
@@ -141,7 +142,7 @@ namespace Editor
                 list.Remove(obj);
         }
 
-        public void Deselect(IEnumerable<MapObject> entities)
+        public void DeselectRange(IEnumerable<MapObject> entities)
         {
             foreach (MapObject obj in entities)
                 Deselect(obj);
@@ -152,6 +153,8 @@ namespace Editor
             list.Clear();
             Select(obj);
         }
+
+        public void SelectAll() => SelectRange(mapViewer.ObjectsEnumerator);
 
         public void DeselectAll() => list.Clear();
 

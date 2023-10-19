@@ -7,5 +7,9 @@
         public UIComponent(RenderingCall calls) => Call = calls;
 
         public abstract void Render();
+
+        public virtual void Save(Config config) { }
+
+        public virtual void Load(Config config) { }
     }
 }

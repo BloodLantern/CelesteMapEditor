@@ -3,7 +3,7 @@ using System;
 
 namespace Editor.UI
 {
-    public class LayerSelection : UIComponent
+    public class LayerSelection : UIComponent, ICloseable
     {
         private enum LayerType : byte
         {
@@ -19,22 +19,28 @@ namespace Editor.UI
         private MapViewer.DebugLayers selectedDebugLayers;
 
         private LayerType currentLayerType = LayerType.Rendering;
-        public bool WindowOpen = true;
+        private bool windowOpen = false;
         private bool windowCollapsed = true;
+
+        public bool WindowOpen { get => windowOpen; set => windowOpen = value; }
 
         public LayerSelection(Application app)
             : base(RenderingCall.StateEditor)
         {
+            windowOpen = app.Session.Config.ShowLayerSelectionWindow;
         }
 
         public override void Render()
         {
+            if (!windowOpen)
+                return;
+
             MapViewer.Layers[] layers = Enum.GetValues<MapViewer.Layers>();
             MapViewer.DebugLayers[] debugLayers = Enum.GetValues<MapViewer.DebugLayers>();
 
             ImGui.SetNextWindowSize(new(currentLayerType == LayerType.Rendering ? WindowWidth : WindowWidth / 2f, Math.Max(layers.Length, debugLayers.Length) * ImGui.GetItemRectSize().Y * 1.75f));
             ImGui.SetNextWindowCollapsed(windowCollapsed);
-            ImGui.Begin("Layers", ref WindowOpen, ImGuiWindowFlags.NoResize);
+            ImGui.Begin("Layers", ref windowOpen, ImGuiWindowFlags.NoResize);
 
             if (ImGui.IsWindowCollapsed())
                 windowCollapsed = false;
@@ -65,6 +71,20 @@ namespace Editor.UI
             }
 
             ImGui.End();
+        }
+
+        public override void Save(Config config)
+        {
+            base.Save(config);
+
+            config.ShowLayerSelectionWindow = windowOpen;
+        }
+
+        public override void Load(Config config)
+        {
+            base.Load(config);
+
+            windowOpen = config.ShowLayerSelectionWindow;
         }
     }
 }

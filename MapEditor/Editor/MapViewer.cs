@@ -52,6 +52,8 @@ namespace Editor
 
         private List<Level> visibleLevels = new();
         private List<Filler> visibleFillers = new();
+        private List<MapObject> objects = new();
+        public IEnumerable<MapObject> ObjectsEnumerator => objects;
         private readonly List<MapObject> visibleObjects = new();
         private readonly List<Entity> visibleEntities = new();
         private readonly List<Trigger> visibleTriggers = new();
@@ -59,7 +61,7 @@ namespace Editor
         private readonly List<Tile> visibleForegroundTiles = new();
         private readonly List<Tile> visibleBackgroundTiles = new();
 
-        private Selection selection;
+        public Selection Selection { get; private set; }
 
         private Layers renderedLayers = Layers.All;
         private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
@@ -75,9 +77,9 @@ namespace Editor
         public void InitializeCamera()
         {
             Camera = new(App, Vector2.Zero, 1e-6f);
-            Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3);
+            Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3f);
 
-            selection = new(this);
+            Selection = new(this);
         }
 
         public void Update(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
@@ -135,7 +137,7 @@ namespace Editor
         {
             Camera.HandleInputs(mouse, keyboard);
 
-            selection.HandleInputs(time, mouse, keyboard);
+            Selection.HandleInputs(time, mouse, keyboard);
         }
 
         public Level GetLevelAt(Vector2 mapPosition)
@@ -204,7 +206,7 @@ namespace Editor
                     trigger.Render(spriteBatch, Camera);
             }
 
-            selection.Render(time, spriteBatch);
+            Selection.Render(time, spriteBatch);
 
             // TODO Draw filler tiles
 
@@ -293,20 +295,20 @@ namespace Editor
 
             ImGui.Separator();
 
-            if (!selection.Empty() && ImGui.TreeNode("Selected objects"))
+            if (!Selection.Empty() && ImGui.TreeNode("Selected objects"))
             {
-                for (int i = 0; i < selection.Count; i++)
+                for (int i = 0; i < Selection.Count; i++)
                 {
-                    if (selection.Count == 1 || ImGui.TreeNode($"{i}"))
+                    if (Selection.Count == 1 || ImGui.TreeNode($"{i}"))
                     {
-                        MapObject obj = selection[i];
+                        MapObject obj = Selection[i];
                         ImGui.Text($"Type: {obj.GetType()}");
                         ImGui.Text($"Level position: {obj.Position}");
                         ImGui.Text($"Absolute position: {obj.AbsolutePosition}");
                         ImGui.Text($"Relative position: {obj.AbsolutePosition - Camera.Position}");
                         ImGui.Text($"Size: {obj.Size}");
 
-                        if (selection.Count > 1)
+                        if (Selection.Count > 1)
                             ImGui.TreePop();
                     }
                 }
@@ -331,7 +333,7 @@ namespace Editor
                                 Camera.MoveTo(obj.Center);
                             else
                                 Camera.ZoomTo(Camera.MapToWindow(obj.Center), 3f);
-                            selection.SelectOnly(obj);
+                            Selection.SelectOnly(obj);
                         }
 
                         obj.DebugInfo();
@@ -345,7 +347,7 @@ namespace Editor
 
             ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
             ImGui.Text($"Total time: {time.TotalGameTime}");
-            ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsole);
+            ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsoleWindow);
             ImGui.Checkbox("Show average fps", ref Session.Config.ShowAverageFps);
             if (ImGui.Button("Test logging"))
                 Logger.Test();

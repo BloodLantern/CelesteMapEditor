@@ -22,6 +22,7 @@ namespace Editor.UI
         public bool Visible = false;
 
         private readonly Application app;
+        private readonly MapViewer mapViewer;
         private readonly ModDependencies modDependencies;
         private readonly LayerSelection layerSelection;
 
@@ -38,6 +39,7 @@ namespace Editor.UI
             : base(RenderingCall.StateEditor)
         {
             this.app = app;
+            mapViewer = app.MapViewer;
             this.modDependencies = modDependencies;
             this.layerSelection = layerSelection;
         }
@@ -248,8 +250,7 @@ namespace Editor.UI
         private void EditMenuSelectAll()
         {
             if (ImGui.MenuItem("Select All"))
-            {
-            }
+                mapViewer.Selection.SelectAll();
         }
 
         private void EditMenuSettings()
@@ -263,7 +264,16 @@ namespace Editor.UI
         {
             if (ImGui.BeginMenu("View"))
             {
-                ImGui.MenuItem("Layer Selection", "", ref layerSelection.WindowOpen);
+                foreach (UIComponent component in app.UIManager)
+                {
+                    if (component is ICloseable closeable)
+                    {
+                        bool open = closeable.WindowOpen;
+                        ImGui.MenuItem(Calc.HumanizeString(component.GetType().Name), "", ref open);
+                        closeable.WindowOpen = open;
+                    }
+                }
+
                 ImGui.EndMenu();
             }
         }
