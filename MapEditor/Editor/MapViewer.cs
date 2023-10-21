@@ -1,4 +1,5 @@
 ﻿using Editor.Celeste;
+using Editor.Edits;
 using Editor.Extensions;
 using Editor.Logging;
 using Editor.Objects;
@@ -52,7 +53,7 @@ namespace Editor
 
         private List<Level> visibleLevels = new();
         private List<Filler> visibleFillers = new();
-        private List<MapObject> objects = new();
+        private readonly List<MapObject> objects = new();
         public IEnumerable<MapObject> ObjectsEnumerator => objects;
         private readonly List<MapObject> visibleObjects = new();
         private readonly List<Entity> visibleEntities = new();
@@ -60,6 +61,8 @@ namespace Editor
         private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
         private readonly List<Tile> visibleForegroundTiles = new();
         private readonly List<Tile> visibleBackgroundTiles = new();
+
+        private readonly List<Edit> edits = new();
 
         public Selection Selection { get; private set; }
 
@@ -237,7 +240,7 @@ namespace Editor
 
         public void RenderDebugFiller(SpriteBatch spriteBatch, Camera camera, Rectangle filler)
             => spriteBatch.DrawRectangle(
-                new RectangleF(Camera.MapToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
+                new RectangleF(Camera.MapPositionToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
                 Color.Brown,
                 Math.Max(camera.Zoom, 1f)
             );
@@ -247,7 +250,7 @@ namespace Editor
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
             Point mousePosition = mouseState.Position;
-            Point mouseMapPosition = Camera.WindowToMap(mousePosition);
+            Point mouseMapPosition = Camera.WindowPositionToMap(mousePosition);
             Level hoveredLevel = GetLevelAt(mouseMapPosition.ToVector2());
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
@@ -332,7 +335,7 @@ namespace Editor
                             if (Camera.Zoom == 3f)
                                 Camera.MoveTo(obj.Center);
                             else
-                                Camera.ZoomTo(Camera.MapToWindow(obj.Center), 3f);
+                                Camera.ZoomTo(Camera.MapPositionToWindow(obj.Center), 3f);
                             Selection.SelectOnly(obj);
                         }
 
@@ -365,6 +368,9 @@ namespace Editor
             ImGui.Checkbox("Show ImGui demo window", ref showImGuiDemoWindow);
             if (showImGuiDemoWindow)
                 ImGui.ShowDemoWindow();
+
+            if (ImGui.Button("Use Application.DebugString"))
+                App.DebugString("Debug message");
 
             ImGui.End();
         }

@@ -54,8 +54,16 @@ namespace Editor.Objects
 
         public Texture Texture;
 
-        public string Name => EntityData.Name;
-        public override Vector2 Position => EntityData.Position - Size.ToVector2() / 2;
+        public string Name
+        {
+            get => EntityData.Name;
+            set => EntityData.Name = value;
+        }
+        public override Vector2 Position
+        {
+            get => EntityData.Position - Size.ToVector2() / 2;
+            set => EntityData.Position = value;
+        }
         public override Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
 
         public Entity(EntityData data, Level level)
@@ -87,7 +95,7 @@ namespace Editor.Objects
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
-            => spriteBatch.DrawRectangle(camera.MapToWindow(AbsoluteBounds), Color.Red, camera.GetLineThickness());
+            => spriteBatch.DrawRectangle(camera.MapAreaToWindow(AbsoluteBounds), Color.Red, camera.GetLineThickness());
 
         public override void DebugInfo()
         {

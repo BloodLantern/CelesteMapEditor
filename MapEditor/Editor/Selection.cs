@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Input;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -16,7 +15,7 @@ namespace Editor
         private Vector2 clickStart;
         private readonly List<MapObject> areaList = new();
         private readonly List<MapObject> list = new();
-        private List<MapObject> clickStartList = new();
+        private List<Vector2> clickStartPositions = new();
 
         private readonly MapViewer mapViewer;
         private readonly Config config;
@@ -36,14 +35,20 @@ namespace Editor
         public void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             Vector2 mousePos = mouse.Position.ToVector2();
-            MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowToMap(mouse.Position).ToVector2());
+            MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
             Vector2 mouseDragDelta = mousePos - clickStart;
 
             if (mouse.WasButtonJustDown(config.SelectButton))
             {
+                // If the click is on nothing, clear the selection
+                if (objectUnderMouse == null)
+                    DeselectAll();
+
                 selectionClickDuration = 0f;
                 clickStart = mousePos;
-                clickStartList = new(list);
+                clickStartPositions = new();
+                foreach (MapObject mapObject in list)
+                    clickStartPositions.Add(mapObject.Position);
 
                 if (!keyboard.IsShiftDown())
                 {
@@ -65,7 +70,7 @@ namespace Editor
 
                     DeselectRange(areaList);
 
-                    List<MapObject> objectsInRectangle = mapViewer.GetObjectsInArea(camera.WindowToMap(area));
+                    List<MapObject> objectsInRectangle = mapViewer.GetObjectsInArea(camera.WindowAreaToMap(area));
 
                     foreach (MapObject obj in objectsInRectangle)
                     {
@@ -84,26 +89,21 @@ namespace Editor
 
                     SelectRange(areaList);
                 }
-                else if (objectUnderMouse != null)
+                else if (clickStartPositions.Count > 0)
                 {
-                    for (int i = 0; i < clickStartList.Count; i++)
-                        list[i].Position = clickStartList[i].Position + camera.WindowToMap(mouseDragDelta);
-                }
-                else
-                {
-                    area = new();
-                    areaList.Clear();
+                    for (int i = 0; i < clickStartPositions.Count; i++)
+                        list[i].Position = clickStartPositions[i] + camera.WindowOffsetToMap(mouseDragDelta);
                 }
             }
 
             if (mouse.WasButtonJustUp(config.SelectButton))
             {
                 area = new();
-                clickStartList.Clear();
+                clickStartPositions.Clear();
 
                 // If we clicked for a short amount of time and we didn't shift, select only the object under the mouse
                 if (selectionClickDuration < 0.35f && !keyboard.IsShiftDown())
-                    SelectOnly(mapViewer.GetObjectAt(camera.WindowToMap(mousePos)));
+                    SelectOnly(mapViewer.GetObjectAt(camera.WindowPositionToMap(mousePos)));
             }
 
             if (keyboard.WasKeyJustUp(config.DeselectKey))
@@ -115,7 +115,7 @@ namespace Editor
             Color color = Color.Lerp(config.EntitySelectionBoundsColorMin, config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f));
 
             foreach (MapObject obj in list)
-                spriteBatch.DrawRectangle(camera.MapToWindow(obj.AbsoluteBounds), color, camera.GetLineThickness());
+                spriteBatch.DrawRectangle(camera.MapAreaToWindow(obj.AbsoluteBounds), color, camera.GetLineThickness());
 
             if (!area.IsEmpty)
             {

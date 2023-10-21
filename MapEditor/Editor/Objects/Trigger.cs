@@ -60,7 +60,7 @@ namespace Editor.Objects
             }*/
 
             //spriteBatch.FillRectangle(camera.MapToWindow(AbsoluteBounds), DefaultColor);
-            spriteBatch.DrawRectangle(camera.MapToWindow(AbsoluteBounds), DefaultColor, camera.GetLineThickness());
+            spriteBatch.DrawRectangle(camera.MapAreaToWindow(AbsoluteBounds), DefaultColor, camera.GetLineThickness());
         }
     }
 }

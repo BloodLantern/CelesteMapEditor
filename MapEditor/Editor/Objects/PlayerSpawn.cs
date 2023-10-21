@@ -23,7 +23,7 @@ namespace Editor.Objects
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
             => spriteBatch.DrawRectangle(
-                new RectangleF(camera.MapToWindow(Position + Offset), Size.Mul(camera.Zoom)),
+                new RectangleF(camera.MapPositionToWindow(Position + Offset), Size.Mul(camera.Zoom)),
                 Color.DarkGreen,
                 camera.GetLineThickness()
             );

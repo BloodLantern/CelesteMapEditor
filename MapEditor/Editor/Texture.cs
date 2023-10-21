@@ -278,7 +278,7 @@ namespace Editor
 
             spriteBatch.Draw(
                         Image,
-                        camera.MapToWindow(offset + Offset),
+                        camera.MapPositionToWindow(offset + Offset),
                         ClipRect,
                         color,
                         Rotation,

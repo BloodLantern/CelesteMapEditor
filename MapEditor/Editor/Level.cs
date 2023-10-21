@@ -120,7 +120,7 @@ namespace Editor
         }
 
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
-            => spriteBatch.DrawRectangle(camera.MapToWindow(Bounds), EditorColor, camera.GetLineThickness());
+            => spriteBatch.DrawRectangle(camera.MapAreaToWindow(Bounds), EditorColor, camera.GetLineThickness());
 
         public List<Entity> GetVisibleEntities(RectangleF cameraBounds) => Entities.FindAll(entity => cameraBounds.Intersects(entity.AbsoluteBounds));
 

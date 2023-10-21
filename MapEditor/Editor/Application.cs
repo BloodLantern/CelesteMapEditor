@@ -13,6 +13,8 @@ using Editor.UI;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.ImGuiNet;
 using ImGuiNET;
+using System.Collections.Generic;
+using MonoGame;
 
 namespace Editor
 {
@@ -59,6 +61,8 @@ namespace Editor
         public int FPS { get; private set; }
 
         private float lastTotalGameTime = 0f;
+
+        private readonly List<(string, Stopwatch)> debugStrings = new();
 
         public Application()
         {
@@ -195,8 +199,10 @@ namespace Editor
         {
             // Clear ImGui focus if the mouse clicked (with middle or right click, left is done by default) outside of a window
             if (!ImGui.GetIO().WantCaptureMouse)
+            {
                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) || ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
                     ImGui.SetWindowFocus(null);
+            }
 
             switch (CurrentState)
             {
@@ -235,6 +241,12 @@ namespace Editor
                 FPS = (int) MathF.Round(1f / time.GetElapsedSeconds());
             lastTotalGameTime = totalTime;
             Logger.UpdateLogsAsync();
+
+            for (int i = 0; i < debugStrings.Count; i++)
+            {
+                if (debugStrings[i].Item2.GetElapsedSeconds() > 1f)
+                    debugStrings.RemoveAt(i--);
+            }
 
             base.Update(time);
         }
@@ -316,6 +328,10 @@ namespace Editor
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
+            SpriteBatch.FillRectangle(new(0, 150, 200, debugStrings.Count * 20), new(0x101010));
+            for (int i = 0; i < debugStrings.Count; i++)
+                SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new Vector2(0f, 150f + i * 20f), Color.White);
+
             SpriteBatch.End();
             
             base.Draw(time);
@@ -393,5 +409,7 @@ namespace Editor
 
             Exit();
         }
+
+        public void DebugString(string str) => debugStrings.Insert(0, new(str, Stopwatch.StartNew()));
     }
 }

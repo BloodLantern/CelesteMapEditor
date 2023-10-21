@@ -103,17 +103,17 @@ namespace Editor
             Vector2 oldMapPosition;
             for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
             {
-                oldMapPosition = WindowToMap(targetWindowPosition);
+                oldMapPosition = WindowPositionToMap(targetWindowPosition);
 
                 Zoom = Calc.EaseLerp(oldZoom, targetZoom, timer, duration, Ease.QuadOut);
-                Position += oldMapPosition - WindowToMap(targetWindowPosition);
+                Position += oldMapPosition - WindowPositionToMap(targetWindowPosition);
 
                 yield return null;
             }
 
-            oldMapPosition = WindowToMap(targetWindowPosition);
+            oldMapPosition = WindowPositionToMap(targetWindowPosition);
             Zoom = targetZoom;
-            Position += oldMapPosition - WindowToMap(targetWindowPosition);
+            Position += oldMapPosition - WindowPositionToMap(targetWindowPosition);
         }
 
         private IEnumerator ZoomRoutine(float targetZoom, float duration)
@@ -171,21 +171,25 @@ namespace Editor
 
         public static float SizeToZoom(Vector2 size) => Application.Instance.WindowSize.ToVector2().Length() / size.Length();
 
-        public Vector2 MapToWindow(Vector2 position) => (position - Position) * Zoom;
+        public Vector2 MapPositionToWindow(Vector2 position) => (position - Position) * Zoom;
 
-        public Point MapToWindow(Point position) => (position - Position.ToPoint()).Mul(Zoom);
+        public Point MapPositionToWindow(Point position) => (position - Position.ToPoint()).Mul(Zoom);
 
-        public Size2 MapToWindow(Size2 size) => size * Zoom;
+        public Vector2 MapOffsetToWindow(Vector2 offset) => offset * Zoom;
 
-        public RectangleF MapToWindow(RectangleF bounds) => new(MapToWindow((Vector2) bounds.Position), MapToWindow(bounds.Size));
+        public Size2 MapOffsetToWindow(Size2 offset) => offset * Zoom;
 
-        public Vector2 WindowToMap(Vector2 position) => position / Zoom + Position;
+        public RectangleF MapAreaToWindow(RectangleF bounds) => new(MapPositionToWindow((Vector2) bounds.Position), MapOffsetToWindow(bounds.Size));
 
-        public Point WindowToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
+        public Vector2 WindowPositionToMap(Vector2 position) => position / Zoom + Position;
 
-        public Vector2 WindowToMap(Size2 size) => size / Zoom;
+        public Point WindowPositionToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
 
-        public RectangleF WindowToMap(RectangleF bounds) => new(WindowToMap((Vector2) bounds.Position), WindowToMap(bounds.Size));
+        public Vector2 WindowOffsetToMap(Vector2 offset) => offset / Zoom;
+
+        public Size2 WindowOffsetToMap(Size2 offset) => offset / Zoom;
+
+        public RectangleF WindowAreaToMap(RectangleF bounds) => new(WindowPositionToMap((Vector2) bounds.Position), WindowOffsetToMap(bounds.Size));
 
         public float GetLineThickness() => Math.Max(Zoom, 1f);
 
