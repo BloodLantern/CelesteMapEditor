@@ -193,6 +193,11 @@ namespace Editor
 
         protected override void Update(GameTime time)
         {
+            // Clear ImGui focus if the mouse clicked (with middle or right click, left is done by default) outside of a window
+            if (!ImGui.GetIO().WantCaptureMouse)
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) || ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+                    ImGui.SetWindowFocus(null);
+
             switch (CurrentState)
             {
                 case State.Loading:
