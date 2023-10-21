@@ -49,6 +49,7 @@ namespace Editor
         public MouseButton CameraMoveButton = MouseButton.Middle;
         public MouseButton SelectButton = MouseButton.Left;
         public Keys DeselectKey = Keys.Escape;
+        public Keys DeleteKey = Keys.Delete;
 
         public Color EntitySelectionBoundsColorMin = Color.DarkMagenta;
         public Color EntitySelectionBoundsColorMax = Color.Magenta;

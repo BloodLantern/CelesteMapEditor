@@ -108,6 +108,12 @@ namespace Editor
 
             if (keyboard.WasKeyJustUp(config.DeselectKey))
                 DeselectAll();
+
+            if (keyboard.WasKeyJustUp(config.DeleteKey))
+            {
+                foreach (MapObject mapObject in list)
+                    mapObject.RemoveFromMap();
+            }
         }
 
         public void Render(GameTime time, SpriteBatch spriteBatch)

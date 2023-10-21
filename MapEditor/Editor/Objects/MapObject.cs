@@ -33,5 +33,10 @@ namespace Editor.Objects
         public MapObject(Level level, Vector2 offset, MapObjectType type = MapObjectType.Object) : this(level, type) => Position = offset;
 
         public virtual void DebugInfo() => ImGui.Text($"Absolute bounds: {AbsoluteBounds}");
+
+        public void RemoveFromMap()
+        {
+            //Level.Entities.Remove(this);
+        }
     }
 }

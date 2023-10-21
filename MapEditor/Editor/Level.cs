@@ -12,14 +12,15 @@ namespace Editor
 {
     public class Level
     {
-        private static readonly Color[] EditorColors = new Color[7] {
-            Color.White,                // Default white
-            Calc.HexToColor("f6735e"),  // Orange
-            Calc.HexToColor("85f65e"),  // Green
-            Calc.HexToColor("37d7e3"),  // Light blue
-            Calc.HexToColor("376be3"),  // Blue
-            Calc.HexToColor("c337e3"),  // Purple
-            Calc.HexToColor("e33773")   // Pink
+        private static readonly Color[] EditorColors = new Color[7]
+        {
+            Color.White,      // Default white
+            new(0xFF5E73F6),  // Orange
+            new(0xFF5EF685),  // Green
+            new(0xFFE3D737),  // Light blue
+            new(0xFFE36B37),  // Blue
+            new(0xFFE337C3),  // Purple
+            new(0xFF7337E3)   // Pink
         };
 
         public readonly LevelData LevelData;

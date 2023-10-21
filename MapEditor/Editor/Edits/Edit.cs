@@ -7,6 +7,8 @@ namespace Editor.Edits
     {
         public readonly List<MapObject> AffectedObjects = new();
 
+        public bool Done { get; private set; } = false;
+
         public abstract void Do();
 
         public abstract void Undo();

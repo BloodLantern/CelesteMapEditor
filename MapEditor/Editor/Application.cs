@@ -328,7 +328,7 @@ namespace Editor
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
-            SpriteBatch.FillRectangle(new(0, 150, 200, debugStrings.Count * 20), new(0x101010));
+            SpriteBatch.FillRectangle(new(0, 150, 200, debugStrings.Count * 20), new(0xFF101010));
             for (int i = 0; i < debugStrings.Count; i++)
                 SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new Vector2(0f, 150f + i * 20f), Color.White);
 
