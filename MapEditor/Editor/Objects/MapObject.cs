@@ -5,7 +5,7 @@ using MonoGame.Extended;
 
 namespace Editor.Objects
 {
-    public class MapObject
+    public abstract class MapObject
     {
         /// <summary>
         /// The position relative to the level this <see cref="MapObject"/> is in.
@@ -34,9 +34,6 @@ namespace Editor.Objects
 
         public virtual void DebugInfo() => ImGui.Text($"Absolute bounds: {AbsoluteBounds}");
 
-        public void RemoveFromMap()
-        {
-            //Level.Entities.Remove(this);
-        }
+        public abstract void RemoveFromMap();
     }
 }

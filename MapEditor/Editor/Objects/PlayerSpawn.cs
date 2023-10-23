@@ -29,5 +29,11 @@ namespace Editor.Objects
             );
 
         internal static void SetupSprite() => Sprite = new(Atlas.Gameplay["characters/player/fallPose10"], 8, 15, SizeConst.X, SizeConst.Y);
+
+        public override void RemoveFromMap()
+        {
+            Level.PlayerSpawns.Remove(this);
+            Level.LevelData.PlayerSpawns.Remove(Position);
+        }
     }
 }
