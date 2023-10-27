@@ -92,9 +92,9 @@ namespace Editor
             BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(this, data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
 
             foreach (DecalData decalData in data.FgDecals)
-                ForegroundDecals.Add(new Decal(decalData));
+                ForegroundDecals.Add(new Decal(this, decalData));
             foreach (DecalData decalData in data.BgDecals)
-                BackgroundDecals.Add(new Decal(decalData));
+                BackgroundDecals.Add(new Decal(this, decalData));
 
             EditorColor = EditorColors[data.EditorColorIndex];
         }
@@ -158,6 +158,40 @@ namespace Editor
             }
 
             return result;
+        }
+
+        public void Remove(MapObject mapObject)
+        {
+            switch (mapObject)
+            {
+                case Entity entity:
+                    Entities.Remove(entity);
+                    break;
+                case Trigger trigger:
+                    Triggers.Remove(trigger);
+                    break;
+                case PlayerSpawn spawn:
+                    PlayerSpawns.Remove(spawn);
+                    break;
+                case Tile tile:
+                    switch (tile.TileType)
+                    {
+                        case Autotiler.TileType.Foreground:
+                            ForegroundTiles.Tiles[tile.X, tile.Y] = null;
+                            break;
+                        case Autotiler.TileType.Background:
+                            BackgroundTiles.Tiles[tile.X, tile.Y] = null;
+                            break;
+                        case Autotiler.TileType.Animated:
+                            // Nothing for now
+                            break;
+                    }
+                    break;
+                case Decal decal:
+                    ForegroundDecals.Remove(decal);
+                    BackgroundDecals.Remove(decal);
+                    break;
+            }
         }
     }
 }

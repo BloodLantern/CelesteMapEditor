@@ -1,21 +1,24 @@
 ﻿using Editor.Celeste;
+using Editor.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 
 namespace Editor
 {
-    public class Decal
+    public class Decal : MapObject
     {
+        public readonly DecalData DecalData;
         public Texture Texture;
-        public Vector2 Position;
         public Vector2 Scale;
 
-        public Decal(DecalData data)
+        public Decal(Level level, DecalData data)
+            : base(level, MapObjectType.Decal)
         {
+            DecalData = data;
             Texture = Atlas.Gameplay["decals/" + data.Texture.Replace('\\', '/').Replace(Path.GetExtension(data.Texture), "")];
-            Position = data.Position;
             Scale = data.Scale;
+            Position = data.Position;
         }
 
         public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 levelPosition)

@@ -103,13 +103,21 @@ namespace Editor
             public bool HasOverlays;
         }
 
+        public enum TileType
+        {
+            Foreground,
+            Background,
+            Animated
+        }
+
         public static Autotiler ForegroundTiles { get; private set; }
         public static Autotiler BackgroundTiles { get; private set; }
         public static Autotiler AnimatedTiles { get; private set; }
 
         private readonly Dictionary<char, TerrainType> lookup = new();
+        private readonly TileType tileType;
 
-        public Autotiler(string filename)
+        public Autotiler(string filename, TileType tileType)
         {
             Dictionary<char, XmlElement> loadedTilesets = new();
             foreach (XmlElement tilesetXml in Calc.LoadContentXML(filename).GetElementsByTagName("Tileset"))
@@ -141,6 +149,8 @@ namespace Editor
                 loadedTilesets.Add(id, tilesetXml);
                 lookup.Add(id, data);
             }
+
+            this.tileType = tileType;
         }
 
         private static void ReadInto(TerrainType data, Tileset tileset, XmlElement xml)
@@ -248,7 +258,7 @@ namespace Editor
                         }
                     }
 
-                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask));
+                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask), x, y, tileType);
                 }
             }
 
@@ -259,9 +269,9 @@ namespace Editor
 
         public static void LoadAutotilers(string celesteGraphicsDirectory)
         {
-            ForegroundTiles = new(Path.Combine(celesteGraphicsDirectory, "ForegroundTiles.xml"));
-            BackgroundTiles = new(Path.Combine(celesteGraphicsDirectory, "BackgroundTiles.xml"));
-            AnimatedTiles = new(Path.Combine(celesteGraphicsDirectory, "AnimatedTiles.xml"));
+            ForegroundTiles = new(Path.Combine(celesteGraphicsDirectory, "ForegroundTiles.xml"), TileType.Foreground);
+            BackgroundTiles = new(Path.Combine(celesteGraphicsDirectory, "BackgroundTiles.xml"), TileType.Background);
+            AnimatedTiles = new(Path.Combine(celesteGraphicsDirectory, "AnimatedTiles.xml"), TileType.Animated);
         }
     }
 }

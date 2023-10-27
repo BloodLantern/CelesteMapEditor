@@ -5,6 +5,7 @@
         Object,
         Tile,
         Entity,
-        PlayerSpawn
+        PlayerSpawn,
+        Decal
     }
 }

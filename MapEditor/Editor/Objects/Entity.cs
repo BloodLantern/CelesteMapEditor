@@ -111,11 +111,5 @@ namespace Editor.Objects
                 ImGui.TreePop();
             }
         }
-
-        public override void RemoveFromMap()
-        {
-            Level.Entities.Remove(this);
-            Level.LevelData.Entities.Remove(EntityData);
-        }
     }
 }
