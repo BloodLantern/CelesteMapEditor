@@ -1,4 +1,5 @@
 ﻿using Editor.Extensions;
+using Editor.Saved;
 using Editor.Utils;
 using ImGuiNET;
 using NativeFileDialogExtendedSharp;
@@ -74,7 +75,7 @@ namespace Editor.UI
             {
                 FileMenuNew();
                 FileMenuOpen();
-                if (config.LastEditedFiles.Count > 0)
+                if (config.RecentEditedFiles.Count > 0)
                     FileMenuOpenRecent(config);
 
                 ImGui.Separator();
@@ -137,7 +138,7 @@ namespace Editor.UI
             if (ImGui.BeginMenu("Open Recent"))
             {
                 string mapToLoad = string.Empty;
-                foreach (string file in config.LastEditedFiles)
+                foreach (string file in config.RecentEditedFiles)
                 {
                     if (ImGui.MenuItem(file))
                         mapToLoad = file;

@@ -1,4 +1,6 @@
-﻿namespace Editor.UI
+﻿using Editor.Saved;
+
+namespace Editor.UI
 {
     public abstract class UIComponent
     {

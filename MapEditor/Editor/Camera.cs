@@ -1,4 +1,5 @@
 ﻿using Editor.Extensions;
+using Editor.Saved;
 using Editor.Utils;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -44,9 +45,9 @@ namespace Editor
         private Vector2 dragDelta;
 
         public Application app;
-        public Config config;
+        public MapViewerConfig config;
 
-        public Camera(Application app, Vector2 centerPosition, float zoom = DefaultZoom)
+        public Camera(Application app, MapViewerConfig config, Vector2 centerPosition, float zoom = DefaultZoom)
         {
             Vector2 size = ZoomToSize(zoom);
             Bounds = new(centerPosition - size / 2, size);
@@ -54,7 +55,7 @@ namespace Editor
             TargetPosition = Position;
 
             this.app = app;
-            config = app.Session.Config;
+            this.config = config;
         }
 
         public bool IsMoving() => Coroutine.IsRunningAndNotEmpty(moveRoutineGuid);
@@ -135,7 +136,7 @@ namespace Editor
 
         public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
-            if (mouse.IsButtonUp(config.CameraMoveButton))
+            if (mouse.IsButtonUp(config.Keybinds.CameraMove))
             {
                 cameraStartPosition = null;
                 cameraMoveClickStartPosition = null;

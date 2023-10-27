@@ -96,9 +96,9 @@ namespace Editor
             Graphics.PreferredBackBufferWidth = BaseWindowWidth;
             Graphics.PreferredBackBufferHeight = BaseWindowHeight;
             Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
-            if (Session.Config.MapViewerRefreshRate != TimeSpan.Zero)
+            if (Session.Config.RefreshRate != 0)
             {
-                TargetElapsedTime = Session.Config.MapViewerRefreshRate;
+                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, Session.Config.RefreshRate);
                 IsFixedTimeStep = true;
             }
             else
@@ -170,8 +170,8 @@ namespace Editor
                     loading.Progress += 0.05f;
 
                     loading.CurrentText = "Loading map";
-                    if (Session.Config.LastEditedFiles.Count > 0)
-                        MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
+                    if (Session.Config.RecentEditedFiles.Count > 0)
+                        MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.RecentEditedFile));
                     loading.Progress += 0.05f;
 
                     Logger.Log($"Startup loading complete. Took {stopwatch.ElapsedMilliseconds}ms");

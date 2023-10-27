@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Editor.Saved;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Editor.UI
@@ -6,8 +7,8 @@ namespace Editor.UI
     public class UIManager : IEnumerable<UIComponent>
     {
         public readonly List<UIComponent> Components = new();
-        private Application app;
-        private Config config;
+        private readonly Application app;
+        private readonly Config config;
 
         public UIManager(Application app)
         {

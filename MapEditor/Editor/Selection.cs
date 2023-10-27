@@ -1,5 +1,6 @@
 ﻿using Editor.Extensions;
 using Editor.Objects;
+using Editor.Saved;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -18,7 +19,7 @@ namespace Editor
         private List<Vector2> clickStartPositions = new();
 
         private readonly MapViewer mapViewer;
-        private readonly Config config;
+        private readonly MapViewerConfig config;
         private readonly Camera camera;
 
         public int Count => list.Count;
@@ -28,7 +29,7 @@ namespace Editor
         public Selection(MapViewer mapViewer)
         {
             this.mapViewer = mapViewer;
-            config = mapViewer.Session.Config;
+            config = mapViewer.Config;
             camera = mapViewer.Camera;
         }
 
@@ -38,7 +39,7 @@ namespace Editor
             MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
             Vector2 mouseDragDelta = mousePos - clickStart;
 
-            if (mouse.WasButtonJustDown(config.SelectButton))
+            if (mouse.WasButtonJustDown(config.Keybinds.Select))
             {
                 // If the click is on nothing, clear the selection
                 if (objectUnderMouse == null)
@@ -57,7 +58,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.IsButtonDown(config.SelectButton))
+            if (mouse.IsButtonDown(config.Keybinds.Select))
             {
                 selectionClickDuration += time.GetElapsedSeconds();
 
@@ -96,7 +97,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.WasButtonJustUp(config.SelectButton))
+            if (mouse.WasButtonJustUp(config.Keybinds.Select))
             {
                 area = new();
                 clickStartPositions.Clear();
@@ -106,10 +107,10 @@ namespace Editor
                     SelectOnly(mapViewer.GetObjectAt(camera.WindowPositionToMap(mousePos)));
             }
 
-            if (keyboard.WasKeyJustUp(config.DeselectKey))
+            if (keyboard.WasKeyJustUp(config.Keybinds.Deselect))
                 DeselectAll();
 
-            if (keyboard.WasKeyJustUp(config.DeleteKey))
+            if (keyboard.WasKeyJustUp(config.Keybinds.Delete))
             {
                 foreach (MapObject mapObject in list)
                     mapObject.RemoveFromMap();

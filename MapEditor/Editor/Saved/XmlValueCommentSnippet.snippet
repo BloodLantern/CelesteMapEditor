@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>XmlValue</Title>
+			<Author>BloodLantern</Author>
+			<Description>Inserts a Config field with a comment that will be forwarded to the serialized XML file.</Description>
+		</Header>
+		<Snippet>
+			<Code Language="CSharp" Kind="type decl">
+				<![CDATA[[XmlAnyElement("$Name$Comment")] public XmlComment $Name$XmlComment { get { return GetType().GetXmlComment(); } set { } } [XmlComment("$Comment$")] public $Type$ $Name$ = $Value$;]]>
+			</Code>
+			<Declarations>
+				<Literal>
+					<ID>Name</ID>
+					<ToolTip>Variable name.</ToolTip>
+					<Default>Value</Default>
+				</Literal>
+				<Literal>
+					<ID>Type</ID>
+					<ToolTip>Variable type.</ToolTip>
+					<Default>object</Default>
+				</Literal>
+				<Literal>
+					<ID>Comment</ID>
+					<ToolTip>Variable XML comment.</ToolTip>
+					<Default>XML comment.</Default>
+				</Literal>
+				<Literal>
+					<ID>Value</ID>
+					<ToolTip>Variable default value.</ToolTip>
+					<Default>null</Default>
+				</Literal>
+			</Declarations>
+			<Imports>
+				<Import>
+					<Namespace>System.Xml</Namespace>
+				</Import>
+				<Import>
+					<Namespace>System.Xml.Serialization</Namespace>
+				</Import>
+				<Import>
+					<Namespace>Editor.Utils</Namespace>
+				</Import>
+				<Import>
+					<Namespace>Editor.Extensions</Namespace>
+				</Import>
+			</Imports>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
