@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Xml;
 using System.IO;
 using Editor.Utils;
-using Editor.Extensions;
 using Editor.Logging;
 using Editor.Saved.Keybinds;
-using YamlDotNet.Serialization;
-using System.Data.SqlTypes;
 
 namespace Editor.Saved
 {
@@ -18,68 +13,84 @@ namespace Editor.Saved
         public const string ConfigFile = "config.xml";
 
         #region Serialized Fields
-        [XmlAnyElement("MaxRecentEditedFilesXmlComment")] public XmlComment MaxRecentEditedFilesXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Max recent edited files saved.")]
+        /// <summary>
+        /// Max recent edited files saved.
+        /// </summary>
         public int MaxRecentEditedFiles = 5;
 
-        [XmlAnyElement("RecentEditedFilesXmlComment")] public XmlComment RecentEditedFilesXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("List of last edited files paths. Should have a maximum of 'MaxRecentEditedFiles' entries.")]
+        /// <summary>
+        /// List of last edited files paths. Should have a maximum of 'MaxRecentEditedFiles' entries.
+        /// </summary>
         public List<string> RecentEditedFiles = new();
 
-        [XmlAnyElement("RefreshRateXmlComment")] public XmlComment RefreshRateXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Refresh rate in milliseconds. Only effective if Vsync is off and value is not 0.")]
+        /// <summary>
+        /// Refresh rate in milliseconds. Only effective if Vsync is off and value is not 0.
+        /// </summary>
         public int RefreshRate = 16;
-
-        [XmlAnyElement("VsyncXmlComment")] public XmlComment VSyncXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to enable vertical synchronization. If enabled, this bypasses the refresh rate of MapViewerRefreshRate")]
+       
+        /// <summary>
+        /// Whether to enable vertical synchronization. If enabled, this bypasses the refresh rate of MapViewerRefreshRate
+        /// </summary>
         public bool Vsync = false;
 
-        [XmlAnyElement("DebugModeXmlComment")] public XmlComment DebugModeXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to enable the debug window and features.")]
+        /// <summary>
+        /// Whether to enable the debug window and features.
+        /// </summary>
         public bool DebugMode = false;
 
-        [XmlAnyElement("EnableLoggingXmlComment")] public XmlComment EnableLoggingXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Enables logging to files. Does not change whether the Logger class is enabled.")]
+        /// <summary>
+        /// Enables logging to files. Does not change whether the Logger class is enabled.
+        /// </summary>
         public bool EnableLogging = false;
 
-        [XmlAnyElement("LogLevelXmlComment")] public XmlComment LogLevelXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Lowest log level for log files.")]
+        /// <summary>
+        /// Lowest log level for log files.
+        /// </summary>
         public LogLevel LogLevel = LogLevel.Error;
 
-        [XmlAnyElement("ShowAverageFpsXmlComment")] public XmlComment ShowAverageFpsXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to show the average FPS count.")]
+        /// <summary>
+        /// Whether to show the average FPS count.
+        /// </summary>
         public bool ShowAverageFps = false;
 
-        [XmlAnyElement("ShowDebugConsoleWindowXmlComment")] public XmlComment ShowDebugConsoleWindowXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to show the debug console window.")]
+        /// <summary>
+        /// Whether to show the debug console window.
+        /// </summary>
         public bool ShowDebugConsoleWindow = false;
 
-        [XmlAnyElement("ShowLayerSelectionWindowXmlComment")] public XmlComment ShowLayerSelectionWindowXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to show the layer selection window.")]
+        /// <summary>
+        /// Whether to show the layer selection window.
+        /// </summary>
         public bool ShowLayerSelectionWindow = true;
 
-        [XmlAnyElement("AutoLoadLastEditedMapXmlComment")] public XmlComment AutoLoadLastEditedMapXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to load the last edited map at startup.")]
+        /// <summary>
+        /// Whether to load the last edited map at startup.
+        /// </summary>
         public bool AutoLoadLastEditedMap = true;
 
-        [XmlAnyElement("AlwaysPreLoadAllModsXmlComment")] public XmlComment AlwaysPreLoadAllModsXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to preload all mods at startup.")]
+        /// <summary>
+        /// Whether to preload all mods at startup.
+        /// </summary>
         public bool AlwaysPreLoadAllMods = false;
 
-        [XmlAnyElement("RoomSelectionWarpXmlComment")] public XmlComment RoomSelectionWarpXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Whether to warp to a room when selecting it in the list.")]
+        /// <summary>
+        /// Whether to warp to a room when selecting it in the list.
+        /// </summary>
         public bool RoomSelectionWarp = true;
 
-        [XmlAnyElement("GeneralKeybindsConfigXmlComment")] public XmlComment GeneralKeybindsConfigXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Global keybinds.")]
+        /// <summary>
+        /// Global keybinds.
+        /// </summary>
         public GeneralKeybindsConfig GeneralKeybindsConfig = new();
 
-        [XmlAnyElement("MapViewerConfigXmlComment")] public XmlComment MapViewerConfigXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("MapViewer configuration.")]
+        /// <summary>
+        /// MapViewer configuration.
+        /// </summary>
         public MapViewerConfig MapViewerConfig = new();
 
-        [XmlAnyElement("UiStyleXmlComment")] public XmlComment UiStyleXmlComment { get { return GetType().GetXmlComment(); } set { } }
-        [XmlComment("Light of dark theme.")]
+        /// <summary>
+        /// Light or dark theme.
+        /// </summary>
         public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
         #endregion
 
