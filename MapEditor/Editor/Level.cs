@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using MonoGame.Extended;
 using Editor.Objects.Entities;
 using Editor.Objects;
-using System;
 
 namespace Editor
 {

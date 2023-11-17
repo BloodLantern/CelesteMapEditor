@@ -161,7 +161,6 @@ namespace Editor.Saved
             //XmlSerializer serializer = new(typeof(Config));
             //FileStream output = new(ConfigFile, FileMode.Open, FileAccess.Read);
             //return (Config)serializer.Deserialize(output);
-
             return File.ReadAllText(ConfigFile).LoadFromXml<Config>();
         }
         #endregion

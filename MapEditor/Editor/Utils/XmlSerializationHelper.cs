@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Text;
 
 namespace Editor.Utils
 {
@@ -14,9 +15,7 @@ namespace Editor.Utils
             {
                 object result = serial.Deserialize(reader);
                 if (result is T t)
-                {
                     returnValue = t;
-                }
             }
             return returnValue;
         }
@@ -32,7 +31,7 @@ namespace Editor.Utils
                 ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
             }
             using var textWriter = new StringWriter();
-            var settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
+            var settings = new XmlWriterSettings() { Indent = true, IndentChars = "    ", Encoding = Encoding.UTF8 }; // For cosmetic purposes.
             using (var xmlWriter = XmlWriter.Create(textWriter, settings))
                 (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
             return textWriter.ToString();

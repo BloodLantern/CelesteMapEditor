@@ -207,7 +207,7 @@ namespace Editor.UI
 
                 ImGui.Separator();
 
-                EditMenuSettings();
+                EditMenuConfiguration();
 
                 ImGui.EndMenu();
             }
@@ -254,9 +254,9 @@ namespace Editor.UI
                 mapViewer.Selection.SelectAll();
         }
 
-        private void EditMenuSettings()
+        private void EditMenuConfiguration()
         {
-            if (ImGui.MenuItem("Settings"))
+            if (ImGui.MenuItem("Configuration"))
             {
             }
         }

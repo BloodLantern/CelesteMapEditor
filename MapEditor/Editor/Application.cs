@@ -255,7 +255,7 @@ namespace Editor
         {
             GraphicsDevice.SetRenderTarget(ImGuiRenderTarget);
             GraphicsDevice.Clear(Color.Transparent);
-            ImGuiRenderer.BeforeLayout(time);
+            ImGuiRenderer.BeginLayout(time);
 
             UIManager.RenderComponents(RenderingCall.BeforeEverything);
 
@@ -280,7 +280,7 @@ namespace Editor
 
             UIManager.RenderComponents(RenderingCall.AfterEverything);
 
-            ImGuiRenderer.AfterLayout();
+            ImGuiRenderer.EndLayout();
 
             if (Loading != null)
             {
