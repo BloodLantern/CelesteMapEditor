@@ -16,6 +16,7 @@ namespace Editor.UI
         private bool windowOpen = false;
 
         public bool WindowOpen { get => windowOpen; set => windowOpen = value; }
+        public string KeyboardShortcut { get; set; }
 
         public DebugConsole(Session session) : base(RenderingCall.AfterEverything) => Session = session;
 

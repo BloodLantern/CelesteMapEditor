@@ -8,7 +8,7 @@ namespace Editor.Saved
     public class MapViewerConfig
     {
         /// <summary>
-        /// Whether to show entities, solids and playher spawns hitboxes.
+        /// Whether to show entities, solids and player spawns hitboxes.
         /// </summary>
         public bool ShowHitboxes = false;
 

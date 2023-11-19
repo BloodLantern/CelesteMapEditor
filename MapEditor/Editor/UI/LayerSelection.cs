@@ -24,6 +24,7 @@ namespace Editor.UI
         private bool windowCollapsed = true;
 
         public bool WindowOpen { get => windowOpen; set => windowOpen = value; }
+        public string KeyboardShortcut { get; set; }
 
         public LayerSelection(Application app)
             : base(RenderingCall.StateEditor)

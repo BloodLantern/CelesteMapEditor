@@ -4,6 +4,8 @@ using System.IO;
 using Editor.Utils;
 using Editor.Logging;
 using Editor.Saved.Keybinds;
+using Editor.Saved.Attributes;
+using Editor.PlatformSpecific;
 
 namespace Editor.Saved
 {
@@ -21,16 +23,19 @@ namespace Editor.Saved
         /// <summary>
         /// List of last edited files paths. Should have a maximum of 'MaxRecentEditedFiles' entries.
         /// </summary>
+        [NotDisplayedOnEditor]
         public List<string> RecentEditedFiles = new();
 
         /// <summary>
         /// Refresh rate in milliseconds. Only effective if Vsync is off and value is not 0.
         /// </summary>
+        [RequiresGraphicsReload]
         public int RefreshRate = 16;
        
         /// <summary>
         /// Whether to enable vertical synchronization. If enabled, this bypasses the refresh rate of MapViewerRefreshRate
         /// </summary>
+        [RequiresGraphicsReload]
         public bool Vsync = false;
 
         /// <summary>
@@ -61,7 +66,7 @@ namespace Editor.Saved
         /// <summary>
         /// Whether to show the layer selection window.
         /// </summary>
-        public bool ShowLayerSelectionWindow = true;
+        public bool ShowLayerSelectionWindow = false;
 
         /// <summary>
         /// Whether to load the last edited map at startup.
@@ -91,6 +96,7 @@ namespace Editor.Saved
         /// <summary>
         /// Light or dark theme.
         /// </summary>
+        [RequiresUIReload]
         public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
         #endregion
 
@@ -108,7 +114,7 @@ namespace Editor.Saved
         private void FirstTimeSetup()
         {
 #if WINDOWS
-            if (!Calc.ShouldSystemUseDarkMode())
+            if (!Windows.ShouldSystemUseDarkMode())
                 UiStyle = ImGuiStyles.Style.Light;
 #endif
         }

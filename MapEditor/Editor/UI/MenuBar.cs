@@ -24,8 +24,8 @@ namespace Editor.UI
 
         private readonly Application app;
         private readonly MapViewer mapViewer;
-        private readonly ModDependencies modDependencies;
-        private readonly LayerSelection layerSelection;
+        private ModDependencies modDependencies;
+        private LayerSelection layerSelection;
 
         private const ImGuiWindowFlags WindowFlags =
             ImGuiWindowFlags.NoDecoration |
@@ -36,13 +36,19 @@ namespace Editor.UI
             ImGuiWindowFlags.NoBackground |
             ImGuiWindowFlags.MenuBar;
 
-        public MenuBar(Application app, ModDependencies modDependencies, LayerSelection layerSelection)
+        public MenuBar(Application app)
             : base(RenderingCall.StateEditor)
         {
             this.app = app;
             mapViewer = app.MapViewer;
-            this.modDependencies = modDependencies;
-            this.layerSelection = layerSelection;
+        }
+
+        internal override void Initialize(UIManager manager)
+        {
+            modDependencies = manager.FindComponent<ModDependencies>();
+            layerSelection = manager.FindComponent<LayerSelection>();
+
+            base.Initialize(manager);
         }
 
         public override void Render()
@@ -270,7 +276,7 @@ namespace Editor.UI
                     if (component is ICloseable closeable)
                     {
                         bool open = closeable.WindowOpen;
-                        ImGui.MenuItem(Calc.HumanizeString(component.GetType().Name), "", ref open);
+                        ImGui.MenuItem(Calc.HumanizeString(component.GetType().Name), closeable.KeyboardShortcut, ref open);
                         closeable.WindowOpen = open;
                     }
                 }
@@ -292,7 +298,7 @@ namespace Editor.UI
         private void ModMenuShowDependencies()
         {
             if (ImGui.MenuItem("Show dependencies"))
-                modDependencies.Open = true;
+                modDependencies.WindowOpen = true;
         }
 
         private void MapMenu()

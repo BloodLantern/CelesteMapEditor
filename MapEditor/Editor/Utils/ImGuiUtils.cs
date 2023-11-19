@@ -1,4 +1,8 @@
-﻿using ImGuiNET;
+﻿using Editor.Saved;
+using ImGuiNET;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Input;
+using System;
 
 namespace Editor.Utils
 {
@@ -18,19 +22,61 @@ namespace Editor.Utils
             return ImGui.Button(label);
         }
 
-        //private static bool errorPopupOpen = false;
-        public static void ErrorInfoDialog(string message)
+        public static Keybind KeybindPicker(string label, Keybind keybind)
         {
-            ImGui.OpenPopup("Error");
-            
-            bool errorPopupOpen = true;
-            if (ImGui.BeginPopupModal("Error", ref errorPopupOpen, ImGuiWindowFlags.AlwaysAutoResize))
+            ImGui.Text(label);
+            ImGui.SameLine();
+            if (ImGui.Button(keybind.ToString()))
+                ImGui.OpenPopupOnItemClick(label, ImGuiPopupFlags.MouseButtonLeft);
+
+            Keybind result = keybind;
+            if (ImGui.BeginPopupModal(label))
             {
-                ImGui.Text($"An unexpected error occured: {message}");
-                if (ButtonCenteredOnLine("Close"))
+                ImGui.Text("Press any keyboard or mouse input");
+                ImGui.Separator();
+
+                if (ImGui.Button("Cancel (Esc)"))
+                {
                     ImGui.CloseCurrentPopup();
+                }
+                else
+                {
+                    Keys[] pressedKeys = Keyboard.GetState().GetPressedKeys();
+
+                    if (pressedKeys.Length > 0)
+                    {
+                        Keys key = pressedKeys[0];
+                        if (key != Keys.Escape)
+                            result = key;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    else
+                    {
+                        MouseStateExtended mouse = MouseExtended.GetState();
+
+                        // Only accept the left mouse button as the new input if not hovering the cancel button.
+                        if (mouse.LeftButton == ButtonState.Pressed && !ImGui.IsItemHovered())
+                        {
+                            result = MouseButton.Left;
+                            ImGui.CloseCurrentPopup();
+                        }
+
+                        MouseButton[] buttons = Enum.GetValues<MouseButton>();
+                        for (int i = (int) MouseButton.Left + 1; i < buttons.Length; i++)
+                        {
+                            MouseButton button = buttons[i];
+                            if (mouse.IsButtonDown(button))
+                            {
+                                result = button;
+                                ImGui.CloseCurrentPopup();
+                            }
+                        }
+                    }
+                }
                 ImGui.EndPopup();
             }
+
+            return result;
         }
     }
 }

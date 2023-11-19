@@ -8,19 +8,19 @@ namespace Editor.UI
     {
         public readonly List<UIComponent> Components = new();
         private readonly Application app;
-        private readonly Config config;
+        public readonly Config Config;
 
         public UIManager(Application app)
         {
             this.app = app;
-            config = app.Session.Config;
+            Config = app.Session.Config;
         }
 
         public void AddComponent(UIComponent component)
         {
             Components.Add(component);
 
-            component.Load(config);
+            component.Initialize(this);
         }
 
         public void AddRange(IEnumerable<UIComponent> components)
@@ -28,7 +28,7 @@ namespace Editor.UI
             Components.AddRange(components);
 
             foreach (UIComponent component in components)
-                component.Load(config);
+                component.Initialize(this);
         }
 
         public T FindComponent<T>() where T : UIComponent
@@ -64,7 +64,7 @@ namespace Editor.UI
         internal void SaveComponents()
         {
             foreach (UIComponent component in Components)
-                component.Save(config);
+                component.Save(Config);
         }
 
         public IEnumerator<UIComponent> GetEnumerator() => Components.GetEnumerator();

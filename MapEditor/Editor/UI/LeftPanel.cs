@@ -22,7 +22,7 @@ namespace Editor.UI
         private const float MoveInDuration = 0.5f;
         private const string Title = "leftPanel";
 
-        private readonly MenuBar menuBar;
+        private MenuBar menuBar;
 
         public LevelList LevelList;
         public ModExplorer ModExplorer;
@@ -33,16 +33,17 @@ namespace Editor.UI
         public Vector2 Size { get; private set; } = new(DefaultWidth, 1f);
 
         public LeftPanel(Application app)
-            : this(app, app.UIManager.FindComponent<MenuBar>())
-        {
-        }
-
-        public LeftPanel(Application app, MenuBar menuBar)
             : base(RenderingCall.StateEditor)
         {
-            this.menuBar = menuBar;
             LevelList = new(app.MapViewer);
             ModExplorer = new(app);
+        }
+
+        internal override void Initialize(UIManager manager)
+        {
+            menuBar = manager.FindComponent<MenuBar>();
+
+            base.Initialize(manager);
         }
 
         public override void Render()

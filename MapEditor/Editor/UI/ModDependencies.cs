@@ -4,14 +4,16 @@ using System.Numerics;
 
 namespace Editor.UI
 {
-    public class ModDependencies : UIComponent
+    public class ModDependencies : UIComponent, ICloseable
     {
         public Session Session;
-        public bool Open = false;
-        private bool wasOpen = false;
 
         private readonly bool[] enabledMods;
         private string searchText = string.Empty;
+
+        private bool wasOpen = false;
+        public bool WindowOpen { get; set; }
+        public string KeyboardShortcut { get; set; }
 
         public ModDependencies(Session session)
             : base(RenderingCall.StateEditor)
@@ -24,19 +26,21 @@ namespace Editor.UI
 
         public override void Render()
         {
-            if (!wasOpen && Open)
+            if (!wasOpen && WindowOpen)
                 ImGui.SetNextWindowFocus();
 
-            if (Open)
+            if (WindowOpen)
             {
-                bool modified = IsModified();
-                ImGui.Begin("Mod Dependencies", ref Open);
+                bool open = WindowOpen;
+                ImGui.Begin("Mod Dependencies", ref open);
+                WindowOpen = open;
 
                 ImGui.SetNextItemWidth(ImGui.GetWindowWidth());
                 ImGui.InputTextWithHint("##search", "Search...", ref searchText, 30);
 
                 float itemHeight = ImGui.GetItemRectSize().Y;
-                Vector2 childSize = new(-1, ImGui.GetWindowHeight() - itemHeight * 2 - ImGui.GetStyle().ItemSpacing.Y - ImGui.GetFrameHeightWithSpacing());
+                Vector2 childSize = new(-1, ImGui.GetWindowHeight() - itemHeight * 2f - ImGui.GetStyle().ItemSpacing.Y - ImGui.GetFrameHeightWithSpacing());
+                bool modified = IsModified();
                 if (modified)
                     childSize.Y -= itemHeight;
 
@@ -67,7 +71,7 @@ namespace Editor.UI
                 ImGui.End();
             }
 
-            wasOpen = Open;
+            wasOpen = WindowOpen;
         }
 
         private void ModEntry(CelesteMod mod)
