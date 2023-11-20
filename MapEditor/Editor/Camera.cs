@@ -1,5 +1,6 @@
 ﻿using Editor.Extensions;
 using Editor.Saved;
+using Editor.Saved.Keybinds;
 using Editor.Utils;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -44,10 +45,10 @@ namespace Editor
         private bool Dragging => cameraStartPosition.HasValue && cameraMoveClickStartPosition.HasValue;
         private Vector2 dragDelta;
 
-        public Application app;
-        public MapViewerConfig config;
+        private readonly Application app;
+        private readonly MapViewer mapViewer;
 
-        public Camera(Application app, MapViewerConfig config, Vector2 centerPosition, float zoom = DefaultZoom)
+        public Camera(Application app, MapViewer mapViewer, Vector2 centerPosition, float zoom = DefaultZoom)
         {
             Vector2 size = ZoomToSize(zoom);
             Bounds = new(centerPosition - size / 2, size);
@@ -55,7 +56,7 @@ namespace Editor
             TargetPosition = Position;
 
             this.app = app;
-            this.config = config;
+            this.mapViewer = mapViewer;
         }
 
         public bool IsMoving() => Coroutine.IsRunningAndNotEmpty(moveRoutineGuid);
@@ -136,7 +137,7 @@ namespace Editor
 
         public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
-            if (mouse.IsButtonUp(config.Keybinds.CameraMove))
+            if (mouse.IsButtonUp(mapViewer.Keybinds.CameraMove))
             {
                 cameraStartPosition = null;
                 cameraMoveClickStartPosition = null;
@@ -158,7 +159,7 @@ namespace Editor
             }
 
             if (mouse.DeltaScrollWheelValue != 0)
-                ZoomTo(mouse.Position.ToVector2(), TargetZoom * MathF.Pow(config.ZoomFactor, -mouse.GetDeltaScrollWheel()));
+                ZoomTo(mouse.Position.ToVector2(), TargetZoom * MathF.Pow(mapViewer.Config.ZoomFactor, -mouse.GetDeltaScrollWheel()));
         }
 
         public void OnResize()

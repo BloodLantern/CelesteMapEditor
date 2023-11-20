@@ -10,7 +10,7 @@ using Editor.PlatformSpecific;
 namespace Editor.Saved
 {
     [Serializable]
-    public class Config
+    public class Config : ConfigBase
     {
         public const string ConfigFile = "config.xml";
 
@@ -72,25 +72,26 @@ namespace Editor.Saved
         public bool RoomSelectionWarp = true;
 
         /// <summary>
+        /// Light or dark theme.
+        /// </summary>
+        [RequiresUIReload]
+        public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
+
+        /// <summary>
         /// Graphics configuration.
         /// </summary>
+        [RequiresGraphicsReload]
         public GraphicsConfig Graphics = new();
 
         /// <summary>
-        /// Global keybinds.
+        /// Keybinds.
         /// </summary>
-        public GeneralKeybindsConfig GeneralKeybinds = new();
+        public KeybindsConfig Keybinds = new();
 
         /// <summary>
         /// MapViewer configuration.
         /// </summary>
         public MapViewerConfig MapViewer = new();
-
-        /// <summary>
-        /// Light or dark theme.
-        /// </summary>
-        [RequiresUIReload]
-        public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
         #endregion
 
         #region Properties
@@ -139,14 +140,7 @@ namespace Editor.Saved
             }
         }
 
-        public void Save()
-        {
-            //XmlSerializer serializer = new(typeof(Config));
-            //FileStream output = new(ConfigFile, FileMode.Create, FileAccess.Write);
-            //serializer.Serialize(output, this);
-
-            File.WriteAllText(ConfigFile, this.GetXml(true));
-        }
+        public void Save() => File.WriteAllText(ConfigFile, this.GetXml(true));
 
         public static Config Load()
         {
@@ -157,11 +151,10 @@ namespace Editor.Saved
                 return config;
             }
 
-            //XmlSerializer serializer = new(typeof(Config));
-            //FileStream output = new(ConfigFile, FileMode.Open, FileAccess.Read);
-            //return (Config)serializer.Deserialize(output);
             return File.ReadAllText(ConfigFile).LoadFromXml<Config>();
         }
+
+        public override object Clone() => CloneFields<Config>();
         #endregion
     }
 }

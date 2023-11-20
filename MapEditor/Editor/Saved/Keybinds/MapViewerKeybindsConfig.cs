@@ -5,7 +5,7 @@ using System;
 namespace Editor.Saved.Keybinds
 {
     [Serializable]
-    public class MapViewerKeybindsConfig
+    public class MapViewerKeybindsConfig : ConfigBase
     {
         /// <summary>
         /// Keybind used to move the camera.
@@ -26,5 +26,7 @@ namespace Editor.Saved.Keybinds
         /// Keybind used to delete the selected objects.
         /// </summary>
         public Keybind Delete = Keys.Delete;
+
+        public override object Clone() => CloneFields<MapViewerKeybindsConfig>();
     }
 }

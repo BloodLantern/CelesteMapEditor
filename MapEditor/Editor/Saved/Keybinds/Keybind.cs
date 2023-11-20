@@ -61,8 +61,30 @@ namespace Editor.Saved
         public readonly void Render(FieldInfo field, object instance)
         {
             Keybind value = (Keybind) field.GetValue(instance);
-            value = ImGuiUtils.KeybindPicker(field.Name, value);
-            field.SetValue(instance, value);
+            Keybind newValue = ImGuiUtils.KeybindPicker(field.Name, value);
+            field.SetValue(instance, newValue);
+        }
+
+        public override readonly bool Equals(object obj)
+        {
+            return obj is Keybind keybind &&
+                   keyboard == keybind.keyboard &&
+                   mouse == keybind.mouse;
+        }
+
+        public override readonly int GetHashCode()
+        {
+            return HashCode.Combine(keyboard, mouse, IsKeyboard, IsMouse);
+        }
+
+        public static bool operator ==(Keybind left, Keybind right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Keybind left, Keybind right)
+        {
+            return !(left == right);
         }
     }
 }

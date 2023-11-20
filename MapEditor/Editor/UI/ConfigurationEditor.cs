@@ -15,7 +15,7 @@ namespace Editor.UI
         public bool WindowOpen { get; set; }
         public string KeyboardShortcut { get; set; }
 
-        private Config config;
+        private Config config, oldConfig;
 
         public ConfigurationEditor()
             : base(RenderingCall.StateEditor)
@@ -32,6 +32,9 @@ namespace Editor.UI
                 bool open = WindowOpen;
                 ImGui.Begin("Configuration Editor", ref open);
                 WindowOpen = open;
+
+                if (!wasOpen)
+                    oldConfig = (Config) config.Clone();
 
                 foreach (FieldInfo field in config.GetType().GetFields())
                 {

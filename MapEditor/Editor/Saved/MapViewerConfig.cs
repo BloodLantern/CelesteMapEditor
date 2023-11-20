@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 namespace Editor.Saved
 {
     [Serializable]
-    public class MapViewerConfig
+    public class MapViewerConfig : ConfigBase
     {
         /// <summary>
         /// Whether to show entities, solids and player spawns hitboxes.
@@ -27,9 +27,6 @@ namespace Editor.Saved
         /// </summary>
         public Color EntitySelectionBoundsColorMax = Color.Magenta;
 
-        /// <summary>
-        /// MapViewer keybinds.
-        /// </summary>
-        public MapViewerKeybindsConfig Keybinds = new();
+        public override object Clone() => CloneFields<MapViewerConfig>();
     }
 }

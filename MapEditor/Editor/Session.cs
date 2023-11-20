@@ -22,29 +22,29 @@ namespace Editor
 
         private static readonly string OlympusConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Olympus", "config.json");
         
-        public Application App;
-        public Config Config;
+        public Application App { get; private set; }
+        public Config Config { get; private set; }
 
-        public string CelesteDirectory;
-        public string CelesteContentDirectory;
-        public string CelesteGraphicsDirectory;
-        public string CelesteModsDirectory;
+        public string CelesteDirectory { get; private set; }
+        public string CelesteContentDirectory { get; private set; }
+        public string CelesteGraphicsDirectory { get; private set; }
+        public string CelesteModsDirectory { get; private set; }
 
-        public Version CelesteVersion;
-        public Version EverestVersion;
+        public Version CelesteVersion { get; private set; }
+        public Version EverestVersion { get; private set; }
 
-        public string ContentDirectory;
+        public string ContentDirectory { get; private set; }
 
         /// <summary>
         /// Mainly used as a debugging font.
         /// </summary>
-        public SpriteFont ConsolasFont;
-        public SpriteFont UbuntuRegularFont;
-        public SpriteFont UbuntuLightFont;
+        public SpriteFont ConsolasFont { get; private set; }
+        public SpriteFont UbuntuRegularFont { get; private set; }
+        public SpriteFont UbuntuLightFont { get; private set; }
         /// <summary>
         /// Mainly used to display trigger names.
         /// </summary>
-        public SpriteFont PixelatedFont;
+        public SpriteFont PixelatedFont { get; private set; }
 
         public List<CelesteMod> CelesteMods = new();
 
@@ -80,18 +80,21 @@ namespace Editor
 
         public bool TryLoad()
         {
-            if (!TryGetActiveCelesteDirectory(out CelesteDirectory))
+            if (!TryGetActiveCelesteDirectory(out string celesteDir))
             {
                 Logger.Log("Could not get the active Celeste directory using the Olympus config file. Stopping program.", LogLevel.Fatal);
                 Logger.Log($"Was looking for {OlympusConfigFilePath}", LogLevel.Fatal);
                 return false;
             }
+            CelesteDirectory = celesteDir;
 
-            if (!TryGetActiveCelesteVersion(out CelesteVersion, out EverestVersion))
+            if (!TryGetActiveCelesteVersion(out Version celesteVersion, out Version everestVersion))
             {
                 Logger.Log("Could not get the active Celeste version. Stopping program.", LogLevel.Fatal);
                 return false;
             }
+            CelesteVersion = celesteVersion;
+            EverestVersion = everestVersion;
 
             if (EverestVersion == null)
                 Logger.Log("Everest version not found. Celeste not modded.", LogLevel.Warning);

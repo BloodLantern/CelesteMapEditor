@@ -1,6 +1,7 @@
 ﻿using Editor.Extensions;
 using Editor.Objects;
 using Editor.Saved;
+using Editor.Saved.Keybinds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -19,7 +20,6 @@ namespace Editor
         private List<Vector2> clickStartPositions = new();
 
         private readonly MapViewer mapViewer;
-        private readonly MapViewerConfig config;
         private readonly Camera camera;
 
         public int Count => list.Count;
@@ -29,7 +29,6 @@ namespace Editor
         public Selection(MapViewer mapViewer)
         {
             this.mapViewer = mapViewer;
-            config = mapViewer.Config;
             camera = mapViewer.Camera;
         }
 
@@ -39,7 +38,7 @@ namespace Editor
             MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
             Vector2 mouseDragDelta = mousePos - clickStart;
 
-            if (mouse.WasButtonJustDown(config.Keybinds.Select))
+            if (mouse.WasButtonJustDown(mapViewer.Keybinds.Select))
             {
                 // If the click is on nothing, clear the selection
                 if (objectUnderMouse == null)
@@ -58,7 +57,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.IsButtonDown(config.Keybinds.Select))
+            if (mouse.IsButtonDown(mapViewer.Keybinds.Select))
             {
                 selectionClickDuration += time.GetElapsedSeconds();
 
@@ -97,7 +96,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.WasButtonJustUp(config.Keybinds.Select))
+            if (mouse.WasButtonJustUp(mapViewer.Keybinds.Select))
             {
                 area = new();
                 clickStartPositions.Clear();
@@ -107,10 +106,10 @@ namespace Editor
                     SelectOnly(mapViewer.GetObjectAt(camera.WindowPositionToMap(mousePos)));
             }
 
-            if (keyboard.WasKeyJustUp(config.Keybinds.Deselect))
+            if (keyboard.WasKeyJustUp(mapViewer.Keybinds.Deselect))
                 DeselectAll();
 
-            if (keyboard.WasKeyJustUp(config.Keybinds.Delete))
+            if (keyboard.WasKeyJustUp(mapViewer.Keybinds.Delete))
             {
                 foreach (MapObject mapObject in list)
                     mapObject.RemoveFromMap();
@@ -119,15 +118,15 @@ namespace Editor
 
         public void Render(GameTime time, SpriteBatch spriteBatch)
         {
-            Color color = Color.Lerp(config.EntitySelectionBoundsColorMin, config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f));
+            Color color = Color.Lerp(mapViewer.Config.EntitySelectionBoundsColorMin, mapViewer.Config.EntitySelectionBoundsColorMax, Calc.YoYo((float) time.TotalGameTime.TotalSeconds % 1f));
 
             foreach (MapObject obj in list)
                 spriteBatch.DrawRectangle(camera.MapAreaToWindow(obj.AbsoluteBounds), color, camera.GetLineThickness());
 
             if (!area.IsEmpty)
             {
-                spriteBatch.FillRectangle(area, config.EntitySelectionBoundsColorMin * 0.5f);
-                spriteBatch.DrawRectangle(area, config.EntitySelectionBoundsColorMax * 0.5f, 2f);
+                spriteBatch.FillRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMin * 0.5f);
+                spriteBatch.DrawRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMax * 0.5f, 2f);
             }
         }
 

@@ -2,8 +2,10 @@
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -159,5 +161,7 @@ namespace Editor
         public static bool OnInterval(float val, float prevVal, float interval) => (int) (prevVal / interval) != (int) (val / interval);
 
         public static Vector2 Abs(Vector2 vec) => new(MathF.Abs(vec.X), MathF.Abs(vec.Y));
+
+        public static List<T> DeepCloneList<T>(List<T> instance) where T : ICloneable => instance.Select(x => x.Clone()).ToList() as List<T>;
     }
 }

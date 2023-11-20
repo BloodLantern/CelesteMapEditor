@@ -4,6 +4,7 @@ using Editor.Extensions;
 using Editor.Logging;
 using Editor.Objects;
 using Editor.Saved;
+using Editor.Saved.Keybinds;
 using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -52,6 +53,7 @@ namespace Editor
         public Map CurrentMap;
         public Camera Camera;
         public readonly MapViewerConfig Config;
+        public readonly MapViewerKeybindsConfig Keybinds;
 
         private List<Level> visibleLevels = new();
         private List<Filler> visibleFillers = new();
@@ -76,13 +78,14 @@ namespace Editor
             App = app;
             Session = app.Session;
             Config = Session.Config.MapViewer;
+            Keybinds = Session.Config.Keybinds.MapViewer;
 
             PlayerSpawn.SetupSprite();
         }
 
         public void InitializeCamera()
         {
-            Camera = new(App, Config, Vector2.Zero, 1e-6f);
+            Camera = new(App, this, Vector2.Zero, 1e-6f);
             Camera.ZoomToDefault(Camera.DefaultZoomDuration * 3f);
 
             Selection = new(this);
