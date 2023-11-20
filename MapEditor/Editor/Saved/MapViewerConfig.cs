@@ -30,6 +30,6 @@ namespace Editor.Saved
         /// <summary>
         /// MapViewer keybinds.
         /// </summary>
-        public MapViewerKeybindsConfig KeybindsConfig = new();
+        public MapViewerKeybindsConfig Keybinds = new();
     }
 }

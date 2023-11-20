@@ -27,18 +27,6 @@ namespace Editor.Saved
         public List<string> RecentEditedFiles = new();
 
         /// <summary>
-        /// Refresh rate in milliseconds. Only effective if Vsync is off and value is not 0.
-        /// </summary>
-        [RequiresGraphicsReload]
-        public int RefreshRate = 16;
-       
-        /// <summary>
-        /// Whether to enable vertical synchronization. If enabled, this bypasses the refresh rate of MapViewerRefreshRate
-        /// </summary>
-        [RequiresGraphicsReload]
-        public bool Vsync = false;
-
-        /// <summary>
         /// Whether to enable the debug window and features.
         /// </summary>
         public bool DebugMode = false;
@@ -84,14 +72,19 @@ namespace Editor.Saved
         public bool RoomSelectionWarp = true;
 
         /// <summary>
+        /// Graphics configuration.
+        /// </summary>
+        public GraphicsConfig Graphics = new();
+
+        /// <summary>
         /// Global keybinds.
         /// </summary>
-        public GeneralKeybindsConfig GeneralKeybindsConfig = new();
+        public GeneralKeybindsConfig GeneralKeybinds = new();
 
         /// <summary>
         /// MapViewer configuration.
         /// </summary>
-        public MapViewerConfig MapViewerConfig = new();
+        public MapViewerConfig MapViewer = new();
 
         /// <summary>
         /// Light or dark theme.

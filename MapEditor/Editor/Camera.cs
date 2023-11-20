@@ -136,7 +136,7 @@ namespace Editor
 
         public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
-            if (mouse.IsButtonUp(config.KeybindsConfig.CameraMove))
+            if (mouse.IsButtonUp(config.Keybinds.CameraMove))
             {
                 cameraStartPosition = null;
                 cameraMoveClickStartPosition = null;

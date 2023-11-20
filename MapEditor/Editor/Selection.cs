@@ -39,7 +39,7 @@ namespace Editor
             MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
             Vector2 mouseDragDelta = mousePos - clickStart;
 
-            if (mouse.WasButtonJustDown(config.KeybindsConfig.Select))
+            if (mouse.WasButtonJustDown(config.Keybinds.Select))
             {
                 // If the click is on nothing, clear the selection
                 if (objectUnderMouse == null)
@@ -58,7 +58,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.IsButtonDown(config.KeybindsConfig.Select))
+            if (mouse.IsButtonDown(config.Keybinds.Select))
             {
                 selectionClickDuration += time.GetElapsedSeconds();
 
@@ -97,7 +97,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.WasButtonJustUp(config.KeybindsConfig.Select))
+            if (mouse.WasButtonJustUp(config.Keybinds.Select))
             {
                 area = new();
                 clickStartPositions.Clear();
@@ -107,10 +107,10 @@ namespace Editor
                     SelectOnly(mapViewer.GetObjectAt(camera.WindowPositionToMap(mousePos)));
             }
 
-            if (keyboard.WasKeyJustUp(config.KeybindsConfig.Deselect))
+            if (keyboard.WasKeyJustUp(config.Keybinds.Deselect))
                 DeselectAll();
 
-            if (keyboard.WasKeyJustUp(config.KeybindsConfig.Delete))
+            if (keyboard.WasKeyJustUp(config.Keybinds.Delete))
             {
                 foreach (MapObject mapObject in list)
                     mapObject.RemoveFromMap();

@@ -24,6 +24,7 @@ namespace Editor.Utils
 
         public static Keybind KeybindPicker(string label, Keybind keybind)
         {
+            ImGui.AlignTextToFramePadding();
             ImGui.Text(label);
             ImGui.SameLine();
             if (ImGui.Button(keybind.ToString()))

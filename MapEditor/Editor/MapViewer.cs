@@ -75,7 +75,7 @@ namespace Editor
         {
             App = app;
             Session = app.Session;
-            Config = Session.Config.MapViewerConfig;
+            Config = Session.Config.MapViewer;
 
             PlayerSpawn.SetupSprite();
         }

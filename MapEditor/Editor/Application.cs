@@ -15,6 +15,7 @@ using MonoGame.ImGuiNet;
 using ImGuiNET;
 using System.Collections.Generic;
 using MonoGame;
+using Editor.Saved;
 
 namespace Editor
 {
@@ -93,20 +94,7 @@ namespace Editor
             UIManager.AddComponent(new DebugConsole(Session));
 
             Window.AllowUserResizing = true;
-            Graphics.PreferredBackBufferWidth = BaseWindowWidth;
-            Graphics.PreferredBackBufferHeight = BaseWindowHeight;
-            Graphics.SynchronizeWithVerticalRetrace = Session.Config.Vsync;
-            if (Session.Config.RefreshRate != 0)
-            {
-                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, Session.Config.RefreshRate);
-                IsFixedTimeStep = true;
-            }
-            else
-            {
-                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 16);
-                IsFixedTimeStep = false;
-            }
-            Graphics.ApplyChanges();
+            ReloadGraphics(Session.Config.Graphics);
 
             GlobalRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
             LoadingRenderTarget = new(GraphicsDevice, BaseWindowWidth, BaseWindowHeight);
@@ -409,5 +397,29 @@ namespace Editor
         }
 
         public void DebugString(string str) => debugStrings.Insert(0, new(str, Stopwatch.StartNew()));
+
+        public void ReloadGraphics(GraphicsConfig config)
+        {
+            Logger.Log($"Reloading graphics...");
+
+            Graphics.PreferredBackBufferWidth = BaseWindowWidth;
+            Graphics.PreferredBackBufferHeight = BaseWindowHeight;
+            Graphics.SynchronizeWithVerticalRetrace = config.Vsync;
+
+            if (config.RefreshRate != 0)
+            {
+                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, config.RefreshRate);
+                IsFixedTimeStep = true;
+            }
+            else
+            {
+                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 16);
+                IsFixedTimeStep = false;
+            }
+
+            Graphics.ApplyChanges();
+
+            Logger.Log($"Graphics reloaded successfully.");
+        }
     }
 }
