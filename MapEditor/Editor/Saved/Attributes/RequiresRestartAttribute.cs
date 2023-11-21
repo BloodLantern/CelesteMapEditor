@@ -3,7 +3,8 @@
 namespace Editor.Saved.Attributes
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class RequiresRestartAttribute : Attribute
+    public class RequiresRestartAttribute : ConfigurationEditorAttribute
     {
+        RequiresRestartAttribute() => Tooltip = "Requires restart";
     }
 }

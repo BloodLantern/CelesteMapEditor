@@ -6,7 +6,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class DebugConsole : UIComponent, ICloseable
     {
@@ -53,7 +53,7 @@ namespace Editor.UI
             foreach (string log in Logger.LogEntries.ToArray())
             {
                 LogLevel level = Logger.GetLevel(log);
-                if ((byte) level < (byte) LogLevel)
+                if ((byte)level < (byte)LogLevel)
                     continue;
 
                 Color color = level switch

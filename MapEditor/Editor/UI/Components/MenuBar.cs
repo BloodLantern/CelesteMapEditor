@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class MenuBar : UIComponent
     {

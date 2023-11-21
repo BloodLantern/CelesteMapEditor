@@ -154,7 +154,7 @@ namespace Editor.Saved
             return File.ReadAllText(ConfigFile).LoadFromXml<Config>();
         }
 
-        public override object Clone() => CloneFields<Config>();
+        public override object Clone() => Clone<Config>();
         #endregion
     }
 }

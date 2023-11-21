@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class ModDependencies : UIComponent, ICloseable
     {

@@ -27,6 +27,6 @@ namespace Editor.Saved.Keybinds
         /// </summary>
         public Keybind Delete = Keys.Delete;
 
-        public override object Clone() => CloneFields<MapViewerKeybindsConfig>();
+        public override object Clone() => Clone<MapViewerKeybindsConfig>();
     }
 }

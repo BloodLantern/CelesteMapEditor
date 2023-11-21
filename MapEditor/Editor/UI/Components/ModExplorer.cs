@@ -1,4 +1,4 @@
-﻿namespace Editor.UI
+﻿namespace Editor.UI.Components
 {
     public class ModExplorer : UIComponent
     {

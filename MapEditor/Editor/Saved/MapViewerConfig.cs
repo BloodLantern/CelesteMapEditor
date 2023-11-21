@@ -27,6 +27,6 @@ namespace Editor.Saved
         /// </summary>
         public Color EntitySelectionBoundsColorMax = Color.Magenta;
 
-        public override object Clone() => CloneFields<MapViewerConfig>();
+        public override object Clone() => Clone<MapViewerConfig>();
     }
 }

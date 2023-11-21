@@ -16,6 +16,7 @@ using ImGuiNET;
 using System.Collections.Generic;
 using MonoGame;
 using Editor.Saved;
+using Editor.UI.Components;
 
 namespace Editor
 {

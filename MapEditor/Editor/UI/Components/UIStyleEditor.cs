@@ -4,7 +4,7 @@ using System;
 using System.Numerics;
 using System.Reflection;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class UIStyleEditor : UIComponent, ICloseable
     {
@@ -40,19 +40,19 @@ namespace Editor.UI
 
                             if (type == typeof(bool).MakeByRefType())
                             {
-                                bool value = (bool) property.GetValue(style);
+                                bool value = (bool)property.GetValue(style);
                                 ImGui.Checkbox(property.Name, ref value);
                                 property.SetValue(style, value);
                             }
                             else if (type == typeof(float).MakeByRefType())
                             {
-                                float value = (float) property.GetValue(style);
+                                float value = (float)property.GetValue(style);
                                 ImGui.InputFloat(property.Name, ref value);
                                 property.SetValue(style, value);
                             }
                             else if (type == typeof(Vector2).MakeByRefType())
                             {
-                                Vector2 value = (Vector2) property.GetValue(style);
+                                Vector2 value = (Vector2)property.GetValue(style);
                                 ImGui.InputFloat2(property.Name, ref value);
                                 property.SetValue(style, value);
                             }
@@ -77,8 +77,8 @@ namespace Editor.UI
                     {
                         RangeAccessor<Vector4> colors = style.Colors;
 
-                        for (int i = 0; i < (int) ImGuiCol.COUNT; i++)
-                            ImGui.ColorEdit4(((ImGuiCol) i).ToString(), ref colors[i]);
+                        for (int i = 0; i < (int)ImGuiCol.COUNT; i++)
+                            ImGui.ColorEdit4(((ImGuiCol)i).ToString(), ref colors[i]);
 
                         ImGui.EndTabItem();
                     }

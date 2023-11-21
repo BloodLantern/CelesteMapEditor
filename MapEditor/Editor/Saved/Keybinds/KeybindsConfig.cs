@@ -10,6 +10,6 @@ namespace Editor.Saved.Keybinds
         /// </summary>
         public MapViewerKeybindsConfig MapViewer = new();
 
-        public override object Clone() => CloneFields<KeybindsConfig>();
+        public override object Clone() => Clone<KeybindsConfig>();
     }
 }

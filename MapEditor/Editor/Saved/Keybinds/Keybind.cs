@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace Editor.Saved
 {
-    public struct Keybind : IXmlSerializable, ICustomConfigurationEditorDisplay
+    public struct Keybind : IXmlSerializable, ICustomConfigurationEditorDisplay, IEquatable<Keybind>
     {
         private Keys? keyboard = null;
         private MouseButton? mouse = null;
@@ -53,11 +53,6 @@ namespace Editor.Saved
                 writer.WriteAttributeString("mouse", mouse.ToString());
         }
 
-        public override string ToString()
-        {
-            return IsKeyboard ? "Keyboard " + keyboard.ToString() : "Mouse " + mouse.ToString();
-        }
-
         public readonly void Render(FieldInfo field, object instance)
         {
             Keybind value = (Keybind) field.GetValue(instance);
@@ -65,26 +60,16 @@ namespace Editor.Saved
             field.SetValue(instance, newValue);
         }
 
-        public override readonly bool Equals(object obj)
-        {
-            return obj is Keybind keybind &&
-                   keyboard == keybind.keyboard &&
-                   mouse == keybind.mouse;
-        }
+        public override string ToString() => IsKeyboard ? "Keyboard " + keyboard.ToString() : "Mouse " + mouse.ToString();
 
-        public override readonly int GetHashCode()
-        {
-            return HashCode.Combine(keyboard, mouse, IsKeyboard, IsMouse);
-        }
+        public override readonly int GetHashCode() => HashCode.Combine(keyboard, mouse, IsKeyboard, IsMouse);
 
-        public static bool operator ==(Keybind left, Keybind right)
-        {
-            return left.Equals(right);
-        }
+        public override readonly bool Equals(object obj) => obj is Keybind keybind && Equals(keybind);
 
-        public static bool operator !=(Keybind left, Keybind right)
-        {
-            return !(left == right);
-        }
+        public readonly bool Equals(Keybind other) => keyboard == other.keyboard && mouse == other.mouse;
+
+        public static bool operator ==(Keybind left, Keybind right) => left.Equals(right);
+
+        public static bool operator !=(Keybind left, Keybind right) => !(left == right);
     }
 }

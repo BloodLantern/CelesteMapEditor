@@ -5,7 +5,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Numerics;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class LeftPanel : UIComponent
     {

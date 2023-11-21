@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Reflection;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class ConfigurationEditor : UIComponent, ICloseable
     {
@@ -16,6 +16,7 @@ namespace Editor.UI
         public string KeyboardShortcut { get; set; }
 
         private Config config, oldConfig;
+        private bool configChanged = false;
 
         public ConfigurationEditor()
             : base(RenderingCall.StateEditor)
@@ -34,7 +35,9 @@ namespace Editor.UI
                 WindowOpen = open;
 
                 if (!wasOpen)
-                    oldConfig = (Config) config.Clone();
+                    oldConfig = (Config)config.Clone();
+
+                ImGui.BeginChild("configFields", new(-1), true, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize);
 
                 foreach (FieldInfo field in config.GetType().GetFields())
                 {
@@ -42,6 +45,27 @@ namespace Editor.UI
                         continue;
 
                     RenderField(field, config);
+                }
+
+                ImGui.EndChild();
+
+                if (configChanged)
+                {
+                    if (ImGui.Button("Cancel"))
+                    {
+
+                    }
+
+                    if (ImGui.Button("Apply"))
+                    {
+                        oldConfig = null;
+                        configChanged = false;
+                    }
+                }
+                else
+                {
+                    if (ImGuiUtils.ReleasedClickOnSomething() && !config.Equals(oldConfig))
+                        configChanged = true;
                 }
 
                 ImGui.End();
@@ -66,19 +90,19 @@ namespace Editor.UI
 
             if (type == typeof(bool))
             {
-                bool value = (bool) field.GetValue(instance);
+                bool value = (bool)field.GetValue(instance);
                 ImGui.Checkbox(field.Name, ref value);
                 field.SetValue(instance, value);
             }
             else if (type == typeof(int))
             {
-                int value = (int) field.GetValue(instance);
+                int value = (int)field.GetValue(instance);
                 ImGui.InputInt(field.Name, ref value);
                 field.SetValue(instance, value);
             }
             else if (type == typeof(float))
             {
-                float value = (float) field.GetValue(instance);
+                float value = (float)field.GetValue(instance);
                 ImGui.InputFloat(field.Name, ref value);
                 field.SetValue(instance, value);
             }
@@ -96,7 +120,7 @@ namespace Editor.UI
             }
             else if (type == typeof(Color))
             {
-                System.Numerics.Vector4 value = ((Color) field.GetValue(instance)).ToVector4().ToNumerics();
+                System.Numerics.Vector4 value = ((Color)field.GetValue(instance)).ToVector4().ToNumerics();
                 ImGui.ColorEdit4(field.Name, ref value);
                 field.SetValue(instance, new Color(value));
             }

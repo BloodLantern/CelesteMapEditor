@@ -1,7 +1,7 @@
 ﻿using ImGuiNET;
 using System.Collections.Generic;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class LevelList : UIComponent
     {

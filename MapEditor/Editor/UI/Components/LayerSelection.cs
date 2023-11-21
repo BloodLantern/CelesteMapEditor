@@ -2,7 +2,7 @@
 using ImGuiNET;
 using System;
 
-namespace Editor.UI
+namespace Editor.UI.Components
 {
     public class LayerSelection : UIComponent, ICloseable
     {
@@ -14,7 +14,7 @@ namespace Editor.UI
         }
 
         private const float WindowWidth = 400f;
-        private const int LayerTypes = (int) LayerType.Count;
+        private const int LayerTypes = (int)LayerType.Count;
 
         private readonly MapViewer.Layers[] selectedLayers = new MapViewer.Layers[LayerTypes];
         private MapViewer.DebugLayers selectedDebugLayers;
@@ -50,25 +50,25 @@ namespace Editor.UI
             LayerType[] types = Enum.GetValues<LayerType>();
             for (int i = 0; i < LayerTypes; i++)
             {
-                if (ImGui.RadioButton(types[i].ToString(), currentLayerType == (LayerType) i))
-                    currentLayerType = (LayerType) i;
+                if (ImGui.RadioButton(types[i].ToString(), currentLayerType == (LayerType)i))
+                    currentLayerType = (LayerType)i;
             }
 
-            ImGui.BeginChild("layerFlags", new(ImGui.GetContentRegionAvail().X * (currentLayerType == LayerType.Rendering ? 0.5f : 1f), - 1), true, ImGuiWindowFlags.NoFocusOnAppearing);
-            int selectedLayersInt = (int) selectedLayers[(int) currentLayerType];
+            ImGui.BeginChild("layerFlags", new(ImGui.GetContentRegionAvail().X * (currentLayerType == LayerType.Rendering ? 0.5f : 1f), -1), true, ImGuiWindowFlags.NoFocusOnAppearing);
+            int selectedLayersInt = (int)selectedLayers[(int)currentLayerType];
             foreach (MapViewer.Layers layer in layers)
-                ImGui.CheckboxFlags(layer.ToString(), ref selectedLayersInt, (int) layer);
-            selectedLayers[(int) currentLayerType] = (MapViewer.Layers) selectedLayersInt;
+                ImGui.CheckboxFlags(layer.ToString(), ref selectedLayersInt, (int)layer);
+            selectedLayers[(int)currentLayerType] = (MapViewer.Layers)selectedLayersInt;
             ImGui.EndChild();
 
             if (currentLayerType == LayerType.Rendering)
             {
                 ImGui.SameLine();
                 ImGui.BeginChild("layerDebugFlags", new(-1), true, ImGuiWindowFlags.NoFocusOnAppearing);
-                int selectedDebugLayersInt = (int) selectedDebugLayers;
+                int selectedDebugLayersInt = (int)selectedDebugLayers;
                 foreach (MapViewer.DebugLayers layer in debugLayers)
-                    ImGui.CheckboxFlags(layer.ToString(), ref selectedDebugLayersInt, (int) layer);
-                selectedDebugLayers = (MapViewer.DebugLayers) selectedDebugLayersInt;
+                    ImGui.CheckboxFlags(layer.ToString(), ref selectedDebugLayersInt, (int)layer);
+                selectedDebugLayers = (MapViewer.DebugLayers)selectedDebugLayersInt;
                 ImGui.EndChild();
             }
 

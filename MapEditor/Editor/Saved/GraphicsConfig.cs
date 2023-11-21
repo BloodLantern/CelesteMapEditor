@@ -14,6 +14,6 @@ namespace Editor.Saved
         /// </summary>
         public bool Vsync = false;
 
-        public override object Clone() => CloneFields<GraphicsConfig>();
+        public override object Clone() => Clone<GraphicsConfig>();
     }
 }
