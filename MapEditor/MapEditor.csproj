@@ -54,11 +54,13 @@
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="dll\nfd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
-  </Target>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y dll\* $(OutDir)" />
   </Target>
 </Project>
