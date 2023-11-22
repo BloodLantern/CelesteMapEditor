@@ -152,7 +152,11 @@ namespace Editor
 
         public static string HumanizeString(string str)
         {
-            str = Regex.Replace(str, @"\p{Lu}", m => " " + m.Value);
+            // Regex: https://regex101.com/r/3rQ25V/1
+            // Matches any uppercase letter that has a lowercase variant,
+            // that is not the first character in the string,
+            // and that is either preceded or followed by a lowercase letter that has an uppercase variant
+            str = Regex.Replace(str, @"(?:(?<=\p{Ll})\p{Lu})|(?:\p{Lu}(?=\p{Ll}))(?<!^.)", m => " " + m.Value);
             return char.ToUpperInvariant(str[0]) + str[1..];
         }
 
