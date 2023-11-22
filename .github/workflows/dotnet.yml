@@ -21,11 +21,10 @@ jobs:
       with:
         # Semantic version range syntax or exact version of a dotnet version
         dotnet-version: 6.0.x
-    # Update references
-    - name: Git Sumbodule Update
-      run: |
-        git pull --recurse-submodules
-        git submodule update --remote --recursive
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
