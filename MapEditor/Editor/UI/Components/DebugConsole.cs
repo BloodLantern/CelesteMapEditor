@@ -44,7 +44,7 @@ namespace Editor.UI.Components
             if (ImGui.Button("Scroll down") || Logger.LoggedLastFrame || ImGui.IsWindowAppearing())
                 scroll = 1;
 
-            ImGui.BeginChild("Logs", new(-1), false, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.HorizontalScrollbar);
+            ImGui.BeginChild("Logs", new(-1), ImGuiChildFlags.Border | ImGuiChildFlags.AlwaysAutoResize);
 
             if (scroll == -1)
                 ImGui.SetScrollHereY(0f);

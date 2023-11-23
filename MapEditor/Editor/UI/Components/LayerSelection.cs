@@ -54,7 +54,7 @@ namespace Editor.UI.Components
                     currentLayerType = (LayerType)i;
             }
 
-            ImGui.BeginChild("layerFlags", new(ImGui.GetContentRegionAvail().X * (currentLayerType == LayerType.Rendering ? 0.5f : 1f), -1), true, ImGuiWindowFlags.NoFocusOnAppearing);
+            ImGui.BeginChild("layerFlags", new(ImGui.GetContentRegionAvail().X * (currentLayerType == LayerType.Rendering ? 0.5f : 1f), -1), ImGuiChildFlags.Border);
             int selectedLayersInt = (int)selectedLayers[(int)currentLayerType];
             foreach (MapViewer.Layers layer in layers)
                 ImGui.CheckboxFlags(layer.ToString(), ref selectedLayersInt, (int)layer);
@@ -64,7 +64,7 @@ namespace Editor.UI.Components
             if (currentLayerType == LayerType.Rendering)
             {
                 ImGui.SameLine();
-                ImGui.BeginChild("layerDebugFlags", new(-1), true, ImGuiWindowFlags.NoFocusOnAppearing);
+                ImGui.BeginChild("layerDebugFlags", new(-1), ImGuiChildFlags.Border);
                 int selectedDebugLayersInt = (int)selectedDebugLayers;
                 foreach (MapViewer.DebugLayers layer in debugLayers)
                     ImGui.CheckboxFlags(layer.ToString(), ref selectedDebugLayersInt, (int)layer);

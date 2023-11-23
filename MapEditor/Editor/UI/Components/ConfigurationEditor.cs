@@ -57,8 +57,7 @@ namespace Editor.UI.Components
                 ImGui.BeginChild(
                     "configFields",
                     ImGui.GetContentRegionAvail() - System.Numerics.Vector2.UnitY * ImGui.GetItemRectSize().Y,
-                    true,
-                    ImGuiWindowFlags.NoFocusOnAppearing
+                    ImGuiChildFlags.Border
                 );
 
                 foreach (FieldInfo field in config.GetType().GetFields())

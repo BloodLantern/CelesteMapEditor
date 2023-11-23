@@ -39,7 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.82.0" />
-    <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
     <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
     <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.8.0" />
     <PackageReference Include="MonoGame.Extended.Graphics" Version="3.8.0" />
