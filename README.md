@@ -2,6 +2,7 @@
 
 This is a work-in-progress map editor for the game Celeste.
 <br/>
+
 Implemented features:
 - Open/Read a map
 - Move the camera
@@ -15,6 +16,7 @@ Implemented features:
 - Open recent maps
 - Mod preloading
 <br/>
+
 Planned features:
 - Object addition
 - Move selection
