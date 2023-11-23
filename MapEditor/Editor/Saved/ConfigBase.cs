@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Editor.Saved
 {
     /// <summary>
     /// Base class for all configuration classes. These classes are used to save and load
-    /// configuration data, they should only define fields that can be serialized.
-    /// This class is not intended to be used directly therefore being declared as abstract.
+    /// configuration data, they should define fields that can be serialized.
+    /// This class is not intended to be used directly and is therefore declared as abstract.
     /// It doesn't have the <see cref="SerializableAttribute"/> because it couldn't be inherited
     /// otherwise. However, all classes derived from this one should have this attribute.
     /// </summary>
-    public abstract class ConfigBase : ICloneable, IEquatable<ConfigBase>
+    public abstract class ConfigBase : ICloneable
     {
         /// <summary>
         /// Makes a deep copy of the current Config object. Any class derived from <see cref="ConfigBase"/>
@@ -34,6 +33,7 @@ namespace Editor.Saved
                 if (field.FieldType.IsClass)
                 {
                     object value = field.GetValue(this);
+
                     if (value is ConfigBase configBase)
                         field.SetValue(clone, configBase.Clone());
                     else if (value is List<string> list)
@@ -52,89 +52,28 @@ namespace Editor.Saved
             return clone;
         }
 
-        public override int GetHashCode() => base.GetHashCode();
-
-        public override bool Equals(object obj) => obj is ConfigBase configBase && Equals(configBase);
-
-        public bool Equals(ConfigBase other)
+        /// <summary>
+        /// Sets all this config's field values to those of the other config.
+        /// </summary>
+        /// <param name="otherConfig">The config to copy the values from.</param>
+        /// <exception cref="ArgumentException">If the other config is not of the same type as the current one.</exception>
+        public void CopyFrom(ConfigBase otherConfig)
         {
             Type type = GetType();
 
-            if (type != other.GetType())
-                return false;
-
-            if (this == other)
-                return true;
+            if (type != otherConfig.GetType())
+                throw new ArgumentException("Cannot copy from different types.");
 
             foreach (FieldInfo field in type.GetFields())
             {
-                if (field.IsLiteral)
-                    continue;
-
-                Type fieldType = field.FieldType;
-                if (fieldType.IsClass)
-                {
-                    object value = field.GetValue(this);
-                    object otherValue = field.GetValue(other);
-                    if (value is ConfigBase configBase && otherValue is ConfigBase otherConfigBase)
-                    {
-                        if (!configBase.Equals(otherConfigBase)) return false;
-                    }
-                    else if (value is List<string> list && otherValue is List<string> otherList)
-                    {
-                        if (!Calc.DeepEqualsList(list, otherList)) return false;
-                    }
-                    else if (value is ICloneable cloneable && otherValue is ICloneable otherCloneable)
-                    {
-                        if (!cloneable.Equals(otherCloneable)) return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                if (!field.IsLiteral)
+                    field.SetValue(this, field.GetValue(otherConfig));
             }
-
-            return true;
         }
 
-        protected bool Equals<T>(T other) where T : ConfigBase
-        {
-            if (GetType() != other.GetType())
-                return false;
-
-            if (this == other)
-                return true;
-
-            foreach (FieldInfo field in typeof(T).GetFields())
-            {
-                if (field.IsLiteral)
-                    continue;
-
-                if (field.FieldType.IsClass)
-                {
-                    object value = field.GetValue(this);
-                    object otherValue = field.GetValue(other);
-                    if (value is ConfigBase configBase && otherValue is ConfigBase otherConfigBase)
-                    {
-                        if (!configBase.Equals(otherConfigBase)) return false;
-                    }
-                    else if (value is List<string> list && otherValue is List<string> otherList)
-                    {
-                        if (!Calc.DeepEqualsList(list, otherList)) return false;
-                    }
-                    else if (value is ICloneable cloneable && otherValue is ICloneable otherCloneable)
-                    {
-                        if (!cloneable.Equals(otherCloneable)) return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
+        /// <summary>
+        /// Called when a new config is created, e.g. if no existing config file was found.
+        /// </summary>
+        internal virtual void FirstTimeSetup() { }
     }
 }

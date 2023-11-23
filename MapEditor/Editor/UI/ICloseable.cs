@@ -2,8 +2,8 @@
 {
     internal interface ICloseable
     {
-        public bool WindowOpen { get; set; }
+        bool WindowOpen { get; set; }
 
-        public string KeyboardShortcut { get; set; }
+        string KeyboardShortcut { get; set; }
     }
 }

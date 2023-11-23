@@ -6,6 +6,7 @@ using Editor.Logging;
 using Editor.Saved.Keybinds;
 using Editor.Saved.Attributes;
 using Editor.PlatformSpecific;
+using System.Reflection;
 
 namespace Editor.Saved
 {
@@ -72,15 +73,13 @@ namespace Editor.Saved
         public bool RoomSelectionWarp = true;
 
         /// <summary>
-        /// Light or dark theme.
+        /// UI configuration.
         /// </summary>
-        [RequiresUIReload]
-        public ImGuiStyles.Style UiStyle = ImGuiStyles.DefaultStyle;
+        public UIConfig UI = new();
 
         /// <summary>
         /// Graphics configuration.
         /// </summary>
-        [RequiresGraphicsReload]
         public GraphicsConfig Graphics = new();
 
         /// <summary>
@@ -95,7 +94,8 @@ namespace Editor.Saved
         #endregion
 
         #region Properties
-        public string RecentEditedFile => RecentEditedFiles.Count > 0 ? RecentEditedFiles[0] : null;
+        [ComparisonIgnore]
+        public string LastEditedFile => RecentEditedFiles.Count > 0 ? RecentEditedFiles[0] : null;
         #endregion
 
         #region Constructors
@@ -105,12 +105,13 @@ namespace Editor.Saved
         #endregion
 
         #region Methods
-        private void FirstTimeSetup()
+        internal override void FirstTimeSetup()
         {
-#if WINDOWS
-            if (!Windows.ShouldSystemUseDarkMode())
-                UiStyle = ImGuiStyles.Style.Light;
-#endif
+            foreach (FieldInfo field in typeof(Config).GetFields())
+            {
+                if (field.GetValue(this) is ConfigBase configBase)
+                    configBase.FirstTimeSetup();
+            }
         }
 
         /// <summary>

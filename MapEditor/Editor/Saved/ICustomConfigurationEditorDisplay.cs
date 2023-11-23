@@ -14,6 +14,6 @@ namespace Editor.Saved
         /// </summary>
         /// <param name="field">The <paramref name="instance"/>'s field to display and change.</param>
         /// <param name="instance">The object instance containing the <paramref name="field"/> to display and change.</param>
-        public void Render(FieldInfo field, object instance);
+        void Render(FieldInfo field, object instance);
     }
 }

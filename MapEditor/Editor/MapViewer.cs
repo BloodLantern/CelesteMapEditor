@@ -361,12 +361,12 @@ namespace Editor
             if (ImGui.Button("Test logging"))
                 Logger.Test();
 
-            if (ImGui.BeginCombo("UI Style", Session.Config.UiStyle.ToString()))
+            if (ImGui.BeginCombo("UI Style", Session.Config.UI.Style.ToString()))
             {
                 foreach (ImGuiStyles.Style style in Enum.GetValues(typeof(ImGuiStyles.Style)))
                 {
                     if (ImGui.Selectable(style.ToString()))
-                        ImGuiStyles.Setup(Session.Config.UiStyle = style);
+                        ImGuiStyles.Setup(Session.Config.UI.Style = style);
                 }
                 ImGui.EndCombo();
             }

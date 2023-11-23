@@ -66,7 +66,7 @@ namespace Editor
         private void SetupImGuiContext(ImGuiRenderer renderer)
         {
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
-            ImGuiStyles.Setup(Config.UiStyle);
+            ImGuiStyles.Setup(Config.UI.Style);
             ImGuiStyles.SetupFont(this, renderer);
         }
 

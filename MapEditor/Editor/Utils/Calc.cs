@@ -166,7 +166,13 @@ namespace Editor
 
         public static Vector2 Abs(Vector2 vec) => new(MathF.Abs(vec.X), MathF.Abs(vec.Y));
 
-        public static List<T> DeepCloneList<T>(List<T> instance) where T : ICloneable => instance.Select(x => x.Clone()).ToList() as List<T>;
+        public static List<T> DeepCloneList<T>(List<T> instance) where T : ICloneable
+        {
+            List<T> result = new();
+            foreach (T item in instance)
+                result.Add((T) item.Clone());
+            return result;
+        }
 
         public static bool DeepEqualsList<T>(List<T> list, List<T> otherList)
         {

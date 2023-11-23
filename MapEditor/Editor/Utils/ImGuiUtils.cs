@@ -80,6 +80,6 @@ namespace Editor.Utils
             return result;
         }
 
-        public static bool ReleasedClickOnSomething() => ImGui.IsAnyItemActive() && ImGui.GetIO().MouseReleased[(int) ImGuiMouseButton.Left];
+        public static bool ReleasedClickOnSomething() => ImGui.IsAnyItemHovered() && ImGui.GetIO().MouseReleased[(int) ImGuiMouseButton.Left];
     }
 }

@@ -147,7 +147,7 @@ namespace Editor
                         {
                             new ModDependencies(Session),
                             new LayerSelection(this),
-                            new ConfigurationEditor(),
+                            new ConfigurationEditor(this),
                             new UIStyleEditor(),
                             menuBar = new MenuBar(this),
                             leftPanel = new LeftPanel(this)
@@ -158,7 +158,7 @@ namespace Editor
 
                     loading.CurrentText = "Loading map";
                     if (Session.Config.RecentEditedFiles.Count > 0)
-                        MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.RecentEditedFile));
+                        MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
                     loading.Progress += 0.05f;
 
                     Logger.Log($"Startup loading complete. Took {stopwatch.ElapsedMilliseconds}ms");
@@ -272,7 +272,7 @@ namespace Editor
             if (Loading != null)
             {
                 // Loading RenderTarget
-                bool darkStyle = Session.Config.UiStyle == ImGuiStyles.Style.Dark;
+                bool darkStyle = Session.Config.UI.Style == ImGuiStyles.Style.Dark;
 
                 GraphicsDevice.SetRenderTarget(LoadingRenderTarget);
                 GraphicsDevice.Clear(darkStyle ? new Color(0xFF202020) : Color.Gray);
@@ -421,6 +421,11 @@ namespace Editor
             Graphics.ApplyChanges();
 
             Logger.Log($"Graphics reloaded successfully.");
+        }
+
+        public void ReloadUI()
+        {
+
         }
     }
 }

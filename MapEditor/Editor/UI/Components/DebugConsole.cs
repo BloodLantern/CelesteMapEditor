@@ -66,7 +66,7 @@ namespace Editor.UI.Components
                     _ => throw new InvalidOperationException("Invalid log level")
                 };
 
-                if (Session.Config.UiStyle == ImGuiStyles.Style.Light)
+                if (Session.Config.UI.Style == ImGuiStyles.Style.Light)
                     color = color.Inverse();
 
                 ImGui.TextColored(color.ToVector4().ToNumerics(), log);

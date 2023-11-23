@@ -44,7 +44,7 @@ namespace Editor.UI.Components
                 if (modified)
                     childSize.Y -= itemHeight;
 
-                ImGui.BeginChild("List", childSize, false, ImGuiWindowFlags.AlwaysAutoResize);
+                ImGui.BeginChild("List", childSize);
                 foreach (CelesteMod mod in Session.CelesteMods)
                 {
                     if (searchText == string.Empty || mod.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))

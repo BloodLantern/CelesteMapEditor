@@ -104,7 +104,7 @@ namespace Editor
             if (!Started)
                 return;
 
-            bool darkStyle = session.Config.UiStyle == ImGuiStyles.Style.Dark;
+            bool darkStyle = session.Config.UI.Style == ImGuiStyles.Style.Dark;
             Color drawColor = darkStyle ? Color.White : Color.Black;
             Vector2 center = app.WindowSize.ToVector2() / 2;
             Vector2 low = new(center.X, app.WindowSize.Y * 3/4);
