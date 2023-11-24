@@ -92,10 +92,7 @@ namespace Editor.Celeste
             return result;
         }
 
-        public Texture this[string key]
-        {
-            get => Textures[key];
-        }
+        public Texture this[string key] => Textures[key];
 
         public List<Texture> GetAtlasSubtextures(string key)
         {

@@ -53,11 +53,14 @@ namespace Editor.Saved
                 writer.WriteAttributeString("mouse", mouse.ToString());
         }
 
-        public readonly void Render(FieldInfo field, object instance)
+        public readonly bool Render(FieldInfo field, object instance)
         {
-            Keybind value = (Keybind) field.GetValue(instance);
-            Keybind newValue = ImGuiUtils.KeybindPicker(field.Name, value);
+            Keybind oldValue = (Keybind) field.GetValue(instance);
+
+            Keybind newValue = ImGuiUtils.KeybindPicker(field.Name, oldValue);
+
             field.SetValue(instance, newValue);
+            return oldValue != newValue;
         }
 
         public override string ToString() => IsKeyboard ? "Keyboard " + keyboard.ToString() : "Mouse " + mouse.ToString();
