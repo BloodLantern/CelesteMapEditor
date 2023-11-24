@@ -1,6 +1,5 @@
 ﻿using Editor.Saved;
 using Editor.Saved.Attributes;
-using Editor.Utils;
 using ImGuiNET;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.Xna.Framework;
@@ -13,11 +12,18 @@ namespace Editor.UI.Components
 {
     public class ConfigurationEditor : UIComponent, ICloseable
     {
+        private class ReloadDataDifference
+        {
+            public string Name;
+
+            public List<ReloadType> ReloadTypes = new();
+        }
+
         private class ReloadData
         {
-            public ReloadType ReloadType;
+            public ReloadType HighestReloadType;
 
-            public List<Difference> Differences;
+            public List<ReloadDataDifference> Differences = new();
         }
 
         private bool wasOpen = false;
@@ -68,11 +74,29 @@ namespace Editor.UI.Components
 
                 ImGui.EndChild();
 
+                bool openPopup = false;
+                if (ImGui.Button("OK"))
+                {
+                    if (configChanged)
+                        openPopup = CheckAndApplyChanges();
+                    WindowOpen = false;
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Cancel"))
+                {
+                    if (configChanged)
+                        CancelChanges();
+                    WindowOpen = false;
+                }
+
                 if (!configChanged)
                 {
                     if (configValueChanged)
                     {
                         configChanged = true;
+                        // Using a goto here avoids another 'if (!configChanged)'
                         goto afterBeginDisabled;
                     }
 
@@ -81,47 +105,26 @@ namespace Editor.UI.Components
                 }
 afterBeginDisabled:
 
-                if (ImGui.Button("Cancel"))
-                    CancelChanges();
-
                 ImGui.SameLine();
 
                 if (ImGui.Button("Apply"))
-                {
-                    currentReloadData = new()
-                    {
-                        Differences = fullComparer.Compare(config, newConfig).Differences
-                    };
+                    openPopup = CheckAndApplyChanges();
 
-                    foreach (Difference diff in currentReloadData.Differences)
-                    {
-                        FieldInfo field = diff.ParentObject1.GetType().GetField(diff.PropertyName[(diff.ParentPropertyName.Length + 1)..]);
-
-                        if (field == null)
-                            continue;
-
-                        foreach (Attribute attribute in field.GetCustomAttributes())
-                        {
-                            switch (attribute)
-                            {
-                                case RequiresReloadAttribute requiresReloadAttribute:
-                                    ReloadType attributeReloadType = requiresReloadAttribute.Type;
-                                    if (attributeReloadType > currentReloadData.ReloadType)
-                                        currentReloadData.ReloadType = attributeReloadType;
-                                    break;
-                            }
-                        }
-                    }
-
-                    if (currentReloadData.ReloadType > ReloadType.None)
-                        ImGui.OpenPopup("Warning");
-                    else
-                        ApplyChanges();
-                }
+                // We need to use a bool here because of how ImGui popup modals work
+                if (openPopup)
+                    ImGui.OpenPopup("Warning");
 
                 if (ImGui.BeginPopupModal("Warning"))
                 {
-                    ImGui.Text($@"Some changes require a {Calc.HumanizeString(currentReloadData.ReloadType.ToString()).ToLower()} reload to take effect");
+                    ImGui.Text("Some changes require a reload to take effect");
+
+                    foreach (ReloadDataDifference difference in currentReloadData.Differences)
+                    {
+                        if (difference.ReloadTypes.Count == 0)
+                            continue;
+
+                        ImGui.Text($"{difference.Name}: {string.Join(", ", difference.ReloadTypes)}");
+                    }
 
                     if (ImGui.Button("Cancel"))
                     {
@@ -165,6 +168,46 @@ afterBeginDisabled:
             this.config = config;
         }
 
+        public bool CheckAndApplyChanges()
+        {
+            currentReloadData = new();
+
+            foreach (Difference diff in fullComparer.Compare(config, newConfig).Differences)
+            {
+                FieldInfo field = diff.ParentObject1.GetType().GetField(diff.PropertyName[(diff.ParentPropertyName.Length + 1)..]);
+
+                if (field == null)
+                    continue;
+
+                ReloadDataDifference reloadDiff = new() { Name = Calc.HumanizeString(field.Name) };
+
+                foreach (Attribute attribute in field.GetCustomAttributes())
+                {
+                    switch (attribute)
+                    {
+                        case RequiresReloadAttribute requiresReloadAttribute:
+                            ReloadType attributeReloadType = requiresReloadAttribute.Type;
+
+                            reloadDiff.ReloadTypes.Add(attributeReloadType);
+
+                            if (attributeReloadType > currentReloadData.HighestReloadType)
+                                currentReloadData.HighestReloadType = attributeReloadType;
+
+                            break;
+                    }
+                }
+
+                currentReloadData.Differences.Add(reloadDiff);
+            }
+
+            if (currentReloadData.HighestReloadType > ReloadType.None)
+                return true;
+            else
+                ApplyChanges();
+
+            return false;
+        }
+
         public void ApplyChanges()
         {
             config.CopyFrom(newConfig);
@@ -179,7 +222,7 @@ afterBeginDisabled:
 
         public void ApplyReload()
         {
-            switch (currentReloadData.ReloadType)
+            switch (currentReloadData.HighestReloadType)
             {
                 case ReloadType.Graphics:
                     app.ReloadGraphics(config.Graphics);
@@ -206,6 +249,7 @@ afterBeginDisabled:
 
             bool valueChanged = false;
 
+            // The code here is terrible, there is certainly a better way to do this
             if (type == typeof(bool))
             {
                 bool oldValue = (bool) field.GetValue(instance);
