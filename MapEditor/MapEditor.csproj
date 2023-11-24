@@ -18,12 +18,15 @@
   <PropertyGroup Condition="'$(IsWindows)'=='true'">
     <DefineConstants>WINDOWS</DefineConstants>
   </PropertyGroup>
-    <PropertyGroup Condition="'$(IsLinux)'=='true'">
-        <DefineConstants>LINUX</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsOSX)'=='true'">
-        <DefineConstants>OSX</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+    <DefineConstants>LINUX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsOSX)'=='true'">
+    <DefineConstants>OSX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Editor\ImGuiNet\**" />
     <EmbeddedResource Remove="Editor\ImGuiNet\**" />
@@ -46,7 +49,9 @@
     <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
-    <PackageReference Include="MonoGame.Primitives2D" Version="1.1.1" />
+    <PackageReference Include="MonoGame.Primitives2D" Version="1.1.1">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="MonoMod" Version="22.7.31.1" />
     <PackageReference Include="NativeFileDialogExtendedSharp" Version="0.1.0" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
