@@ -1,5 +1,6 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -258,7 +259,7 @@ namespace Editor
                         }
                     }
 
-                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask), x, y, tileType);
+                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask), new Point(x, y), tileType);
                 }
             }
 

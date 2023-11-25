@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Editor.Celeste;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Objects
@@ -6,17 +7,19 @@ namespace Editor.Objects
     public class Tile : MapObject
     {
         public readonly Texture Texture;
-        public readonly int X, Y;
+        public readonly Point TilePosition;
         public readonly Autotiler.TileType TileType;
 
-        public Tile(Level level, Texture texture, int x, int y, Autotiler.TileType tileType) : base(level, MapObjectType.Tile)
+        public override Vector2 Position => TilePosition.ToVector2() * Size.ToVector2();
+        public override Point Size => new(Tileset.TileSize);
+
+        public Tile(Level level, Texture texture, Point tilePosition, Autotiler.TileType tileType) : base(level, MapObjectType.Tile)
         {
             Texture = texture;
-            X = x;
-            Y = y;
+            TilePosition = tilePosition;
             TileType = tileType;
         }
 
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset) => Texture.Render(spriteBatch, camera, offset);
+        public void Render(SpriteBatch spriteBatch, Camera camera) => Texture.Render(spriteBatch, camera, AbsolutePosition);
     }
 }

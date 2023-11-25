@@ -90,9 +90,7 @@ namespace Editor.Celeste
 
             // Check if the map is a vanilla one
             if (Directory.GetParent(filePath)?.Parent?.FullName == Session.Current.CelesteContentDirectory)
-            {
                 Campaign = VanillaCampaign;
-            }
         }
 
         public override readonly bool Equals(object obj) => obj is AreaKey && this == obj as AreaKey?;

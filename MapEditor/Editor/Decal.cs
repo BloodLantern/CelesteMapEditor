@@ -12,6 +12,8 @@ namespace Editor
         public Texture Texture;
         public Vector2 Scale;
 
+        public override Point Size => (Texture.Size.ToVector2() * Scale).ToPoint();
+
         public Decal(Level level, DecalData data)
             : base(level, MapObjectType.Decal)
         {
@@ -21,7 +23,7 @@ namespace Editor
             Position = data.Position;
         }
 
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 levelPosition)
-            => Texture.Render(spriteBatch, camera, Position + levelPosition - Texture.Size.ToVector2() * Scale / 2, Color.White, Scale);
+        public void Render(SpriteBatch spriteBatch, Camera camera)
+            => Texture.Render(spriteBatch, camera, Position + Level.Position.ToVector2() - Texture.Size.ToVector2() * Scale / 2, Color.White, Scale);
     }
 }

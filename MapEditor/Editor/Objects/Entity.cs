@@ -61,8 +61,8 @@ namespace Editor.Objects
         }
         public override Vector2 Position
         {
-            get => EntityData.Position - Size.ToVector2() / 2;
-            set => EntityData.Position = value;
+            get => EntityData.Position - Size.ToVector2() / 2f;
+            set => EntityData.Position = value + Size.ToVector2() / 2f;
         }
         public override Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
 

@@ -51,8 +51,6 @@ namespace Editor
         public MapViewer MapViewer;
 
         public RenderTarget2D ImGuiRenderTarget;
-        private LeftPanel leftPanel;
-        private MenuBar menuBar;
         public UIManager UIManager;
 
         public Loading Loading;
@@ -149,8 +147,8 @@ namespace Editor
                             new LayerSelection(this),
                             new ConfigurationEditor(this),
                             new UIStyleEditor(),
-                            menuBar = new MenuBar(this),
-                            leftPanel = new LeftPanel(this)
+                            new MenuBar(this),
+                            new LeftPanel(this)
                         }
                     );
 
@@ -210,9 +208,11 @@ namespace Editor
                     // On loading state change
                     if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
                     {
+                        LeftPanel leftPanel = UIManager.GetComponent<LeftPanel>();
                         leftPanel.Visible = true;
                         leftPanel.StartMoveInRoutine();
 
+                        MenuBar menuBar = UIManager.GetComponent<MenuBar>();
                         menuBar.Visible = true;
                         menuBar.StartMoveInRoutine();
 
@@ -305,19 +305,24 @@ namespace Editor
                 SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
 
             if (Session.Config.ShowAverageFps)
-                SpriteBatch.DrawString(
-                    Session.UbuntuRegularFont,
-                    $"FPS: {FPS}",
-                    new Vector2((leftPanel != null ? (leftPanel.CurrentX + leftPanel.Size.X) : 0f) + 10f,
-                    menuBar != null ? menuBar.CurrentY + menuBar.Size.Y : 0f),
-                    Color.White
-                );
+            {
+                Vector2 position = new(10f, 0f);
+
+                LeftPanel leftPanel = UIManager.GetComponent<LeftPanel>();
+                if (leftPanel != null)
+                    position.X += leftPanel.CurrentX + leftPanel.Size.X;
+
+                MenuBar menuBar = UIManager.GetComponent<MenuBar>();
+                if (menuBar != null)
+                    position.Y += menuBar.CurrentY + menuBar.Size.Y;
+
+                SpriteBatch.DrawString(Session.UbuntuRegularFont, $"FPS: {FPS}", position, Color.White);
+            }
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
-            SpriteBatch.FillRectangle(new(0, 150, 200, debugStrings.Count * 20), new(0xFF101010));
             for (int i = 0; i < debugStrings.Count; i++)
-                SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new Vector2(0f, 150f + i * 20f), Color.White);
+                SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new Vector2(0f, i * 20f), Color.Magenta);
 
             SpriteBatch.End();
             
@@ -407,7 +412,7 @@ namespace Editor
             Graphics.PreferredBackBufferHeight = BaseWindowHeight;
             Graphics.SynchronizeWithVerticalRetrace = config.Vsync;
 
-            if (config.RefreshRate != 0)
+            if (config.RefreshRate != 0 && !config.Vsync)
             {
                 TargetElapsedTime = new TimeSpan(0, 0, 0, 0, config.RefreshRate);
                 IsFixedTimeStep = true;
@@ -421,11 +426,6 @@ namespace Editor
             Graphics.ApplyChanges();
 
             Logger.Log($"Graphics reloaded successfully.");
-        }
-
-        public void ReloadUI()
-        {
-
         }
     }
 }

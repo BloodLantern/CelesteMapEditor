@@ -265,6 +265,9 @@ namespace Editor
         public void JustifyOrigin(float x, float y)
             => Origin = new(Width * x, Height * y);
 
+        public void JustifyOrigin(Vector2 xy)
+            => Origin = new(Width * xy.X, Height * xy.Y);
+
         public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 offset)
             => Render(spriteBatch, camera, offset, Color.White);
 

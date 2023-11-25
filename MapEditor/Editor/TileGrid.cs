@@ -28,15 +28,6 @@ namespace Editor
             Level = level;
         }
 
-        public void Render(SpriteBatch spriteBatch, Camera camera, Vector2 levelPosition)
-        {
-            for (int x = 0; x < TilesX; x++)
-            {
-                for (int y = 0; y < TilesY; y++)
-                    Tiles[x, y]?.Render(spriteBatch, camera, levelPosition + new Vector2(x * Tileset.TileSize, y * Tileset.TileSize));
-            }
-        }
-
         public void Clear()
         {
             for (int x = 0; x < TilesX; x++)
@@ -44,6 +35,18 @@ namespace Editor
                 for (int y = 0; y < TilesY; y++)
                     Tiles[x, y] = null;
             }
+        }
+
+        public Tile this[int x, int y]
+        {
+            get => Tiles[x, y];
+            set => Tiles[x, y] = value;
+        }
+
+        public Tile this[Point tilePosition]
+        {
+            get => Tiles[tilePosition.X, tilePosition.Y];
+            set => Tiles[tilePosition.X, tilePosition.Y] = value;
         }
     }
 }

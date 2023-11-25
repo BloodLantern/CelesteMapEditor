@@ -25,6 +25,7 @@ namespace Editor
         public readonly LevelData LevelData;
         public readonly List<Entity> Entities = new();
         public readonly List<Trigger> Triggers = new();
+        public readonly List<Spinner> Spinners = new();
         public readonly List<Spinner.BackgroundSpinner> BackgroundSpinners = new();
         public readonly TileGrid ForegroundTiles;
         public readonly TileGrid BackgroundTiles;
@@ -69,19 +70,26 @@ namespace Editor
                     "spikes" => new Spikes(entityData, this),
                     "jumpthru" => new JumpThru(entityData, this),
                     "spring" => new Spring(entityData, this),
-                    _ => new(entityData, this)
+                    _ => new Entity(entityData, this)
                 };
                 entity.UpdateTexture();
                 Entities.Add(entity);
+
+                switch (entity)
+                {
+                    case Spinner spinner:
+                        Spinners.Add(spinner);
+                        break;
+                }
             }
 
             foreach (EntityData triggerData in LevelData.Triggers)
-                Triggers.Add(new(triggerData, this));
+                Triggers.Add(new Trigger(triggerData, this));
 
-            foreach (Entity entity in Entities)
+            foreach (Spinner spinner in Spinners)
             {
-                if (entity is Spinner spinner)
-                    spinner.CreateBackgroundSpinners(Entities, BackgroundSpinners);
+                spinner.CreateBackgroundSpinners(Spinners);
+                BackgroundSpinners.AddRange(spinner.BackgroundSpinners);
             }
 
             foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
@@ -98,27 +106,6 @@ namespace Editor
             EditorColor = EditorColors[data.EditorColorIndex];
         }
 
-        public void RenderForeground(SpriteBatch spriteBatch, Camera camera)
-        {
-            Vector2 position = Position.ToVector2();
-            ForegroundTiles.Render(spriteBatch, camera, position);
-
-            foreach (Decal decal in ForegroundDecals)
-                decal.Render(spriteBatch, camera, position);
-        }
-
-        public void RenderBackground(SpriteBatch spriteBatch, Camera camera)
-        {
-            Vector2 position = Position.ToVector2();
-            BackgroundTiles.Render(spriteBatch, camera, position);
-
-            foreach (Decal decal in BackgroundDecals)
-                decal.Render(spriteBatch, camera, position);
-
-            foreach (Spinner.BackgroundSpinner bgSpinner in BackgroundSpinners)
-                bgSpinner.Render(spriteBatch, camera);
-        }
-
         public void RenderDebug(SpriteBatch spriteBatch, Camera camera)
             => spriteBatch.DrawRectangle(camera.MapAreaToWindow(Bounds), EditorColor, camera.GetLineThickness());
 
@@ -129,6 +116,8 @@ namespace Editor
 
         public List<Trigger> GetVisibleTriggers(RectangleF cameraBounds) => Triggers.FindAll(trigger => cameraBounds.Intersects(trigger.AbsoluteBounds));
 
+        public List<Spinner.BackgroundSpinner> GetVisibleBackgroundSpinners(RectangleF cameraBounds) => BackgroundSpinners.FindAll(bgSpinner => cameraBounds.Intersects(bgSpinner.AbsoluteBounds));
+
         public List<Tile> GetVisibleForegroundTiles(RectangleF cameraBounds)
         {
             List<Tile> result = new();
@@ -137,7 +126,7 @@ namespace Editor
                 if (tile == null)
                     continue;
 
-                if (cameraBounds.Intersects(tile.Bounds))
+                if (cameraBounds.Intersects(tile.AbsoluteBounds))
                     result.Add(tile);
             }
 
@@ -152,12 +141,16 @@ namespace Editor
                 if (tile == null)
                     continue;
 
-                if (cameraBounds.Intersects(tile.Bounds))
-                        result.Add(tile);
+                if (cameraBounds.Intersects(tile.AbsoluteBounds))
+                    result.Add(tile);
             }
 
             return result;
         }
+
+        public List<Decal> GetVisibleForegroundDecals(RectangleF cameraBounds) => ForegroundDecals.FindAll(decal => cameraBounds.Intersects(decal.AbsoluteBounds));
+
+        public List<Decal> GetVisibleBackgroundDecals(RectangleF cameraBounds) => BackgroundDecals.FindAll(decal => cameraBounds.Intersects(decal.AbsoluteBounds));
 
         public void Remove(MapObject mapObject)
         {
@@ -176,10 +169,10 @@ namespace Editor
                     switch (tile.TileType)
                     {
                         case Autotiler.TileType.Foreground:
-                            ForegroundTiles.Tiles[tile.X, tile.Y] = null;
+                            ForegroundTiles[tile.TilePosition] = null;
                             break;
                         case Autotiler.TileType.Background:
-                            BackgroundTiles.Tiles[tile.X, tile.Y] = null;
+                            BackgroundTiles[tile.TilePosition] = null;
                             break;
                         case Autotiler.TileType.Animated:
                             // Nothing for now

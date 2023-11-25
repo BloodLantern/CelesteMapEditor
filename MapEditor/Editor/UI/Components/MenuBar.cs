@@ -45,8 +45,8 @@ namespace Editor.UI.Components
 
         internal override void Initialize(UIManager manager)
         {
-            modDependencies = manager.FindComponent<ModDependencies>();
-            layerSelection = manager.FindComponent<LayerSelection>();
+            modDependencies = manager.GetComponent<ModDependencies>();
+            layerSelection = manager.GetComponent<LayerSelection>();
 
             base.Initialize(manager);
         }

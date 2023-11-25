@@ -1,7 +1,5 @@
 ﻿using Editor.Extensions;
 using Editor.Objects;
-using Editor.Saved;
-using Editor.Saved.Keybinds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -36,11 +34,10 @@ namespace Editor
         {
             Vector2 mousePos = mouse.Position.ToVector2();
             MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
-            Vector2 mouseDragDelta = mousePos - clickStart;
 
             if (mouse.WasButtonJustDown(mapViewer.Keybinds.Select))
             {
-                // If the click is on nothing, clear the selection
+                // If the click was on nothing, clear the selection
                 if (objectUnderMouse == null)
                     DeselectAll();
 
@@ -50,12 +47,11 @@ namespace Editor
                 foreach (MapObject mapObject in list)
                     clickStartPositions.Add(mapObject.Position);
 
-                if (!keyboard.IsShiftDown())
-                {
-                    if (keyboard.IsControlDown())
-                        Select(objectUnderMouse);
-                }
+                if (!keyboard.IsShiftDown() && keyboard.IsControlDown())
+                    Select(objectUnderMouse);
             }
+
+            Vector2 mouseDragDelta = mousePos - clickStart;
 
             if (mouse.IsButtonDown(mapViewer.Keybinds.Select))
             {
@@ -89,10 +85,11 @@ namespace Editor
 
                     SelectRange(areaList);
                 }
-                else if (clickStartPositions.Count > 0)
+                else
                 {
+                    Vector2 offset = camera.WindowOffsetToMap(mouseDragDelta);
                     for (int i = 0; i < clickStartPositions.Count; i++)
-                        list[i].Position = clickStartPositions[i] + camera.WindowOffsetToMap(mouseDragDelta);
+                        list[i].Position = clickStartPositions[i] + offset;
                 }
             }
 

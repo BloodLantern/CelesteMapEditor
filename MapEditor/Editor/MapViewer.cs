@@ -3,6 +3,7 @@ using Editor.Edits;
 using Editor.Extensions;
 using Editor.Logging;
 using Editor.Objects;
+using Editor.Objects.Entities;
 using Editor.Saved;
 using Editor.Saved.Keybinds;
 using Editor.Utils;
@@ -63,8 +64,11 @@ namespace Editor
         private readonly List<Entity> visibleEntities = new();
         private readonly List<Trigger> visibleTriggers = new();
         private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
+        private readonly List<Spinner.BackgroundSpinner> visibleBackgroundSpinners = new();
         private readonly List<Tile> visibleForegroundTiles = new();
         private readonly List<Tile> visibleBackgroundTiles = new();
+        private readonly List<Decal> visibleForegroundDecals = new();
+        private readonly List<Decal> visibleBackgroundDecals = new();
 
         private readonly List<Edit> edits = new();
 
@@ -120,8 +124,11 @@ namespace Editor
             visibleEntities.Clear();
             visibleTriggers.Clear();
             visiblePlayerSpawns.Clear();
+            visibleBackgroundSpinners.Clear();
             visibleForegroundTiles.Clear();
             visibleBackgroundTiles.Clear();
+            visibleForegroundDecals.Clear();
+            visibleBackgroundDecals.Clear();
         }
 
         private void AddLevelObjectsToLists(Level level, RectangleF cameraBounds)
@@ -129,8 +136,11 @@ namespace Editor
             visibleEntities.AddRange(level.GetVisibleEntities(cameraBounds));
             visibleTriggers.AddRange(level.GetVisibleTriggers(cameraBounds));
             visiblePlayerSpawns.AddRange(level.GetVisiblePlayerSpawns(cameraBounds));
+            visibleBackgroundSpinners.AddRange(level.GetVisibleBackgroundSpinners(cameraBounds));
             visibleForegroundTiles.AddRange(level.GetVisibleForegroundTiles(cameraBounds));
             visibleBackgroundTiles.AddRange(level.GetVisibleBackgroundTiles(cameraBounds));
+            visibleForegroundDecals.AddRange(level.GetVisibleForegroundDecals(cameraBounds));
+            visibleBackgroundDecals.AddRange(level.GetVisibleBackgroundDecals(cameraBounds));
         }
 
         private void AddObjectsToMainList()
@@ -138,8 +148,11 @@ namespace Editor
             visibleObjects.AddRange(visibleEntities);
             visibleObjects.AddRange(visibleTriggers);
             visibleObjects.AddRange(visiblePlayerSpawns);
+            visibleObjects.AddRange(visibleBackgroundSpinners);
             visibleObjects.AddRange(visibleForegroundTiles);
             visibleObjects.AddRange(visibleBackgroundTiles);
+            visibleObjects.AddRange(visibleForegroundDecals);
+            visibleObjects.AddRange(visibleBackgroundDecals);
         }
 
         private void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
@@ -187,8 +200,14 @@ namespace Editor
 
             if (renderedLayers.HasFlag(Layers.LevelBackground))
             {
-                foreach (Level level in visibleLevels)
-                    level.RenderBackground(spriteBatch, Camera);
+                foreach (Tile tile in visibleBackgroundTiles)
+                    tile.Render(spriteBatch, Camera);
+
+                foreach (Decal decal in visibleBackgroundDecals)
+                    decal.Render(spriteBatch, Camera);
+
+                foreach (Spinner.BackgroundSpinner bgSpinner in visibleBackgroundSpinners)
+                    bgSpinner.Render(spriteBatch, Camera);
             }
 
             if (renderedLayers.HasFlag(Layers.PlayerSpawns))
@@ -205,8 +224,11 @@ namespace Editor
 
             if (renderedLayers.HasFlag(Layers.LevelForeground))
             {
-                foreach (Level level in visibleLevels)
-                    level.RenderForeground(spriteBatch, Camera);
+                foreach (Tile tile in visibleForegroundTiles)
+                    tile.Render(spriteBatch, Camera);
+
+                foreach (Decal decal in visibleForegroundDecals)
+                    decal.Render(spriteBatch, Camera);
             }
 
             if (renderedLayers.HasFlag(Layers.Triggers))
@@ -328,6 +350,12 @@ namespace Editor
             ImGui.Text($"Visible levels: {visibleLevels.Count}");
             ImGui.Text($"Visible fillers: {visibleFillers.Count}");
             ImGui.Text($"Visible entities: {visibleEntities.Count}");
+            ImGui.Text($"Visible player spawns: {visiblePlayerSpawns.Count}");
+            ImGui.Text($"Visible background spinners: {visibleBackgroundSpinners.Count}");
+            ImGui.Text($"Visible background decals: {visibleBackgroundDecals.Count}");
+            ImGui.Text($"Visible foreground decals: {visibleForegroundDecals.Count}");
+            ImGui.Text($"Visible background tiles: {visibleBackgroundTiles.Count}");
+            ImGui.Text($"Visible foreground tiles: {visibleForegroundTiles.Count}");
             ImGui.Text($"Visible objects: {visibleObjects.Count}");
             if (ImGui.TreeNode($"Visible objects list"))
             {
@@ -356,20 +384,8 @@ namespace Editor
 
             ImGui.Text($"Active coroutines: {Coroutine.RunningCount}");
             ImGui.Text($"Total time: {time.TotalGameTime}");
-            ImGui.Checkbox("Show debug console", ref Session.Config.ShowDebugConsoleWindow);
-            ImGui.Checkbox("Show average fps", ref Session.Config.ShowAverageFps);
             if (ImGui.Button("Test logging"))
                 Logger.Test();
-
-            if (ImGui.BeginCombo("UI Style", Session.Config.UI.Style.ToString()))
-            {
-                foreach (ImGuiStyles.Style style in Enum.GetValues(typeof(ImGuiStyles.Style)))
-                {
-                    if (ImGui.Selectable(style.ToString()))
-                        ImGuiStyles.Setup(Session.Config.UI.Style = style);
-                }
-                ImGui.EndCombo();
-            }
 
             ImGui.Checkbox("Show ImGui demo window", ref showImGuiDemoWindow);
             if (showImGuiDemoWindow)

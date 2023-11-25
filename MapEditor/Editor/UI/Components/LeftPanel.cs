@@ -41,7 +41,7 @@ namespace Editor.UI.Components
 
         internal override void Initialize(UIManager manager)
         {
-            menuBar = manager.FindComponent<MenuBar>();
+            menuBar = manager.GetComponent<MenuBar>();
 
             base.Initialize(manager);
         }

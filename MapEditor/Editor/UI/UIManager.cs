@@ -31,7 +31,7 @@ namespace Editor.UI
                 component.Initialize(this);
         }
 
-        public T FindComponent<T>() where T : UIComponent
+        public T GetComponent<T>() where T : UIComponent
         {
             foreach (UIComponent component in Components)
             {
@@ -41,7 +41,7 @@ namespace Editor.UI
             return null;
         }
 
-        public List<T> FindComponents<T>() where T : UIComponent
+        public List<T> GetComponents<T>() where T : UIComponent
         {
             List<T> result = new();
             foreach (UIComponent component in Components)
