@@ -1,4 +1,4 @@
-# CelesteMapEditor
+# Celeste Map Editor
 
 This is a work-in-progress map editor for the game Celeste.
 <br/>
@@ -30,6 +30,10 @@ Planned features:
   - Manage assets
   - Manage multiple maps
   - Export mod
+  - Mod project file
 - Automatic updates
 - Wiki
 - Console commands
+- Discord Rich Presence
+- Full UI style editor
+- UI style integration with ImThemes

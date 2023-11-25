@@ -16,31 +16,31 @@ namespace Editor.UI.Components
         [Flags]
         public enum Layers : byte
         {
-            None                = 0b00000000,
-            ForegroundTiles     = 0b00000001,
-            BackgroundTiles     = 0b00000010,
-            Fillers             = 0b00000100, // Rendering only, not selectable
-            Entities            = 0b00001000,
-            Triggers            = 0b00010000,
-            PlayerSpawns        = 0b00100000,
-            ForegroundDecals    = 0b01000000,
-            BackgroundDecals    = 0b10000000,
-            All                 = 0b11111111,
+            None                = byte.MinValue,
+            BackgroundTiles     = 1 << 0,
+            BackgroundDecals    = 1 << 1,
+            PlayerSpawns        = 1 << 2,
+            Entities            = 1 << 3,
+            ForegroundTiles     = 1 << 4,
+            Fillers             = 1 << 5, // Rendering only, not selectable
+            ForegroundDecals    = 1 << 6,
+            Triggers            = 1 << 7,
+            All                 = byte.MaxValue,
         }
 
         [Flags]
         public enum DebugLayers : byte
         {
-            None                = 0b00000000,
-            LevelBounds         = 0b00000001,
-            EntityBounds        = 0b00000010,
-            FillerBounds        = 0b00000100,
-            PlayerSpawns        = 0b00001000,
-            Unused2             = 0b00010000,
-            Unused3             = 0b00100000,
-            Unused4             = 0b01000000,
-            Unused5             = 0b10000000,
-            All                 = 0b11111111,
+            None                = byte.MinValue,
+            LevelBounds         = 1 << 0,
+            FillerBounds        = 1 << 1,
+            EntityBounds        = 1 << 2,
+            PlayerSpawns        = 1 << 3,
+            Unused2             = 1 << 4,
+            Unused3             = 1 << 5,
+            Unused4             = 1 << 6,
+            Unused5             = 1 << 7,
+            All                 = byte.MaxValue,
         }
 
         private const float WindowWidth = 400f;
