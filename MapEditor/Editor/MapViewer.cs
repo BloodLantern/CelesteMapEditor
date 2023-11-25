@@ -6,6 +6,7 @@ using Editor.Objects;
 using Editor.Objects.Entities;
 using Editor.Saved;
 using Editor.Saved.Keybinds;
+using Editor.UI.Components;
 using Editor.Utils;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -14,41 +15,12 @@ using MonoGame.Extended;
 using MonoGame.Extended.Input;
 using System;
 using System.Collections.Generic;
+using static Editor.UI.Components.LayerSelection;
 
 namespace Editor
 {
     public class MapViewer
     {
-        [Flags]
-        public enum Layers : byte
-        {
-            None            = 0b00000000,
-            LevelForeground = 0b00000001,
-            LevelBackground = 0b00000010,
-            Fillers         = 0b00000100,
-            Entities        = 0b00001000,
-            Triggers        = 0b00010000,
-            PlayerSpawns    = 0b00100000,
-            Unused1         = 0b01000000,
-            Unused2         = 0b10000000,
-            All             = 0b11111111
-        }
-
-        [Flags]
-        public enum DebugLayers : byte
-        {
-            None            = 0b00000000,
-            LevelBounds     = 0b00000001,
-            EntityBounds    = 0b00000010,
-            FillerBounds    = 0b00000100,
-            PlayerSpawns    = 0b00001000,
-            Unused2         = 0b00010000,
-            Unused3         = 0b00100000,
-            Unused4         = 0b01000000,
-            Unused5         = 0b10000000,
-            All             = 0b11111111
-        }
-
         public readonly Session Session;
         public readonly Application App;
         public Map CurrentMap;
@@ -74,8 +46,7 @@ namespace Editor
 
         public Selection Selection { get; private set; }
 
-        private Layers renderedLayers = Layers.All;
-        private DebugLayers renderedDebugLayers = DebugLayers.LevelBounds | DebugLayers.FillerBounds;
+        public LayerSelection LayerSelection;
 
         public MapViewer(Application app)
         {
@@ -85,6 +56,11 @@ namespace Editor
             Keybinds = Session.Config.Keybinds.MapViewer;
 
             PlayerSpawn.SetupSprite();
+        }
+
+        public void Initialize()
+        {
+            LayerSelection = App.UIManager.GetComponent<LayerSelection>();
         }
 
         public void InitializeCamera()
@@ -172,23 +148,196 @@ namespace Editor
             return null;
         }
 
-        public MapObject GetObjectAt(Vector2 mapPosition)
+        public MapObject GetObjectAt(Vector2 mapPosition, Layers layers = Layers.All)
         {
-            foreach (MapObject obj in visibleObjects)
+            switch (layers)
             {
-                if (obj.AbsoluteBounds.Contains(mapPosition))
-                    return obj;
+                case Layers.All:
+                    foreach (MapObject obj in visibleObjects)
+                    {
+                        if (obj.AbsoluteBounds.Contains(mapPosition))
+                            return obj;
+                    }
+                    break;
+                case Layers.ForegroundTiles:
+                    foreach (Tile tile in visibleForegroundTiles)
+                    {
+                        if (tile.AbsoluteBounds.Contains(mapPosition))
+                            return tile;
+                    }
+                    break;
+                case Layers.BackgroundTiles:
+                    foreach (Tile tile in visibleBackgroundTiles)
+                    {
+                        if (tile.AbsoluteBounds.Contains(mapPosition))
+                            return tile;
+                    }
+                    break;
+                case Layers.Entities:
+                    foreach (Entity entity in visibleEntities)
+                    {
+                        if (entity.AbsoluteBounds.Contains(mapPosition))
+                            return entity;
+                    }
+                    break;
+                case Layers.Triggers:
+                    foreach (Trigger trigger in visibleTriggers)
+                    {
+                        if (trigger.AbsoluteBounds.Contains(mapPosition))
+                            return trigger;
+                    }
+                    break;
+                case Layers.PlayerSpawns:
+                    foreach (PlayerSpawn spawn in visiblePlayerSpawns)
+                    {
+                        if (spawn.AbsoluteBounds.Contains(mapPosition))
+                            return spawn;
+                    }
+                    break;
+                case Layers.ForegroundDecals:
+                    foreach (Decal decal in visibleForegroundDecals)
+                    {
+                        if (decal.AbsoluteBounds.Contains(mapPosition))
+                            return decal;
+                    }
+                    break;
+                case Layers.BackgroundDecals:
+                    foreach (Decal decal in visibleBackgroundDecals)
+                    {
+                        if (decal.AbsoluteBounds.Contains(mapPosition))
+                            return decal;
+                    }
+                    break;
             }
             return null;
         }
 
-        public List<MapObject> GetObjectsInArea(RectangleF mapArea)
+        public List<MapObject> GetObjectsAt(Vector2 mapPosition, Layers layers = Layers.All)
         {
             List<MapObject> result = new();
-            foreach (MapObject obj in visibleObjects)
+            switch (layers)
             {
-                if (mapArea.Intersects(obj.AbsoluteBounds))
-                    result.Add(obj);
+                case Layers.All:
+                    foreach (MapObject obj in visibleObjects)
+                    {
+                        if (obj.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(obj);
+                    }
+                    break;
+                case Layers.ForegroundTiles:
+                    foreach (Tile tile in visibleForegroundTiles)
+                    {
+                        if (tile.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(tile);
+                    }
+                    break;
+                case Layers.BackgroundTiles:
+                    foreach (Tile tile in visibleBackgroundTiles)
+                    {
+                        if (tile.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(tile);
+                    }
+                    break;
+                case Layers.Entities:
+                    foreach (Entity entity in visibleEntities)
+                    {
+                        if (entity.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(entity);
+                    }
+                    break;
+                case Layers.Triggers:
+                    foreach (Trigger trigger in visibleTriggers)
+                    {
+                        if (trigger.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(trigger);
+                    }
+                    break;
+                case Layers.PlayerSpawns:
+                    foreach (PlayerSpawn spawn in visiblePlayerSpawns)
+                    {
+                        if (spawn.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(spawn);
+                    }
+                    break;
+                case Layers.ForegroundDecals:
+                    foreach (Decal decal in visibleForegroundDecals)
+                    {
+                        if (decal.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(decal);
+                    }
+                    break;
+                case Layers.BackgroundDecals:
+                    foreach (Decal decal in visibleBackgroundDecals)
+                    {
+                        if (decal.AbsoluteBounds.Contains(mapPosition))
+                            result.Add(decal);
+                    }
+                    break;
+            }
+            return result;
+        }
+
+        public List<MapObject> GetObjectsInArea(RectangleF mapArea, Layers layers = Layers.All)
+        {
+            List<MapObject> result = new();
+            switch (layers)
+            {
+                case Layers.All:
+                    foreach (MapObject obj in visibleObjects)
+                    {
+                        if (mapArea.Intersects(obj.AbsoluteBounds))
+                            result.Add(obj);
+                    }
+                    break;
+                case Layers.ForegroundTiles:
+                    foreach (Tile tile in visibleForegroundTiles)
+                    {
+                        if (mapArea.Intersects(tile.AbsoluteBounds))
+                            result.Add(tile);
+                    }
+                    break;
+                case Layers.BackgroundTiles:
+                    foreach (Tile tile in visibleBackgroundTiles)
+                    {
+                        if (mapArea.Intersects(tile.AbsoluteBounds))
+                            result.Add(tile);
+                    }
+                    break;
+                case Layers.Entities:
+                    foreach (Entity entity in visibleEntities)
+                    {
+                        if (mapArea.Intersects(entity.AbsoluteBounds))
+                            result.Add(entity);
+                    }
+                    break;
+                case Layers.Triggers:
+                    foreach (Trigger trigger in visibleTriggers)
+                    {
+                        if (mapArea.Intersects(trigger.AbsoluteBounds))
+                            result.Add(trigger);
+                    }
+                    break;
+                case Layers.PlayerSpawns:
+                    foreach (PlayerSpawn spawn in visiblePlayerSpawns)
+                    {
+                        if (mapArea.Intersects(spawn.AbsoluteBounds))
+                            result.Add(spawn);
+                    }
+                    break;
+                case Layers.ForegroundDecals:
+                    foreach (Decal decal in visibleForegroundDecals)
+                    {
+                        if (mapArea.Intersects(decal.AbsoluteBounds))
+                            result.Add(decal);
+                    }
+                    break;
+                case Layers.BackgroundDecals:
+                    foreach (Decal decal in visibleBackgroundDecals)
+                    {
+                        if (mapArea.Intersects(decal.AbsoluteBounds))
+                            result.Add(decal);
+                    }
+                    break;
             }
             return result;
         }
@@ -198,11 +347,16 @@ namespace Editor
             if (CurrentMap == null)
                 return;
 
-            if (renderedLayers.HasFlag(Layers.LevelBackground))
+            Layers renderingLayers = LayerSelection.GetLayers(LayerType.Rendering);
+
+            if (renderingLayers.HasFlag(Layers.BackgroundTiles))
             {
                 foreach (Tile tile in visibleBackgroundTiles)
                     tile.Render(spriteBatch, Camera);
+            }
 
+            if (renderingLayers.HasFlag(Layers.BackgroundDecals))
+            {
                 foreach (Decal decal in visibleBackgroundDecals)
                     decal.Render(spriteBatch, Camera);
 
@@ -210,28 +364,31 @@ namespace Editor
                     bgSpinner.Render(spriteBatch, Camera);
             }
 
-            if (renderedLayers.HasFlag(Layers.PlayerSpawns))
+            if (renderingLayers.HasFlag(Layers.PlayerSpawns))
             {
                 foreach (PlayerSpawn playerSpawn in visiblePlayerSpawns)
                     playerSpawn.Render(spriteBatch, Camera);
             }
 
-            if (renderedLayers.HasFlag(Layers.Entities))
+            if (renderingLayers.HasFlag(Layers.Entities))
             {
                 foreach (Entity entity in visibleEntities)
                     entity.Render(spriteBatch, Camera);
             }
 
-            if (renderedLayers.HasFlag(Layers.LevelForeground))
+            if (renderingLayers.HasFlag(Layers.ForegroundTiles))
             {
                 foreach (Tile tile in visibleForegroundTiles)
                     tile.Render(spriteBatch, Camera);
+            }
 
+            if (renderingLayers.HasFlag(Layers.ForegroundDecals))
+            {
                 foreach (Decal decal in visibleForegroundDecals)
                     decal.Render(spriteBatch, Camera);
             }
 
-            if (renderedLayers.HasFlag(Layers.Triggers))
+            if (renderingLayers.HasFlag(Layers.Triggers))
             {
                 foreach (Trigger trigger in visibleTriggers)
                     trigger.Render(spriteBatch, Camera);
@@ -241,25 +398,27 @@ namespace Editor
 
             // TODO Draw filler tiles
 
-            if (renderedDebugLayers.HasFlag(DebugLayers.LevelBounds))
+            DebugLayers renderingDebugLayers = LayerSelection.GetDebugLayers();
+
+            if (renderingDebugLayers.HasFlag(DebugLayers.LevelBounds))
             {
                 foreach (Level level in visibleLevels)
                     level.RenderDebug(spriteBatch, Camera);
             }
 
-            if (renderedDebugLayers.HasFlag(DebugLayers.PlayerSpawns))
+            if (renderingDebugLayers.HasFlag(DebugLayers.PlayerSpawns))
             {
                 foreach (PlayerSpawn spawn in visiblePlayerSpawns)
                     spawn.RenderDebug(spriteBatch, Camera);
             }
 
-            if (renderedDebugLayers.HasFlag(DebugLayers.EntityBounds))
+            if (renderingDebugLayers.HasFlag(DebugLayers.EntityBounds))
             {
                 foreach (Entity entity in visibleEntities)
                     entity.RenderDebug(spriteBatch, Camera);
             }
 
-            if (renderedDebugLayers.HasFlag(DebugLayers.FillerBounds))
+            if (renderingDebugLayers.HasFlag(DebugLayers.FillerBounds))
             {
                 foreach (Rectangle filler in visibleFillers)
                     RenderDebugFiller(spriteBatch, Camera, filler);
@@ -283,28 +442,6 @@ namespace Editor
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
             ImGui.Checkbox("Debug mode", ref Session.Config.DebugMode);
-
-            ImGui.Separator();
-
-            if (ImGui.TreeNode("Layers"))
-            {
-                int renderedLayersInt = (int) renderedLayers;
-                foreach (Layers layer in Enum.GetValues(typeof(Layers)))
-                    ImGui.CheckboxFlags(layer.ToString(), ref renderedLayersInt, (int) layer);
-                renderedLayers = (Layers) renderedLayersInt;
-
-                ImGui.TreePop();
-            }
-
-            if (ImGui.TreeNode("Debug layers"))
-            {
-                int renderedDebugLayersInt = (int) renderedDebugLayers;
-                foreach (DebugLayers layer in Enum.GetValues(typeof(DebugLayers)))
-                    ImGui.CheckboxFlags(layer.ToString(), ref renderedDebugLayersInt, (int) layer);
-                renderedDebugLayers = (DebugLayers) renderedDebugLayersInt;
-
-                ImGui.TreePop();
-            }
 
             ImGui.Separator();
 

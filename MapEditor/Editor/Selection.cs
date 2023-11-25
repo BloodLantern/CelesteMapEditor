@@ -1,5 +1,6 @@
 ﻿using Editor.Extensions;
 using Editor.Objects;
+using Editor.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -11,11 +12,37 @@ namespace Editor
 {
     public class Selection : IEnumerable<MapObject>
     {
+        private class HoveredObjectManager : IEnumerable<MapObject>
+        {
+            public List<MapObject> Objects;
+            public int CurrentIndex = 0;
+
+            public int Count => Objects.Count;
+            public MapObject CurrentObject => Count > 0 ? Objects[CurrentIndex] : null;
+
+            public void UpdateObjects(List<MapObject> objects) => Objects = objects;
+
+            public MapObject NextObject() => Count > 0 ? Objects[NextObjectIndex()] : null;
+
+            private int NextObjectIndex()
+            {
+                CurrentIndex++;
+                CurrentIndex %= Objects.Count;
+                return CurrentIndex;
+            }
+
+            public IEnumerator<MapObject> GetEnumerator() => Objects.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => Objects.GetEnumerator();
+
+            public MapObject this[int index] => Objects[index];
+        }
+
         private RectangleF area;
         private Vector2 clickStart;
         private readonly List<MapObject> areaList = new();
         private readonly List<MapObject> list = new();
-        private List<Vector2> clickStartPositions = new();
+        private readonly List<Vector2> clickStartPositions = new();
 
         private readonly MapViewer mapViewer;
         private readonly Camera camera;
@@ -23,6 +50,10 @@ namespace Editor
         public int Count => list.Count;
 
         private float selectionClickDuration = 0f;
+
+        private readonly HoveredObjectManager hoveredObjectManager = new();
+
+        private LayerSelection layerSelection;
 
         public Selection(MapViewer mapViewer)
         {
@@ -33,22 +64,21 @@ namespace Editor
         public void HandleInputs(GameTime time, MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
             Vector2 mousePos = mouse.Position.ToVector2();
-            MapObject objectUnderMouse = mapViewer.GetObjectAt(camera.WindowPositionToMap(mouse.Position).ToVector2());
+            Vector2 mouseMapPosition = camera.WindowPositionToMap(mousePos);
+
+            hoveredObjectManager.UpdateObjects(mapViewer.GetObjectsAt(mouseMapPosition));
 
             if (mouse.WasButtonJustDown(mapViewer.Keybinds.Select))
             {
                 // If the click was on nothing, clear the selection
-                if (objectUnderMouse == null)
+                if (hoveredObjectManager.Count == 0)
                     DeselectAll();
 
                 selectionClickDuration = 0f;
                 clickStart = mousePos;
-                clickStartPositions = new();
+                clickStartPositions.Clear();
                 foreach (MapObject mapObject in list)
                     clickStartPositions.Add(mapObject.Position);
-
-                if (!keyboard.IsShiftDown() && keyboard.IsControlDown())
-                    Select(objectUnderMouse);
             }
 
             Vector2 mouseDragDelta = mousePos - clickStart;
@@ -100,7 +130,13 @@ namespace Editor
 
                 // If we clicked for a short amount of time and we didn't shift, select only the object under the mouse
                 if (selectionClickDuration < 0.35f && !keyboard.IsShiftDown())
-                    SelectOnly(mapViewer.GetObjectAt(camera.WindowPositionToMap(mousePos)));
+                {
+                    MapObject objectToSelect = hoveredObjectManager.NextObject();
+                    if (keyboard.IsControlDown())
+                        Select(objectToSelect);
+                    else
+                        SelectOnly(objectToSelect);
+                }
             }
 
             if (keyboard.WasKeyJustUp(mapViewer.Keybinds.Deselect))

@@ -138,7 +138,7 @@ namespace Editor
 
                     loading.CurrentText = "Loading map viewer";
                     MapViewer = new(this);
-                    loading.Progress += 0.05f;
+                    loading.Progress += 0.04f;
 
                     loading.CurrentText = "Loading UI";
                     UIManager.AddRange(new UIComponent[]
@@ -151,8 +151,11 @@ namespace Editor
                             new LeftPanel(this)
                         }
                     );
-
                     loading.Progress += 0.05f;
+
+                    loading.CurrentText = "Initializing map viewer";
+                    MapViewer.Initialize();
+                    loading.Progress += 0.01f;
 
                     loading.CurrentText = "Loading map";
                     if (Session.Config.RecentEditedFiles.Count > 0)

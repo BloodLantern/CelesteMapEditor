@@ -7,6 +7,7 @@ using Editor.Saved.Keybinds;
 using Editor.Saved.Attributes;
 using Editor.PlatformSpecific;
 using System.Reflection;
+using Editor.UI.Components;
 
 namespace Editor.Saved
 {
@@ -50,12 +51,18 @@ namespace Editor.Saved
         /// <summary>
         /// Whether to show the debug console window.
         /// </summary>
+        [NotDisplayedOnEditor]
         public bool ShowDebugConsoleWindow = false;
 
         /// <summary>
         /// Whether to show the layer selection window.
         /// </summary>
+        [NotDisplayedOnEditor]
         public bool ShowLayerSelectionWindow = false;
+
+        public LayerSelection.Layers[] LayerSelectionLayers = new LayerSelection.Layers[LayerSelection.LayerTypes] { LayerSelection.Layers.All, LayerSelection.Layers.Entities };
+
+        public LayerSelection.DebugLayers LayerSelectionDebugLayers = LayerSelection.DebugLayers.LevelBounds | LayerSelection.DebugLayers.FillerBounds;
 
         /// <summary>
         /// Whether to load the last edited map at startup.
