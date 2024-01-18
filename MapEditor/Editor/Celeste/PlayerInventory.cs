@@ -5,7 +5,7 @@
         public static readonly PlayerInventory Prologue = new() { Dashes = 0, DreamDash = false };
         public static readonly PlayerInventory Default = new();
         public static readonly PlayerInventory OldSite = new() { DreamDash = false };
-        public static readonly PlayerInventory CH6End = new() { Dashes = 2 };
+        public static readonly PlayerInventory Ch6End = new() { Dashes = 2 };
         public static readonly PlayerInventory TheSummit = new() { Dashes = 2, DreamDash = true, Backpack = false };
         public static readonly PlayerInventory Core = new() { Dashes = 2, NoRefills = true };
         public static readonly PlayerInventory Farewell = new() { Backpack = false };
@@ -26,7 +26,7 @@
                 "Prologue" => Prologue,
                 "Default" => Default,
                 "OldSite" => OldSite,
-                "CH6End" => CH6End,
+                "CH6End" => Ch6End,
                 "TheSummit" => TheSummit,
                 "Core" => Core,
                 "Farewell" => Farewell,

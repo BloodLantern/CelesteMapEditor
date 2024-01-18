@@ -15,7 +15,7 @@ namespace Editor
         private class HoveredObjectManager : IEnumerable<MapObject>
         {
             public List<MapObject> Objects;
-            public int CurrentIndex = 0;
+            public int CurrentIndex;
 
             public int Count => Objects.Count;
             public MapObject CurrentObject => Count > 0 ? Objects[CurrentIndex] : null;
@@ -49,7 +49,7 @@ namespace Editor
 
         public int Count => list.Count;
 
-        private float selectionClickDuration = 0f;
+        private float selectionClickDuration;
 
         private readonly HoveredObjectManager hoveredObjectManager = new();
 
@@ -156,11 +156,11 @@ namespace Editor
             foreach (MapObject obj in list)
                 spriteBatch.DrawRectangle(camera.MapAreaToWindow(obj.AbsoluteBounds), color, camera.GetLineThickness());
 
-            if (!area.IsEmpty)
-            {
-                spriteBatch.FillRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMin * 0.5f);
-                spriteBatch.DrawRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMax * 0.5f, 2f);
-            }
+            if (area.IsEmpty)
+                return;
+            
+            spriteBatch.FillRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMin * 0.5f);
+            spriteBatch.DrawRectangle(area, mapViewer.Config.EntitySelectionBoundsColorMax * 0.5f, 2f);
         }
 
         public void Select(MapObject obj)

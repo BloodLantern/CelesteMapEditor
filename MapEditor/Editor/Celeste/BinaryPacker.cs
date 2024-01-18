@@ -9,12 +9,12 @@ namespace Editor.Celeste
 {
     public static class BinaryPacker
     {
-        private static readonly HashSet<string> ignoreAttributes = new() {
+        private static readonly HashSet<string> IgnoreAttributes = new() {
             "_eid"
         };
-        private const string innerTextAttributeName = "innerText";
-        private const string outputFileExtension = ".bin";
-        private static readonly Dictionary<string, short> stringValue = new();
+        private const string InnerTextAttributeName = "innerText";
+        private const string OutputFileExtension = ".bin";
+        private static readonly Dictionary<string, short> StringValue = new();
         private static string[] stringLookup;
         private static short stringCounter;
 
@@ -23,7 +23,7 @@ namespace Editor.Celeste
             string extension = Path.GetExtension(filename);
             if (outdir != null)
                 Path.Combine(outdir + Path.GetFileName(filename));
-            _ = filename.Replace(extension, outputFileExtension);
+            _ = filename.Replace(extension, OutputFileExtension);
             XmlDocument xmlDocument = new();
             xmlDocument.Load(filename);
             XmlElement rootElement = null;
@@ -40,16 +40,16 @@ namespace Editor.Celeste
 
         public static void ToBinary(XmlElement rootElement, string outfilename)
         {
-            stringValue.Clear();
+            StringValue.Clear();
             stringCounter = 0;
             CreateLookupTable(rootElement);
-            AddLookupValue(innerTextAttributeName);
+            AddLookupValue(InnerTextAttributeName);
             using FileStream output = new(outfilename, FileMode.Create);
             BinaryWriter writer = new(output);
             writer.Write("CELESTE MAP");
             writer.Write(Path.GetFileNameWithoutExtension(outfilename));
-            writer.Write(stringValue.Count);
-            foreach (KeyValuePair<string, short> keyValuePair in stringValue)
+            writer.Write(StringValue.Count);
+            foreach (KeyValuePair<string, short> keyValuePair in StringValue)
                 writer.Write(keyValuePair.Key);
             WriteElement(writer, rootElement);
             writer.Flush();
@@ -60,7 +60,7 @@ namespace Editor.Celeste
             AddLookupValue(element.Name);
             foreach (XmlAttribute attribute in (XmlNamedNodeMap) element.Attributes)
             {
-                if (!ignoreAttributes.Contains(attribute.Name))
+                if (!IgnoreAttributes.Contains(attribute.Name))
                 {
                     AddLookupValue(attribute.Name);
                     if (ParseValue(attribute.Value, out byte type, out object _) && type == 5)
@@ -76,9 +76,9 @@ namespace Editor.Celeste
 
         private static void AddLookupValue(string name)
         {
-            if (stringValue.ContainsKey(name))
+            if (StringValue.ContainsKey(name))
                 return;
-            stringValue.Add(name, stringCounter);
+            StringValue.Add(name, stringCounter);
             ++stringCounter;
         }
 
@@ -93,19 +93,19 @@ namespace Editor.Celeste
             int num2 = 0;
             foreach (XmlAttribute attribute in (XmlNamedNodeMap) element.Attributes)
             {
-                if (!ignoreAttributes.Contains(attribute.Name))
+                if (!IgnoreAttributes.Contains(attribute.Name))
                     ++num2;
             }
             if (element.InnerText.Length > 0 && num1 == 0)
                 ++num2;
-            writer.Write(stringValue[element.Name]);
+            writer.Write(StringValue[element.Name]);
             writer.Write(num2);
             foreach (XmlAttribute attribute in (XmlNamedNodeMap) element.Attributes)
             {
-                if (!ignoreAttributes.Contains(attribute.Name))
+                if (!IgnoreAttributes.Contains(attribute.Name))
                 {
                     ParseValue(attribute.Value, out byte type, out object result);
-                    writer.Write(stringValue[attribute.Name]);
+                    writer.Write(StringValue[attribute.Name]);
                     writer.Write(type);
                     switch (type)
                     {
@@ -125,7 +125,7 @@ namespace Editor.Celeste
                             writer.Write((float) result);
                             continue;
                         case 5:
-                            writer.Write(stringValue[(string) result]);
+                            writer.Write(StringValue[(string) result]);
                             continue;
                         default:
                             continue;
@@ -134,7 +134,7 @@ namespace Editor.Celeste
             }
             if (element.InnerText.Length > 0 && num1 == 0)
             {
-                writer.Write(stringValue[innerTextAttributeName]);
+                writer.Write(StringValue[InnerTextAttributeName]);
                 if (element.Name is "solids" or "bg")
                 {
                     byte[] buffer = RunLengthEncoding.Encode(element.InnerText);

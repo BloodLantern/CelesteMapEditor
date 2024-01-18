@@ -59,9 +59,9 @@ namespace Editor.Utils
             }
         }
 
-        private static readonly Dictionary<Guid, Routine> runningRoutines = new();
+        private static readonly Dictionary<Guid, Routine> RunningRoutines = new();
 
-        public static int RunningCount => runningRoutines.Count;
+        public static int RunningCount => RunningRoutines.Count;
 
         /// <summary>
         /// Starts a new coroutine, assigning it a <see cref="Guid"/>. Note that the coroutine
@@ -72,7 +72,7 @@ namespace Editor.Utils
         public static Guid Start(IEnumerator routine)
         {
             Guid guid = Guid.NewGuid();
-            runningRoutines.Add(guid, new(guid, routine));
+            RunningRoutines.Add(guid, new(guid, routine));
             return guid;
         }
 
@@ -92,7 +92,7 @@ namespace Editor.Utils
         internal static void UpdateAll(GameTime time)
         {
             List<Guid> finishedRoutines = new();
-            foreach (Routine routine in runningRoutines.Values)
+            foreach (Routine routine in RunningRoutines.Values)
             {
                 routine.Update(time);
                 if (routine.Finished)
@@ -105,17 +105,17 @@ namespace Editor.Utils
 
         public static IEnumerator Stop(Guid guid)
         {
-            if (runningRoutines.ContainsKey(guid))
+            if (RunningRoutines.ContainsKey(guid))
             {
-                IEnumerator enumerator = runningRoutines[guid].Enumerator;
-                runningRoutines.Remove(guid);
+                IEnumerator enumerator = RunningRoutines[guid].Enumerator;
+                RunningRoutines.Remove(guid);
                 return enumerator;
             }
 
             return null;
         }
 
-        public static bool IsRunning(Guid guid) => runningRoutines.ContainsKey(guid);
+        public static bool IsRunning(Guid guid) => RunningRoutines.ContainsKey(guid);
 
         public static bool IsRunningAndNotEmpty(Guid guid) => guid != Guid.Empty && IsRunning(guid);
     }

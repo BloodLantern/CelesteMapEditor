@@ -21,7 +21,7 @@ namespace Editor
         public System.Version Version;
         public string VersionString;
 
-        public string DLL;
+        public string Dll;
 
         public readonly List<CelesteMod> Dependencies = new();
         public readonly List<CelesteMod> OptionalDependencies = new();
@@ -115,8 +115,8 @@ namespace Editor
             ZipArchiveEntry everestYaml = archive.GetEntry("everest.yaml") ?? archive.GetEntry("everest.yml");
             if (everestYaml != null)
             {
-                using Stream _everestYamlStream = everestYaml.Open();
-                ReadYaml(_everestYamlStream);
+                using Stream everestYamlStream = everestYaml.Open();
+                ReadYaml(everestYamlStream);
             }
 
             const string gameplayPath = "Graphics/Atlases/Gameplay";
@@ -168,7 +168,7 @@ namespace Editor
                         break;
 
                     case "DLL":
-                        DLL = (string) entry.Value;
+                        Dll = (string) entry.Value;
                         break;
 
                     case "Dependencies":
@@ -384,7 +384,7 @@ namespace Editor
 
         public override string ToString() => Name;
 
-        public override int GetHashCode() => HashCode.Combine(Name, Version, VersionString, DLL, Dependencies, OptionalDependencies, GameplayAtlasEntries);
+        public override int GetHashCode() => HashCode.Combine(Name, Version, VersionString, Dll, Dependencies, OptionalDependencies, GameplayAtlasEntries);
 
         public override bool Equals(object obj)
         {

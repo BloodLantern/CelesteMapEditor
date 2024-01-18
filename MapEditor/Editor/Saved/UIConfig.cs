@@ -5,11 +5,11 @@ using System;
 namespace Editor.Saved
 {
     [Serializable]
-    public class UIConfig : ConfigBase
+    public class UiConfig : ConfigBase
     {
         public ImGuiStyles.Style Style = ImGuiStyles.DefaultStyle;
 
-        public override object Clone() => Clone<UIConfig>();
+        public override object Clone() => Clone<UiConfig>();
 
         internal override void FirstTimeSetup()
         {

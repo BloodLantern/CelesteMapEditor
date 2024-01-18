@@ -82,7 +82,7 @@ namespace Editor.Saved
         /// <summary>
         /// UI configuration.
         /// </summary>
-        public UIConfig UI = new();
+        public UiConfig Ui = new();
 
         /// <summary>
         /// Graphics configuration.

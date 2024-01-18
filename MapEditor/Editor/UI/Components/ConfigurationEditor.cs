@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Editor.UI.Components
 {
-    public class ConfigurationEditor : UIComponent, ICloseable
+    public class ConfigurationEditor : UiComponent, ICloseable
     {
         private class ReloadDataDifference
         {

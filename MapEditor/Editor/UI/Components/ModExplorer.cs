@@ -2,7 +2,7 @@
 
 namespace Editor.UI.Components
 {
-    public class ModExplorer : UIComponent
+    public class ModExplorer : UiComponent
     {
         private Application app;
 

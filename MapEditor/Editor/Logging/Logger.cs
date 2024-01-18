@@ -27,31 +27,31 @@ namespace Editor.Logging
         private const string LogsDirectory = "logs";
 
         public static List<string> LogEntries { get; private set; } = new();
-        private static readonly ConcurrentQueue<LogEntry> logsQueue = new();
+        private static readonly ConcurrentQueue<LogEntry> LogsQueue = new();
 
         public static bool LoggedLastFrame { get; private set; }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Info)
-            => logsQueue.Enqueue(new LogEntry(message, logLevel, DateTime.Now));
+            => LogsQueue.Enqueue(new LogEntry(message, logLevel, DateTime.Now));
 
         public static async void UpdateLogsAsync()
         {
             LoggedLastFrame = false;
 
-            if (logsQueue.IsEmpty)
+            if (LogsQueue.IsEmpty)
                 return;
 
             LoggedLastFrame = true;
 
-            await Task.Run(updateLogs);
+            await Task.Run(UpdateLogs);
         }
 
-        private static readonly Action updateLogs = () =>
+        private static readonly Action UpdateLogs = () =>
         {
             // Empty the queue
-            while (!logsQueue.IsEmpty)
+            while (!LogsQueue.IsEmpty)
             {
-                if (!logsQueue.TryDequeue(out LogEntry log))
+                if (!LogsQueue.TryDequeue(out LogEntry log))
                     // Avoid deadlocks by breaking out of the loop
                     break;
 
@@ -88,7 +88,7 @@ namespace Editor.Logging
             if (!config.EnableLogging)
                 return;
 
-            updateLogs();
+            UpdateLogs();
             LogEntries.Add(string.Empty); // Add an empty line at the end of the logs
 
             // Remove all the logs below the minimum log level

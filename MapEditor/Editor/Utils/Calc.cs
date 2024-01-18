@@ -25,7 +25,7 @@ namespace Editor
             return value;
         }
 
-        public static XmlDocument LoadContentXML(string filename)
+        public static XmlDocument LoadContentXml(string filename)
         {
             XmlDocument xmlDocument = new();
             using (StreamReader inStream = new(Path.Combine(Session.Current.CelesteContentDirectory, filename)))

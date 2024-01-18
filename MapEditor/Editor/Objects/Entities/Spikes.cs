@@ -18,7 +18,7 @@ namespace Editor.Objects.Entities
         }
 
         private const string TentacleType = "tentacles";
-        private static readonly string spikesTextureBaseName = "danger/spikes/";
+        private static readonly string SpikesTextureBaseName = "danger/spikes/";
 
         public readonly Directions Direction;
         public readonly string SpikeType;
@@ -60,7 +60,7 @@ namespace Editor.Objects.Entities
                 return;
             }
 
-            Texture = Atlas.Gameplay[spikesTextureBaseName + SpikeType + '_' + Direction.ToString() + "00"];
+            Texture = Atlas.Gameplay[SpikesTextureBaseName + SpikeType + '_' + Direction.ToString() + "00"];
             for (int i = 0; i < Length / Tileset.TileSize; i++)
             {
                 Texture texture = new(Texture);

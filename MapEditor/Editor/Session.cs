@@ -66,7 +66,7 @@ namespace Editor
         private void SetupImGuiContext(ImGuiRenderer renderer)
         {
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
-            ImGuiStyles.Setup(Config.UI.Style);
+            ImGuiStyles.Setup(Config.Ui.Style);
             ImGuiStyles.SetupFont(this, renderer);
         }
 
@@ -119,7 +119,7 @@ namespace Editor
 
             JsonDocument doc = JsonDocument.Parse(File.OpenRead(OlympusConfigFilePath), new JsonDocumentOptions() { CommentHandling = JsonCommentHandling.Skip });
 
-            int celesteInstallID = -1;
+            int celesteInstallId = -1;
             List<string> celesteInstalls = new();
 
             JsonElement root = doc.RootElement;
@@ -130,7 +130,7 @@ namespace Editor
                 return false;
             }
 
-            if (!install.TryGetInt32(out celesteInstallID))
+            if (!install.TryGetInt32(out celesteInstallId))
             {
                 Logger.Log($"Error while reading Olympus config file: {nameof(JsonElement)} 'install' is not of type {nameof(Int32)}.", LogLevel.Error);
                 return false;
@@ -167,7 +167,7 @@ namespace Editor
                 celesteInstalls.Add(path);
             }
 
-            activeCelesteDirectory = celesteInstalls[Math.Clamp(celesteInstallID - 1, 0, celesteInstalls.Count)];
+            activeCelesteDirectory = celesteInstalls[Math.Clamp(celesteInstallId - 1, 0, celesteInstalls.Count)];
             return true;
         }
 
@@ -200,8 +200,8 @@ namespace Editor
                 }
 
                 using ModuleDefinition game = ModuleDefinition.ReadModule(gamePath);
-                TypeDefinition t_Celeste = game.GetType("Celeste.Celeste");
-                if (t_Celeste == null)
+                TypeDefinition tCeleste = game.GetType("Celeste.Celeste");
+                if (tCeleste == null)
                     return false;
 
                 // Find Celeste .ctor (luckily only has one)
@@ -209,38 +209,38 @@ namespace Editor
                 string versionString = null;
                 int[] versionInts = null;
 
-                MethodDefinition c_Celeste =
-                    t_Celeste.FindMethod("System.Void orig_ctor_Celeste()") ??
-                    t_Celeste.FindMethod("System.Void .ctor()");
+                MethodDefinition cCeleste =
+                    tCeleste.FindMethod("System.Void orig_ctor_Celeste()") ??
+                    tCeleste.FindMethod("System.Void .ctor()");
 
-                if (c_Celeste != null && c_Celeste.HasBody)
+                if (cCeleste != null && cCeleste.HasBody)
                 {
-                    Mono.Collections.Generic.Collection<Instruction> instrs = c_Celeste.Body.Instructions;
+                    Mono.Collections.Generic.Collection<Instruction> instrs = cCeleste.Body.Instructions;
                     for (int instri = 0; instri < instrs.Count; instri++)
                     {
                         Instruction instr = instrs[instri];
-                        MethodReference c_Version = instr.Operand as MethodReference;
-                        if (instr.OpCode != OpCodes.Newobj || c_Version?.DeclaringType?.FullName != "System.Version")
+                        MethodReference cVersion = instr.Operand as MethodReference;
+                        if (instr.OpCode != OpCodes.Newobj || cVersion?.DeclaringType?.FullName != "System.Version")
                             continue;
 
                         // We're constructing a System.Version - check if all parameters are of type int.
-                        bool c_Version_intsOnly = true;
-                        foreach (ParameterReference param in c_Version.Parameters)
+                        bool cVersionIntsOnly = true;
+                        foreach (ParameterReference param in cVersion.Parameters)
                             if (param.ParameterType.MetadataType != MetadataType.Int32)
                             {
-                                c_Version_intsOnly = false;
+                                cVersionIntsOnly = false;
                                 break;
                             }
 
-                        if (c_Version_intsOnly)
+                        if (cVersionIntsOnly)
                         {
                             // Assume that ldc.i4* instructions are right before the newobj.
-                            versionInts = new int[c_Version.Parameters.Count];
+                            versionInts = new int[cVersion.Parameters.Count];
                             for (int i = -versionInts.Length; i < 0; i++)
                                 versionInts[i + versionInts.Length] = instrs[i + instri].GetInt();
                         }
 
-                        if (c_Version.Parameters.Count == 1 && c_Version.Parameters[0].ParameterType.MetadataType == MetadataType.String)
+                        if (cVersion.Parameters.Count == 1 && cVersion.Parameters[0].ParameterType.MetadataType == MetadataType.String)
                         {
                             // Assume that a ldstr is right before the newobj.
                             versionString = instrs[instri - 1].Operand as string;
@@ -264,11 +264,11 @@ namespace Editor
                 else if (versionInts.Length == 4)
                     version = new Version(versionInts[0], versionInts[1], versionInts[2], versionInts[3]);
 
-                TypeDefinition t_Everest = game.GetType("Celeste.Mod.Everest");
-                if (t_Everest != null)
+                TypeDefinition tEverest = game.GetType("Celeste.Mod.Everest");
+                if (tEverest != null)
                 {
                     // The first operation in .cctor is ldstr with the version string.
-                    string versionModStr = (string) t_Everest.FindMethod("System.Void .cctor()").Body.Instructions[0].Operand;
+                    string versionModStr = (string) tEverest.FindMethod("System.Void .cctor()").Body.Instructions[0].Operand;
                     int versionSplitIndex = versionModStr.IndexOf('-');
                     if (versionSplitIndex != -1 && Version.TryParse(versionModStr.AsSpan(0, versionSplitIndex), out Version versionMod))
                     {

@@ -4,7 +4,7 @@ namespace Editor.Celeste
 {
     public class ModeProperties
     {
-        public string PoemID;
+        public string PoemId;
         public string StartLevel;
         public PlayerInventory Inventory;
         public AudioState AudioState;

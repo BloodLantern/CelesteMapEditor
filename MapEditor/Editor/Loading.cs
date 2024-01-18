@@ -104,7 +104,7 @@ namespace Editor
             if (!Started)
                 return;
 
-            bool darkStyle = session.Config.UI.Style == ImGuiStyles.Style.Dark;
+            bool darkStyle = session.Config.Ui.Style == ImGuiStyles.Style.Dark;
             Color drawColor = darkStyle ? Color.White : Color.Black;
             Vector2 center = app.WindowSize.ToVector2() / 2;
             Vector2 low = new(center.X, app.WindowSize.Y * 3/4);
@@ -115,8 +115,8 @@ namespace Editor
             else
                 spriteBatch.DrawArc(center, LoadingCircleRadius, LoadingCircleResolution, LoadingCircleStartingAngle, Progress * MathHelper.TwoPi, drawColor, LoadingCircleThickness);
             
-            string ProgressString = Progress.ToString(ProgressFormat);
-            spriteBatch.DrawString(session.UbuntuRegularFont, ProgressString, center - session.UbuntuRegularFont.MeasureString(ProgressString) / 2, drawColor);
+            string progressString = Progress.ToString(ProgressFormat);
+            spriteBatch.DrawString(session.UbuntuRegularFont, progressString, center - session.UbuntuRegularFont.MeasureString(progressString) / 2, drawColor);
 
             if (ShowLoadingString)
             {

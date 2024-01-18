@@ -51,16 +51,21 @@ namespace Editor
         public MapViewer MapViewer;
 
         public RenderTarget2D ImGuiRenderTarget;
-        public UIManager UIManager;
+        public UiManager UiManager;
 
         public Loading Loading;
         public RenderTarget2D LoadingRenderTarget;
 
         public Point WindowSize => GraphicsDevice.PresentationParameters.Bounds.Size;
 
-        public int FPS { get; private set; }
+        public int Fps { get; private set; }
+        public long Memory { get; private set; }
+        public const float StatisticsUpdateInterval = 1f;
 
-        private float lastTotalGameTime = 0f;
+        public GameTime GameTime;
+        public TimeSpan TotalGameTime => GameTime.TotalGameTime;
+        public float TotalGameTimeSeconds => (float) TotalGameTime.TotalSeconds;
+        public float LastTotalGameTime;
 
         private readonly List<(string, Stopwatch)> debugStrings = new();
 
@@ -89,8 +94,8 @@ namespace Editor
 
             Session = new(this);
 
-            UIManager = new(this);
-            UIManager.AddComponent(new DebugConsole(Session));
+            UiManager = new(this);
+            UiManager.AddComponent(new DebugConsole(Session));
 
             Window.AllowUserResizing = true;
             ReloadGraphics(Session.Config.Graphics);
@@ -141,14 +146,14 @@ namespace Editor
                     loading.Progress += 0.04f;
 
                     loading.CurrentText = "Loading UI";
-                    UIManager.AddRange(new UIComponent[]
+                    UiManager.AddRange(new UiComponent[]
                         {
+                            new ConfigurationEditor(this),
                             new ModDependencies(Session),
                             new LayerSelection(this),
-                            new ConfigurationEditor(this),
-                            new UIStyleEditor(),
+                            new LeftPanel(this),
                             new MenuBar(this),
-                            new LeftPanel(this)
+                            new PerformanceSummary(this)
                         }
                     );
                     loading.Progress += 0.05f;
@@ -185,6 +190,8 @@ namespace Editor
 
         protected override void Update(GameTime time)
         {
+            GameTime = time;
+            
             // Clear ImGui focus if the mouse clicked (with middle or right click, left is done by default) outside of a window
             if (!ImGui.GetIO().WantCaptureMouse)
             {
@@ -211,11 +218,11 @@ namespace Editor
                     // On loading state change
                     if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
                     {
-                        LeftPanel leftPanel = UIManager.GetComponent<LeftPanel>();
+                        LeftPanel leftPanel = UiManager.GetComponent<LeftPanel>();
                         leftPanel.Visible = true;
                         leftPanel.StartMoveInRoutine();
 
-                        MenuBar menuBar = UIManager.GetComponent<MenuBar>();
+                        MenuBar menuBar = UiManager.GetComponent<MenuBar>();
                         menuBar.Visible = true;
                         menuBar.StartMoveInRoutine();
 
@@ -226,17 +233,22 @@ namespace Editor
             }
 
             Coroutine.UpdateAll(time);
-            float totalTime = (float) time.TotalGameTime.TotalSeconds;
-            if (Calc.OnInterval(totalTime, lastTotalGameTime, 1f))
-                FPS = (int) MathF.Round(1f / time.GetElapsedSeconds());
-            lastTotalGameTime = totalTime;
-            Logger.UpdateLogsAsync();
+            if (Calc.OnInterval(TotalGameTimeSeconds, LastTotalGameTime, StatisticsUpdateInterval))
+            {
+                Fps = (int) MathF.Round(1f / time.GetElapsedSeconds());
+                Memory = GC.GetTotalMemory(false);
+            }
+            
+            UiManager.UpdateComponents(time);
 
             for (int i = 0; i < debugStrings.Count; i++)
             {
                 if (debugStrings[i].Item2.GetElapsedSeconds() > 1f)
                     debugStrings.RemoveAt(i--);
             }
+
+            LastTotalGameTime = TotalGameTimeSeconds;
+            Logger.UpdateLogsAsync();
 
             base.Update(time);
         }
@@ -247,7 +259,7 @@ namespace Editor
             GraphicsDevice.Clear(Color.Transparent);
             ImGuiRenderer.BeginLayout(time);
 
-            UIManager.RenderComponents(RenderingCall.BeforeEverything);
+            UiManager.RenderComponents(RenderingCall.BeforeEverything);
 
             if (Loading != null)
                 ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 1f - Loading.DrawAlpha);
@@ -255,27 +267,27 @@ namespace Editor
             switch (CurrentState)
             {
                 case State.Editor:
-                    UIManager.RenderComponents(RenderingCall.StateEditor);
+                    UiManager.RenderComponents(RenderingCall.StateEditor);
 
                     if (Session.Config.DebugMode)
                         MapViewer.RenderDebug(time);
                     break;
                 case State.Loading:
-                    UIManager.RenderComponents(RenderingCall.StateLoading);
+                    UiManager.RenderComponents(RenderingCall.StateLoading);
                     break;
             }
 
             if (Loading != null)
                 ImGui.PopStyleVar();
 
-            UIManager.RenderComponents(RenderingCall.AfterEverything);
+            UiManager.RenderComponents(RenderingCall.AfterEverything);
 
             ImGuiRenderer.EndLayout();
 
             if (Loading != null)
             {
                 // Loading RenderTarget
-                bool darkStyle = Session.Config.UI.Style == ImGuiStyles.Style.Dark;
+                bool darkStyle = Session.Config.Ui.Style == ImGuiStyles.Style.Dark;
 
                 GraphicsDevice.SetRenderTarget(LoadingRenderTarget);
                 GraphicsDevice.Clear(darkStyle ? new Color(0xFF202020) : Color.Gray);
@@ -311,15 +323,15 @@ namespace Editor
             {
                 Vector2 position = new(10f, 0f);
 
-                LeftPanel leftPanel = UIManager.GetComponent<LeftPanel>();
+                LeftPanel leftPanel = UiManager.GetComponent<LeftPanel>();
                 if (leftPanel != null)
                     position.X += leftPanel.CurrentX + leftPanel.Size.X;
 
-                MenuBar menuBar = UIManager.GetComponent<MenuBar>();
+                MenuBar menuBar = UiManager.GetComponent<MenuBar>();
                 if (menuBar != null)
                     position.Y += menuBar.CurrentY + menuBar.Size.Y;
 
-                SpriteBatch.DrawString(Session.UbuntuRegularFont, $"FPS: {FPS}", position, Color.White);
+                SpriteBatch.DrawString(Session.UbuntuRegularFont, $"FPS: {Fps}", position, Color.White);
             }
 
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
@@ -334,7 +346,7 @@ namespace Editor
 
         protected override void EndRun()
         {
-            UIManager.SaveComponents();
+            UiManager.SaveComponents();
 
             // Save config
             Session.Exit();

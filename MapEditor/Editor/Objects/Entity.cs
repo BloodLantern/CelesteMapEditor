@@ -10,7 +10,7 @@ namespace Editor.Objects
 {
     public class Entity : MapObject
     {
-        private static readonly Dictionary<string, Texture> textureLookupTable = new()
+        private static readonly Dictionary<string, Texture> TextureLookupTable = new()
         {
             {
                 "goldenBerry",
@@ -76,13 +76,13 @@ namespace Editor.Objects
         {
             if (Atlas.Gameplay.Textures.ContainsKey(Name))
                 Texture = Atlas.Gameplay[Name];
-            else if (textureLookupTable.ContainsKey(Name))
-                Texture = textureLookupTable[Name];
+            else if (TextureLookupTable.ContainsKey(Name))
+                Texture = TextureLookupTable[Name];
             else
             {
                 // TODO don't hardcode this
                 if (Name.StartsWith("summitgem"))
-                    Texture = textureLookupTable[Name + EntityData.Int("gem")];
+                    Texture = TextureLookupTable[Name + EntityData.Int("gem")];
             }
         }
 

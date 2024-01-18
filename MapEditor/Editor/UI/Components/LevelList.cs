@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Editor.UI.Components
 {
-    public class LevelList : UIComponent
+    public class LevelList : UiComponent
     {
         private MapViewer mapViewer;
 

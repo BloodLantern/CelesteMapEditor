@@ -4,7 +4,7 @@ using System;
 
 namespace Editor.UI.Components
 {
-    public class LayerSelection : UIComponent, ICloseable
+    public class LayerSelection : UiComponent, ICloseable
     {
         public enum LayerType : byte
         {

@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Editor.UI.Components
 {
-    public class ModDependencies : UIComponent, ICloseable
+    public class ModDependencies : UiComponent, ICloseable
     {
         public Session Session;
 
@@ -86,7 +86,7 @@ namespace Editor.UI.Components
 
             ImGui.SameLine();
 
-            if (mod.DLL == null && mod.Dependencies.Count == 0 && mod.OptionalDependencies.Count == 0)
+            if (mod.Dll == null && mod.Dependencies.Count == 0 && mod.OptionalDependencies.Count == 0)
             {
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 27);
                 ImGui.Text(mod.NameAndVersion);
@@ -95,8 +95,8 @@ namespace Editor.UI.Components
 
             if (ImGui.TreeNode(mod.NameAndVersion))
             {
-                if (mod.DLL != null)
-                    ImGui.Text($"DLL path: {mod.DLL}");
+                if (mod.Dll != null)
+                    ImGui.Text($"DLL path: {mod.Dll}");
 
                 if (mod.Dependencies.Count > 0 && ImGui.TreeNode($"Dependencies: {mod.Dependencies.Count}"))
                 {

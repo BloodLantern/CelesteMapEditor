@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace Editor.UI.Components
 {
-    public class LeftPanel : UIComponent
+    public class LeftPanel : UiComponent
     {
         private const float DefaultWidth = 200f;
         private const ImGuiWindowFlags WindowFlags =
@@ -39,7 +39,7 @@ namespace Editor.UI.Components
             ModExplorer = new(app);
         }
 
-        internal override void Initialize(UIManager manager)
+        internal override void Initialize(UiManager manager)
         {
             menuBar = manager.GetComponent<MenuBar>();
 

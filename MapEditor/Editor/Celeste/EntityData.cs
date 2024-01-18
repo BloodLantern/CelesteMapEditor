@@ -7,7 +7,7 @@ namespace Editor.Celeste
 {
     public class EntityData
     {
-        public int ID;
+        public int Id;
         public string Name;
         public LevelData Level;
         /// <summary>

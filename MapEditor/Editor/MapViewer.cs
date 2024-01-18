@@ -60,7 +60,7 @@ namespace Editor
 
         public void Initialize()
         {
-            LayerSelection = App.UIManager.GetComponent<LayerSelection>();
+            LayerSelection = App.UiManager.GetComponent<LayerSelection>();
         }
 
         public void InitializeCamera()
@@ -87,8 +87,8 @@ namespace Editor
 
             AddObjectsToMainList();
 
-            ImGuiIOPtr imGuiIO = ImGui.GetIO();
-            if (imGuiIO.WantCaptureMouse || imGuiIO.WantCaptureKeyboard)
+            ImGuiIOPtr imGuiIo = ImGui.GetIO();
+            if (imGuiIo.WantCaptureMouse || imGuiIo.WantCaptureKeyboard)
                 return;
 
             HandleInputs(time, mouse, keyboard);

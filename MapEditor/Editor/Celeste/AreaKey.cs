@@ -12,19 +12,19 @@ namespace Editor.Celeste
         public const string DefaultCampaign = "Uncategorized";
         public const string VanillaCampaign = "Celeste";
 
-        public int ID = 0;
+        public int Id = 0;
         public AreaMode Mode = AreaMode.Normal;
         public string Campaign = DefaultCampaign;
 
         public AreaKey(int id, AreaMode mode = AreaMode.Normal, string campaign = DefaultCampaign)
         {
-            ID = id;
+            Id = id;
             Mode = mode;
             Campaign = campaign;
         }
 
         /// <summary>
-        /// Tries to load the <see cref="ID"/> and the <see cref="Mode"/> using the map file name.
+        /// Tries to load the <see cref="Id"/> and the <see cref="Mode"/> using the map file name.
         /// Also checks if the file is located in <see cref="Session.CelesteContentDirectory"/> and
         /// sets the <see cref="Campaign"/> to the vanilla one if it is the case.
         /// </summary>
@@ -43,7 +43,7 @@ namespace Editor.Celeste
                     while (digitCount < prefix.Length && char.IsNumber(prefix[digitCount]))
                         digitCount++;
 
-                    ID = int.Parse(prefix[..digitCount]);
+                    Id = int.Parse(prefix[..digitCount]);
 
                     if (digitCount < prefix.Length)
                     {
@@ -67,7 +67,7 @@ namespace Editor.Celeste
                     suffixIndex = 1;
 
                 // If there was no prefix or if there was one but there is also a suffix
-                if (ID == -1 || suffixIndex == 2)
+                if (Id == -1 || suffixIndex == 2)
                 {
                     string suffix = fileNameParts[suffixIndex];
 
@@ -95,11 +95,11 @@ namespace Editor.Celeste
 
         public override readonly bool Equals(object obj) => obj is AreaKey && this == obj as AreaKey?;
 
-        public override readonly int GetHashCode() => (int) (ID * 3 + Mode);
+        public override readonly int GetHashCode() => (int) (Id * 3 + Mode);
 
         public override readonly string ToString()
         {
-            string result = Campaign + '/' + ID;
+            string result = Campaign + '/' + Id;
             switch (Mode)
             {
                 case AreaMode.Normal:
@@ -119,7 +119,7 @@ namespace Editor.Celeste
 
         public static bool operator ==(AreaKey a, AreaKey b)
         {
-            return a.ID == b.ID && a.Mode == b.Mode && a.Campaign == b.Campaign;
+            return a.Id == b.Id && a.Mode == b.Mode && a.Campaign == b.Campaign;
         }
 
         public static bool operator !=(AreaKey a, AreaKey b)

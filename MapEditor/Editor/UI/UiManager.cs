@@ -1,39 +1,40 @@
 ﻿using Editor.Saved;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Editor.UI
 {
-    public class UIManager : IEnumerable<UIComponent>
+    public class UiManager : IEnumerable<UiComponent>
     {
-        public readonly List<UIComponent> Components = new();
+        public readonly List<UiComponent> Components = new();
         private readonly Application app;
         public readonly Config Config;
 
-        public UIManager(Application app)
+        public UiManager(Application app)
         {
             this.app = app;
             Config = app.Session.Config;
         }
 
-        public void AddComponent(UIComponent component)
+        public void AddComponent(UiComponent component)
         {
             Components.Add(component);
 
             component.Initialize(this);
         }
 
-        public void AddRange(IEnumerable<UIComponent> components)
+        public void AddRange(IEnumerable<UiComponent> components)
         {
             Components.AddRange(components);
 
-            foreach (UIComponent component in components)
+            foreach (UiComponent component in components)
                 component.Initialize(this);
         }
 
-        public T GetComponent<T>() where T : UIComponent
+        public T GetComponent<T>() where T : UiComponent
         {
-            foreach (UIComponent component in Components)
+            foreach (UiComponent component in Components)
             {
                 if (component is T t)
                     return t;
@@ -41,10 +42,10 @@ namespace Editor.UI
             return null;
         }
 
-        public List<T> GetComponents<T>() where T : UIComponent
+        public List<T> GetComponents<T>() where T : UiComponent
         {
             List<T> result = new();
-            foreach (UIComponent component in Components)
+            foreach (UiComponent component in Components)
             {
                 if (component is T t)
                     result.Add(t);
@@ -52,9 +53,18 @@ namespace Editor.UI
             return result;
         }
 
+        public void UpdateComponents(GameTime time)
+        {
+            foreach (UiComponent component in Components)
+            {
+                if (component is IUpdateable updateable)
+                    updateable.Update(time);
+            }
+        }
+
         public void RenderComponents(RenderingCall call)
         {
-            foreach (UIComponent component in Components)
+            foreach (UiComponent component in Components)
             {
                 if (component.Call == call)
                     component.Render();
@@ -63,11 +73,11 @@ namespace Editor.UI
 
         internal void SaveComponents()
         {
-            foreach (UIComponent component in Components)
+            foreach (UiComponent component in Components)
                 component.Save(Config);
         }
 
-        public IEnumerator<UIComponent> GetEnumerator() => Components.GetEnumerator();
+        public IEnumerator<UiComponent> GetEnumerator() => Components.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => Components.GetEnumerator();
     }

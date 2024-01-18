@@ -1,6 +1,6 @@
 ﻿namespace Editor.PlatformSpecific
 {
-    public class MacOS
+    public class MacOs
     {
 #if OSX
 #endif

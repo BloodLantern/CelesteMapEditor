@@ -16,7 +16,7 @@ namespace Editor
         /// </summary>
         private class TerrainType
         {
-            public char ID;
+            public char Id;
             public HashSet<char> Ignores = new();
             public List<MaskedTile> Masked = new();
             public Tile Padded = new();
@@ -25,7 +25,7 @@ namespace Editor
 
             public TerrainType(char id, Tileset tileset)
             {
-                ID = id;
+                Id = id;
                 Tileset = tileset;
             }
 
@@ -81,7 +81,7 @@ namespace Editor
                 if (otherId is '0' or char.MinValue)
                     return 0;
 
-                if (otherId == ID)
+                if (otherId == Id)
                     return 1;
 
                 if (Ignores.Contains('*') || Ignores.Contains(otherId))
@@ -121,7 +121,7 @@ namespace Editor
         public Autotiler(string filename, TileType tileType)
         {
             Dictionary<char, XmlElement> loadedTilesets = new();
-            foreach (XmlElement tilesetXml in Calc.LoadContentXML(filename).GetElementsByTagName("Tileset"))
+            foreach (XmlElement tilesetXml in Calc.LoadContentXml(filename).GetElementsByTagName("Tileset"))
             {
                 char id = tilesetXml.AttrChar("id");
                 Tileset tileset = new(Atlas.Gameplay["tilesets/" + tilesetXml.Attr("path")]);

@@ -15,7 +15,7 @@ namespace Editor.Extensions
             return new Color(r, g, b, color.A);
         }
 
-        public static void ToHSV(this Color color, out float hue, out float saturation, out float value)
+        public static void ToHsv(this Color color, out float hue, out float saturation, out float value)
         {
             float r = color.R / 255f;
             float g = color.G / 255f;

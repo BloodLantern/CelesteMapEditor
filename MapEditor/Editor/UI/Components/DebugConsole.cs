@@ -8,7 +8,7 @@ using System;
 
 namespace Editor.UI.Components
 {
-    public class DebugConsole : UIComponent, ICloseable
+    public class DebugConsole : UiComponent, ICloseable
     {
         public LogLevel LogLevel = LogLevel.Debug;
         public Session Session;
@@ -16,7 +16,7 @@ namespace Editor.UI.Components
         private bool windowOpen = false;
 
         public bool WindowOpen { get => windowOpen; set => windowOpen = value; }
-        public string KeyboardShortcut { get; set; }
+        public string KeyboardShortcut { get; } = "`";
 
         public DebugConsole(Session session) : base(RenderingCall.AfterEverything) => Session = session;
 
@@ -66,7 +66,7 @@ namespace Editor.UI.Components
                     _ => throw new InvalidOperationException("Invalid log level")
                 };
 
-                if (Session.Config.UI.Style == ImGuiStyles.Style.Light)
+                if (Session.Config.Ui.Style == ImGuiStyles.Style.Light)
                     color = color.Inverse();
 
                 ImGui.TextColored(color.ToVector4().ToNumerics(), log);

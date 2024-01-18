@@ -226,7 +226,7 @@ namespace Editor.Celeste
                 foreach (KeyValuePair<string, object> attribute in entity.Attributes)
                 {
                     if (attribute.Key == "id")
-                        result.ID = (int) attribute.Value;
+                        result.Id = (int) attribute.Value;
                     else if (attribute.Key == "x")
                         result.Position.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "y")

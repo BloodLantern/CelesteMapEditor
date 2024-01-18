@@ -1,9 +1,9 @@
 ﻿namespace Editor.UI
 {
-    internal interface ICloseable
+    public interface ICloseable
     {
         bool WindowOpen { get; set; }
 
-        string KeyboardShortcut { get; set; }
+        string KeyboardShortcut { get; }
     }
 }

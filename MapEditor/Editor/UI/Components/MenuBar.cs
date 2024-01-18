@@ -11,7 +11,7 @@ using System.Numerics;
 
 namespace Editor.UI.Components
 {
-    public class MenuBar : UIComponent
+    public class MenuBar : UiComponent
     {
         private const float MoveInDuration = 0.5f;
         private const float DefaultHeight = 30f;
@@ -43,7 +43,7 @@ namespace Editor.UI.Components
             mapViewer = app.MapViewer;
         }
 
-        internal override void Initialize(UIManager manager)
+        internal override void Initialize(UiManager manager)
         {
             modDependencies = manager.GetComponent<ModDependencies>();
             layerSelection = manager.GetComponent<LayerSelection>();
@@ -77,33 +77,32 @@ namespace Editor.UI.Components
 
         private void FileMenu(Config config)
         {
-            if (ImGui.BeginMenu("File"))
-            {
-                FileMenuNew();
-                FileMenuOpen();
-                if (config.RecentEditedFiles.Count > 0)
-                    FileMenuOpenRecent(config);
+            if (!ImGui.BeginMenu("File"))
+                return;
+            
+            FileMenuNew();
+            FileMenuOpen();
+            if (config.RecentEditedFiles.Count > 0)
+                FileMenuOpenRecent(config);
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                FileMenuSave();
-                FileMenuSaveAll();
-                FileMenuSaveAs();
+            FileMenuSave();
+            FileMenuSaveAll();
+            FileMenuSaveAs();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                FileMenuRestart();
-                FileMenuExit();
+            FileMenuRestart();
+            FileMenuExit();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void FileMenuNew()
         {
-            if (ImGui.MenuItem("New"))
-            {
-            }
+            if (!ImGui.MenuItem("New"))
+                return;
         }
 
         private static readonly IEnumerable<NfdFilter> OpenFileFilters = new List<NfdFilter>()
@@ -114,307 +113,292 @@ namespace Editor.UI.Components
 
         private void FileMenuOpen()
         {
-            if (ImGui.MenuItem("Open"))
+            if (!ImGui.MenuItem("Open"))
+                return;
+            
+            NfdDialogResult result = Nfd.FileOpen(OpenFileFilters);
+            switch (result.Status)
             {
-                NfdDialogResult result = Nfd.FileOpen(OpenFileFilters);
-                switch (result.Status)
-                {
-                    case NfdStatus.Ok:
-                        switch (Path.GetExtension(result.Path).ToLower())
-                        {
-                            case ".bin":
-                                app.LoadMap(result.Path);
-                                break;
-                            case ".zip":
-                                app.LoadModZip(result.Path);
-                                break;
-                        }
-                        break;
+                case NfdStatus.Ok:
+                    switch (Path.GetExtension(result.Path).ToLower())
+                    {
+                        case ".bin":
+                            app.LoadMap(result.Path);
+                            break;
+                        case ".zip":
+                            app.LoadModZip(result.Path);
+                            break;
+                    }
+                    break;
 
-                    case NfdStatus.Error:
-                        // TODO notify the user an error occurred
-                        //errorMessage = result.Error;
-                        break;
-                }
+                case NfdStatus.Error:
+                    // TODO notify the user an error occurred
+                    //errorMessage = result.Error;
+                    break;
             }
         }
 
         private void FileMenuOpenRecent(Config config)
         {
-            if (ImGui.BeginMenu("Open Recent"))
+            if (!ImGui.BeginMenu("Open Recent"))
+                return;
+            
+            string mapToLoad = string.Empty;
+            foreach (string file in config.RecentEditedFiles)
             {
-                string mapToLoad = string.Empty;
-                foreach (string file in config.RecentEditedFiles)
-                {
-                    if (ImGui.MenuItem(file))
-                        mapToLoad = file;
-                }
-
-                if (mapToLoad != string.Empty)
-                    app.LoadMap(mapToLoad);
-
-                ImGui.EndMenu();
+                if (ImGui.MenuItem(file))
+                    mapToLoad = file;
             }
+
+            if (mapToLoad != string.Empty)
+                app.LoadMap(mapToLoad);
+
+            ImGui.EndMenu();
         }
 
         private void FileMenuSave()
         {
-            if (ImGui.MenuItem("Save"))
-            {
-            }
+            if (!ImGui.MenuItem("Save"))
+                return;
         }
 
         private void FileMenuSaveAll()
         {
-            if (ImGui.MenuItem("Save All"))
-            {
-            }
+            if (!ImGui.MenuItem("Save All"))
+                return;
         }
 
         private void FileMenuSaveAs()
         {
-            if (ImGui.MenuItem("Save As"))
-            {
-            }
+            if (!ImGui.MenuItem("Save As"))
+                return;
         }
 
         private void FileMenuRestart()
         {
-            if (ImGui.MenuItem("Restart"))
-            {
-                app.Restart();
-            }
+            if (!ImGui.MenuItem("Restart"))
+                return;
+            
+            app.Restart();
         }
 
         private void FileMenuExit()
         {
-            if (ImGui.MenuItem("Exit"))
-            {
-                app.Exit();
-            }
+            if (!ImGui.MenuItem("Exit"))
+                return;
+            
+            app.Exit();
         }
 
         private void EditMenu()
         {
-            if (ImGui.BeginMenu("Edit"))
-            {
-                EditMenuUndo();
-                EditMenuRedo();
+            if (!ImGui.BeginMenu("Edit"))
+                return;
+            
+            EditMenuUndo();
+            EditMenuRedo();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                EditMenuCut();
-                EditMenuCopy();
-                EditMenuPaste();
+            EditMenuCut();
+            EditMenuCopy();
+            EditMenuPaste();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                EditMenuSelectAll();
+            EditMenuSelectAll();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                EditMenuConfiguration();
+            EditMenuConfiguration();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void EditMenuUndo()
         {
-            if (ImGui.MenuItem("Undo"))
-            {
-            }
+            if (!ImGui.MenuItem("Undo"))
+                return;
         }
 
         private void EditMenuRedo()
         {
-            if (ImGui.MenuItem("Redo"))
-            {
-            }
+            if (!ImGui.MenuItem("Redo"))
+                return;
         }
 
         private void EditMenuCut()
         {
-            if (ImGui.MenuItem("Cut"))
-            {
-            }
+            if (!ImGui.MenuItem("Cut"))
+                return;
         }
 
         private void EditMenuCopy()
         {
-            if (ImGui.MenuItem("Copy"))
-            {
-            }
+            if (!ImGui.MenuItem("Copy"))
+                return;
         }
 
         private void EditMenuPaste()
         {
-            if (ImGui.MenuItem("Paste"))
-            {
-            }
+            if (!ImGui.MenuItem("Paste"))
+                return;
         }
 
         private void EditMenuSelectAll()
         {
-            if (ImGui.MenuItem("Select All"))
-                mapViewer.Selection.SelectAll();
+            if (!ImGui.MenuItem("Select All"))
+                return;
+            
+            mapViewer.Selection.SelectAll();
         }
 
         private void EditMenuConfiguration()
         {
-            if (ImGui.MenuItem("Configuration"))
-            {
-            }
+            if (!ImGui.MenuItem("Configuration"))
+                return;
         }
 
         private void ViewMenu()
         {
-            if (ImGui.BeginMenu("View"))
+            if (!ImGui.BeginMenu("View"))
+                return;
+            
+            foreach (UiComponent component in app.UiManager)
             {
-                foreach (UIComponent component in app.UIManager)
+                if (component is ICloseable closeable)
                 {
-                    if (component is ICloseable closeable)
-                    {
-                        bool open = closeable.WindowOpen;
-                        ImGui.MenuItem(Calc.HumanizeString(component.GetType().Name), closeable.KeyboardShortcut, ref open);
-                        closeable.WindowOpen = open;
-                    }
+                    bool open = closeable.WindowOpen;
+                    ImGui.MenuItem(Calc.HumanizeString(component.GetType().Name), closeable.KeyboardShortcut != string.Empty ? closeable.KeyboardShortcut : null, ref open);
+                    closeable.WindowOpen = open;
                 }
-
-                ImGui.EndMenu();
             }
+
+            ImGui.EndMenu();
         }
 
         private void ModMenu()
         {
-            if (ImGui.BeginMenu("Mod"))
-            {
-                ModMenuShowDependencies();
+            if (!ImGui.BeginMenu("Mod"))
+                return;
+            
+            ModMenuShowDependencies();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void ModMenuShowDependencies()
         {
-            if (ImGui.MenuItem("Show dependencies"))
-                modDependencies.WindowOpen = true;
+            if (!ImGui.MenuItem("Show dependencies"))
+                return;
+            
+            modDependencies.WindowOpen = true;
         }
 
         private void MapMenu()
         {
-            if (ImGui.BeginMenu("Map"))
-            {
-                MapMenuStylegrounds();
-                MapMenuMetadata();
+            if (!ImGui.BeginMenu("Map"))
+                return;
+            
+            MapMenuStylegrounds();
+            MapMenuMetadata();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                MapMenuSaveMapImage();
+            MapMenuSaveMapImage();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void MapMenuStylegrounds()
         {
-            if (ImGui.MenuItem("Stylegrounds"))
-            {
-            }
+            if (!ImGui.MenuItem("Stylegrounds"))
+                return;
         }
 
         private void MapMenuMetadata()
         {
-            if (ImGui.MenuItem("Metadata"))
-            {
-            }
+            if (!ImGui.MenuItem("Metadata"))
+                return;
         }
 
         private void MapMenuSaveMapImage()
         {
-            if (ImGui.MenuItem("Save map image"))
-            {
-            }
+            if (!ImGui.MenuItem("Save map image"))
+                return;
         }
 
         private void RoomMenu()
         {
-            if (ImGui.BeginMenu("Room"))
-            {
-                RoomMenuAddRoom();
-                RoomMenuAddFiller();
-                RoomMenuAddFillerRoom();
+            if (!ImGui.BeginMenu("Room"))
+                return;
+            
+            RoomMenuAddRoom();
+            RoomMenuAddFiller();
+            RoomMenuAddFillerRoom();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                RoomMenuEdit();
+            RoomMenuEdit();
 
-                ImGui.Separator();
+            ImGui.Separator();
 
-                RoomMenuDelete();
+            RoomMenuDelete();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void RoomMenuAddRoom()
         {
-            if (ImGui.MenuItem("Add room"))
-            {
-            }
+            if (!ImGui.MenuItem("Add room"))
+                return;
         }
 
         private void RoomMenuAddFiller()
         {
-            if (ImGui.MenuItem("Add filler"))
-            {
-            }
+            if (!ImGui.MenuItem("Add filler"))
+                return;
         }
 
         private void RoomMenuAddFillerRoom()
         {
-            if (ImGui.MenuItem("Add filler room"))
-            {
-            }
+            if (!ImGui.MenuItem("Add filler room"))
+                return;
         }
 
         private void RoomMenuEdit()
         {
-            if (ImGui.MenuItem("Edit"))
-            {
-            }
+            if (!ImGui.MenuItem("Edit"))
+                return;
         }
 
         private void RoomMenuDelete()
         {
-            if (ImGui.MenuItem("Delete"))
-            {
-            }
+            if (!ImGui.MenuItem("Delete"))
+                return;
         }
 
         private void HelpMenu()
         {
-            if (ImGui.BeginMenu("Help"))
-            {
-                HelpMenuCheckForUpdates();
-                HelpMenuAbout();
+            if (!ImGui.BeginMenu("Help"))
+                return;
+            
+            HelpMenuCheckForUpdates();
+            HelpMenuAbout();
 
-                ImGui.EndMenu();
-            }
+            ImGui.EndMenu();
         }
 
         private void HelpMenuCheckForUpdates()
         {
-            if (ImGui.MenuItem("Check for updates"))
-            {
-            }
+            if (!ImGui.MenuItem("Check for updates"))
+                return;
         }
 
         private void HelpMenuAbout()
         {
-            if (ImGui.MenuItem("About"))
-            {
-            }
+            if (!ImGui.MenuItem("About"))
+                return;
         }
 
         public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-DefaultHeight, 0f, MoveInDuration));
