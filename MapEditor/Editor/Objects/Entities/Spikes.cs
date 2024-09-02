@@ -1,7 +1,6 @@
 ﻿using Editor.Celeste;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
@@ -34,19 +33,19 @@ namespace Editor.Objects.Entities
             {
                 case "up":
                     Direction = Directions.Up;
-                    Length = data.Size.X;
+                    Length = (int) data.Size.X;
                     break;
                 case "down":
                     Direction = Directions.Down;
-                    Length = data.Size.X;
+                    Length = (int) data.Size.X;
                     break;
                 case "left":
                     Direction = Directions.Left;
-                    Length = data.Size.Y;
+                    Length = (int) data.Size.Y;
                     break;
                 case "right":
                     Direction = Directions.Right;
-                    Length = data.Size.Y;
+                    Length = (int) data.Size.Y;
                     break;
                 default:
                     throw new ArgumentException("Spike direction not handled");
@@ -70,18 +69,24 @@ namespace Editor.Objects.Entities
                         texture.JustifyOrigin(0.5f, 1f);
                         texture.Offset = new((i + 0.5f) * Tileset.TileSize, 1f);
                         break;
+                    
                     case Directions.Down:
                         texture.JustifyOrigin(0.5f, 0f);
                         texture.Offset = new((i + 0.5f) * Tileset.TileSize, -1f);
                         break;
+                    
                     case Directions.Left:
                         texture.JustifyOrigin(1f, 0.5f);
                         texture.Offset = new(1f, (i + 0.5f) * Tileset.TileSize);
                         break;
+                    
                     case Directions.Right:
                         texture.JustifyOrigin(0f, 0.5f);
                         texture.Offset = new(-1f, (i + 0.5f) * Tileset.TileSize);
                         break;
+                    
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
                 textures.Add(texture);
             }

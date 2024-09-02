@@ -9,9 +9,7 @@ namespace Editor.Celeste
 {
     public static class BinaryPacker
     {
-        private static readonly HashSet<string> IgnoreAttributes = new() {
-            "_eid"
-        };
+        private static readonly HashSet<string> IgnoreAttributes = ["_eid"];
         private const string InnerTextAttributeName = "innerText";
         private const string OutputFileExtension = ".bin";
         private static readonly Dictionary<string, short> StringValue = new();
@@ -230,7 +228,7 @@ namespace Editor.Celeste
 
             byte valueCount = reader.ReadByte();
             if (valueCount > 0)
-                element.Attributes = new Dictionary<string, object>();
+                element.Attributes = new();
 
             for (int i = 0; i < valueCount; ++i)
             {
@@ -270,7 +268,7 @@ namespace Editor.Celeste
 
             short childCount = reader.ReadInt16();
             if (childCount > 0)
-                element.Children = new List<Element>();
+                element.Children = [];
 
             for (int i = 0; i < childCount; ++i)
                 element.Children.Add(ReadElement(reader));

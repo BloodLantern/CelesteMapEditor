@@ -3,7 +3,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Editor.Logging
@@ -32,7 +31,7 @@ namespace Editor.Logging
         public static bool LoggedLastFrame { get; private set; }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Info)
-            => LogsQueue.Enqueue(new LogEntry(message, logLevel, DateTime.Now));
+            => LogsQueue.Enqueue(new(message, logLevel, DateTime.Now));
 
         public static async void UpdateLogsAsync()
         {

@@ -8,63 +8,95 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e022ef6b-7f52-4207-9921-fb42da50708f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/MapEditor/Editor/Utils/StateMachine.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/.gitmodules" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/ImGui.NET" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/shelf/Uncommitted_changes_before_Update_at_1_15_2024_6_31_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/shelf/Uncommitted_changes_before_Update_at_1_15_2024_6_31_PM__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CelesteMapEditor.sln" beforeDir="false" afterPath="$PROJECT_DIR$/CelesteMapEditor.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Application.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Application.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Atlas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Atlas.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Autotiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Autotiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/AreaKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/AreaKey.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/AudioState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/AudioState.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/BinaryPacker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/BinaryPacker.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/EntityData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/EntityData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/LevelData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/LevelData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/ModeProperties.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/ModeProperties.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/PlayerInventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/PlayerInventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/MapData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/MapData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Celeste/Tileset.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Celeste/Tileset.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/CelesteMod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/CelesteMod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Decal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Decal.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Extensions/ColorExt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Extensions/ColorExt.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Extensions/ICollectionExt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Extensions/ICollectionExt.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Filler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Filler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/ImGuiNet/DrawVertDeclaration.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/ImGuiNet/ImGuiRenderer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Level.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Level.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Loading.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Loading.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Logging/LogLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Logging/LogLevel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Logging/Logger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Logging/Logger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Map.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Map.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/MapViewer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/MapViewer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/JumpThru.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/JumpThru.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spikes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spikes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spinner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spinner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spring.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entities/Spring.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/MapObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/MapObject.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/PlayerSpawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/PlayerSpawn.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/PlatformSpecific/MacOS.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/PlatformSpecific/MacOS.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Tile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Tile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Objects/Trigger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Objects/Trigger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/Attributes/ConfigurationEditorAttribute.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/Attributes/ConfigurationEditorAttribute.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/Attributes/RequiresReloadAttribute.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/Attributes/RequiresReloadAttribute.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/Config.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/Config.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/UIConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/UIConfig.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Selection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Selection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/GraphicsConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/GraphicsConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Saved/MapViewerConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Saved/MapViewerConfig.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Session.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Texture.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Texture.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/TileGrid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/TileGrid.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ConfigurationEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ConfigurationEditor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/DebugConsole.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/DebugConsole.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LayerSelection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LayerSelection.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LeftPanel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LeftPanel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LevelList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LevelList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/MenuBar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/MenuBar.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ModDependencies.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ModDependencies.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ModExplorer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ModExplorer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/UIStyleEditor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/ICloseable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/ICloseable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/UIComponent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/UiComponent.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/UIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/UiManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/PerformanceSummary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/PerformanceSummary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/RenderingCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/RenderingCall.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Utils/Calc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Utils/Calc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Utils/Coroutine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Utils/Coroutine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Utils/ImGuiStyles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Utils/ImGuiStyles.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Utils/XmlSerializationHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Utils/XmlSerializationHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/MapEditor.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/MapEditor.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonoGame.ImGuiNet" beforeDir="false" afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DpaMonitoringSettings">
+    <option name="autoShow" value="false" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/492abbeef0d8a6ea902ac8f90ed339c7b1d18bf4/src/libraries/System.Private.CoreLib/src/System/Runtime/CompilerServices/DefaultInterpolatedStringHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/00b1d3a7e2c548f8a73862f94710c0954ae00/cf/846697e3/ImGui.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/ec/5b8e241b/Game.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ef0f4f575d6c4c21bfc710db8f2f75c618b800/54/7caa578d/GameWindow.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ef0f4f575d6c4c21bfc710db8f2f75c618b800/ae/ab3aa3d7/Game.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/4c/c3cd6c96/IGameComponent.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/a3/476d9c9f/GameComponentCollection.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/ef/f30032d0/Game.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../Celeste/Monocle/StateMachine.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MonoGame.ImGuiNet/ImGui.NET/src/ImGui.NET/Generated/ImGui.gen.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../Mountain/Mountain/include/Mountain/scene/component/state_machine.hpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Toolset" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
@@ -77,31 +109,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.MapEditor.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.C#&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\maxim\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\maxim\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\maxim\\AppData\\Local\\Symbols\\src&quot;
-    ]
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.MapEditor.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.sourceCode.C#",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="MapEditor" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/MapEditor/MapEditor.csproj" />
@@ -141,6 +166,8 @@
       <workItem from="1705346051258" duration="598000" />
       <workItem from="1705507627718" duration="15511000" />
       <workItem from="1705620657813" duration="537000" />
+      <workItem from="1724943099343" duration="8749000" />
+      <workItem from="1725036599474" duration="4517000" />
     </task>
     <task id="LOCAL-00001" summary="Started to switch from MonoGame Extended to Nez">
       <option name="closed" value="true" />
@@ -157,6 +184,7 @@
     <option name="version" value="3" />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -170,6 +198,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Started to switch from MonoGame Extended to Nez" />
     <option name="LAST_COMMIT_MESSAGE" value="Started to switch from MonoGame Extended to Nez" />

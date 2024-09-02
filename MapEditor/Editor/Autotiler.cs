@@ -1,6 +1,5 @@
 ﻿using Editor.Celeste;
 using Editor.Extensions;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -133,7 +132,7 @@ namespace Editor
                 {
                     char copyId = tilesetXml.AttrChar("copy");
                     if (!loadedTilesets.ContainsKey(copyId))
-                        throw new Exception("Copied tilesets must be defined before the tilesets that copy them!");
+                        throw new("Copied tilesets must be defined before the tilesets that copy them!");
                     ReadInto(data, tileset, loadedTilesets[copyId]);
                 }
 
@@ -259,7 +258,7 @@ namespace Editor
                         }
                     }
 
-                    result.Tiles[x, y] = new Objects.Tile(level, terrainType.GetTileFromMask(mask), new Point(x, y), tileType);
+                    result.Tiles[x, y] = new(level, terrainType.GetTileFromMask(mask), new(x, y), tileType);
                 }
             }
 

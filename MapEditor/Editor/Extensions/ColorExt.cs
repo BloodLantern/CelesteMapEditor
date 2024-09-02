@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Extended;
 using System;
 
 namespace Editor.Extensions
@@ -12,7 +11,7 @@ namespace Editor.Extensions
             int g = 255 - color.G;
             int b = 255 - color.B;
 
-            return new Color(r, g, b, color.A);
+            return new(r, g, b, color.A);
         }
 
         public static void ToHsv(this Color color, out float hue, out float saturation, out float value)

@@ -9,7 +9,7 @@ namespace Editor.Utils
     {
         public static T LoadFromXml<T>(this string xmlString, XmlSerializer serial = null)
         {
-            serial ??= new XmlSerializer(typeof(T));
+            serial ??= new(typeof(T));
             T returnValue = default;
             using (StringReader reader = new(xmlString))
             {
@@ -27,7 +27,7 @@ namespace Editor.Utils
             XmlSerializerNamespaces ns = null;
             if (omitStandardNamespaces)
             {
-                ns = new XmlSerializerNamespaces();
+                ns = new();
                 ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
             }
             using var textWriter = new StringWriter();

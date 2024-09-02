@@ -2,8 +2,8 @@
 {
     public class AudioState
     {
-        public static string[] LayerParameters = new string[10]
-        {
+        public static string[] LayerParameters =
+        [
             "layer0",
             "layer1",
             "layer2",
@@ -14,7 +14,7 @@
             "layer7",
             "layer8",
             "layer9"
-        };
+        ];
         public string Music;
         public string Ambience;
 

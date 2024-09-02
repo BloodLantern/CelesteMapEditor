@@ -24,8 +24,8 @@ namespace Editor.UI.Components
 
         private MenuBar menuBar;
 
-        public LevelList LevelList;
-        public ModExplorer ModExplorer;
+        public readonly LevelList LevelList;
+        public readonly ModExplorer ModExplorer;
 
         public float CurrentX { get; private set; } = -DefaultWidth;
         public bool Visible = false;

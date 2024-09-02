@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Editor.Utils;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -15,8 +14,8 @@ namespace Editor.Celeste
         /// </summary>
         public Vector2 Position;
         public Vector2 Origin;
-        public Point Size;
-        public Vector2[] Nodes;
+        public Vector2 Size;
+        public readonly Vector2[] Nodes;
         public Dictionary<string, object> Attributes = new();
 
         public EntityData(string name, LevelData level, Vector2[] nodes)

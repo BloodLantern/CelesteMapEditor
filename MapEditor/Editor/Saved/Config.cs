@@ -5,7 +5,6 @@ using Editor.Utils;
 using Editor.Logging;
 using Editor.Saved.Keybinds;
 using Editor.Saved.Attributes;
-using Editor.PlatformSpecific;
 using System.Reflection;
 using Editor.UI.Components;
 
@@ -26,7 +25,7 @@ namespace Editor.Saved
         /// List of last edited files paths. Should have a maximum of 'MaxRecentEditedFiles' entries.
         /// </summary>
         [NotDisplayedOnEditor]
-        public List<string> RecentEditedFiles = new();
+        public List<string> RecentEditedFiles = [];
 
         /// <summary>
         /// Whether to enable the debug window and features.
@@ -60,7 +59,7 @@ namespace Editor.Saved
         [NotDisplayedOnEditor]
         public bool ShowLayerSelectionWindow = false;
 
-        public LayerSelection.Layers[] LayerSelectionLayers = new LayerSelection.Layers[LayerSelection.LayerTypes] { LayerSelection.Layers.All, LayerSelection.Layers.Entities };
+        public LayerSelection.Layers[] LayerSelectionLayers = [LayerSelection.Layers.All, LayerSelection.Layers.Entities];
 
         public LayerSelection.DebugLayers LayerSelectionDebugLayers = LayerSelection.DebugLayers.LevelBounds | LayerSelection.DebugLayers.FillerBounds;
 

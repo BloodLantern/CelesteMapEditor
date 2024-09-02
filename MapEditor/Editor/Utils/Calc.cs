@@ -1,12 +1,8 @@
 ﻿using Editor.Utils;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -14,7 +10,7 @@ namespace Editor
 {
     public static class Calc
     {
-        public static Random Random = new();
+        public static readonly Random Random = new();
         public const float DefaultFrameDuration = 1f / 60f;
         private const string Hex = "0123456789ABCDEF";
 
@@ -38,7 +34,7 @@ namespace Editor
             if (index == 0)
                 return a;
             if (index != 1)
-                throw new Exception("Index was out of range");
+                throw new("Index was out of range");
             return b;
         }
 
@@ -49,7 +45,7 @@ namespace Editor
                 0 => a,
                 1 => b,
                 2 => c,
-                _ => throw new Exception("Index was out of range!"),
+                _ => throw new("Index was out of range!"),
             };
         }
 
@@ -61,7 +57,7 @@ namespace Editor
                 1 => b,
                 2 => c,
                 3 => d,
-                _ => throw new Exception("Index was out of range!"),
+                _ => throw new("Index was out of range!"),
             };
         }
 
@@ -74,7 +70,7 @@ namespace Editor
                 2 => c,
                 3 => d,
                 4 => e,
-                _ => throw new Exception("Index was out of range!"),
+                _ => throw new("Index was out of range!"),
             };
         }
 
@@ -88,7 +84,7 @@ namespace Editor
                 3 => d,
                 4 => e,
                 5 => f,
-                _ => throw new Exception("Index was out of range!"),
+                _ => throw new("Index was out of range!"),
             };
         }
 
@@ -106,7 +102,7 @@ namespace Editor
                 float g = (HexToByte(hex[prefixLength + 2]) * 16 + HexToByte(hex[prefixLength + 3])) / (float) byte.MaxValue;
                 float b = (HexToByte(hex[prefixLength + 4]) * 16 + HexToByte(hex[prefixLength + 5])) / (float) byte.MaxValue;
 
-                return new Color(r, g, b);
+                return new(r, g, b);
             }
 
             return int.TryParse(hex[prefixLength..], out int result) ? HexToColor(result) : Color.White;
@@ -127,14 +123,14 @@ namespace Editor
             float val2 = val1 * (1f - Math.Abs(angle / 60f % 2f - 1f));
             float val3 = v - val1;
             if (angle < 60)
-                return new Color(val3 + val1, val3 + val2, val3);
+                return new(val3 + val1, val3 + val2, val3);
             if (angle < 120)
-                return new Color(val3 + val2, val3 + val1, val3);
+                return new(val3 + val2, val3 + val1, val3);
             if (angle < 180)
-                return new Color(val3, val3 + val1, val3 + val2);
+                return new(val3, val3 + val1, val3 + val2);
             if (angle < 240)
-                return new Color(val3, val3 + val2, val3 + val1);
-            return angle < 300 ? new Color(val3 + val2, val3, val3 + val1) : new Color(val3 + val1, val3, val3 + val2);
+                return new(val3, val3 + val2, val3 + val1);
+            return angle < 300 ? new(val3 + val2, val3, val3 + val1) : new Color(val3 + val1, val3, val3 + val2);
         }
 
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
@@ -168,7 +164,7 @@ namespace Editor
 
         public static List<T> DeepCloneList<T>(List<T> instance) where T : ICloneable
         {
-            List<T> result = new();
+            List<T> result = [];
             foreach (T item in instance)
                 result.Add((T) item.Clone());
             return result;

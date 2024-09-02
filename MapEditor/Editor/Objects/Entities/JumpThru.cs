@@ -8,7 +8,7 @@ namespace Editor.Objects.Entities
     public class JumpThru : Entity
     {
         public override Vector2 Position => EntityData.Position;
-        public override Point Size => EntityData.Size;
+        public override Vector2 Size => EntityData.Size;
 
         private Texture leftWallTexture, rightWallTexture;
         private Texture leftTexture, rightTexture;
@@ -91,7 +91,7 @@ namespace Editor.Objects.Entities
         public override void Render(SpriteBatch spriteBatch, Camera camera)
         {
             Point tilePosition = MapViewer.ToTilePosition(Position.ToPoint());
-            Point tileSize = MapViewer.ToTilePosition(Size);
+            Point tileSize = MapViewer.ToTilePosition(Size.ToPoint());
 
             int yIndex = Calc.Clamp(tilePosition.Y, 0, Level.ForegroundTiles.TilesY - 1);
 
@@ -104,7 +104,7 @@ namespace Editor.Objects.Entities
 
             // Right part
             // If there is a wall on the right
-            if (Level.ForegroundTiles.Tiles[Calc.Clamp(tilePosition.X + Size.X, 0, Level.ForegroundTiles.TilesX - 1), yIndex] != null)
+            if (Level.ForegroundTiles.Tiles[Calc.Clamp(tilePosition.X + (int) Size.X, 0, Level.ForegroundTiles.TilesX - 1), yIndex] != null)
                 rightWallTexture.Render(spriteBatch, camera, AbsolutePosition + new Vector2(Size.X - Tileset.TileSize, 0));
             else
                 rightTexture.Render(spriteBatch, camera, AbsolutePosition + new Vector2(Size.X - Tileset.TileSize, 0));

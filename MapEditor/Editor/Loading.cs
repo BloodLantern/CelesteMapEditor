@@ -30,18 +30,18 @@ namespace Editor
 
         private readonly LoadingFunc func;
 
-        public float FadeInDuration = 1f;
-        public float FadeOutDuration = 1f;
+        public readonly float FadeInDuration = 1f;
+        public readonly float FadeOutDuration = 1f;
 
-        public float LoadingCircleRadius = 100f;
-        public int LoadingCircleResolution = 100;
-        public int LoadingCircleThickness = 5;
-        public float LoadingCircleStartingAngle = 3f * MathHelper.PiOver2;
-        public string ProgressFormat = "P0";
+        public readonly float LoadingCircleRadius = 100f;
+        public readonly int LoadingCircleResolution = 100;
+        public readonly int LoadingCircleThickness = 5;
+        public readonly float LoadingCircleStartingAngle = 3f * MathHelper.PiOver2;
+        public readonly string ProgressFormat = "P0";
         public bool ShowRemainingTime = false;
-        public bool ShowElapsedTime = false;
-        public bool ShowLoadingString = false;
-        public string LoadingString = "Loading";
+        public readonly bool ShowElapsedTime = false;
+        public readonly bool ShowLoadingString = false;
+        public readonly string LoadingString = "Loading";
 
         private float? lastTotalGameTime = null;
         private TimeSpan elapsedTime;

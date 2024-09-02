@@ -7,7 +7,7 @@ namespace Editor
     {
         public const string DefaultDisplayName = "FILLER";
 
-        public string DisplayName;
+        public readonly string DisplayName;
         public Rectangle Bounds;
         public bool Selected;
 
@@ -20,7 +20,7 @@ namespace Editor
         }
 
         public Filler(int x, int y, int width, int height, int index)
-            : this(new Rectangle(x, y, width, height), index)
+            : this(new(x, y, width, height), index)
         {
         }
 

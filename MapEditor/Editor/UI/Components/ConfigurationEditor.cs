@@ -43,8 +43,8 @@ namespace Editor.UI.Components
         {
             this.app = app;
 
-            defaultComparer = new CompareLogic(new ComparisonConfig() { AttributesToIgnore = { typeof(ComparisonIgnoreAttribute) } });
-            fullComparer = new CompareLogic(new ComparisonConfig() { AttributesToIgnore = { typeof(ComparisonIgnoreAttribute) }, MaxDifferences = int.MaxValue });
+            defaultComparer = new(new ComparisonConfig() { AttributesToIgnore = { typeof(ComparisonIgnoreAttribute) } });
+            fullComparer = new(new ComparisonConfig() { AttributesToIgnore = { typeof(ComparisonIgnoreAttribute) }, MaxDifferences = int.MaxValue });
         }
 
         public override void Render()
@@ -103,8 +103,8 @@ namespace Editor.UI.Components
                     // Disable the Cancel and Apply buttons if the config hasn't changed
                     ImGui.BeginDisabled();
                 }
-afterBeginDisabled:
 
+afterBeginDisabled:
                 ImGui.SameLine();
 
                 if (ImGui.Button("Apply"))
@@ -302,7 +302,7 @@ afterBeginDisabled:
 
                 ImGui.ColorEdit4(displayName, ref value);
 
-                Color newValue = new Color(value);
+                Color newValue = new(value);
                 field.SetValue(instance, newValue);
 
                 valueChanged = oldValue != newValue;

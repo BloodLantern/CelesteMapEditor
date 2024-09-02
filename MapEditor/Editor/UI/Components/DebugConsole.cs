@@ -11,7 +11,7 @@ namespace Editor.UI.Components
     public class DebugConsole : UiComponent, ICloseable
     {
         public LogLevel LogLevel = LogLevel.Debug;
-        public Session Session;
+        public readonly Session Session;
 
         private bool windowOpen = false;
 

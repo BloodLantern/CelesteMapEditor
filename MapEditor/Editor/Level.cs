@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
 using Editor.Celeste;
 using System.Collections.Generic;
 using MonoGame.Extended;
@@ -11,8 +10,8 @@ namespace Editor
 {
     public class Level
     {
-        private static readonly Color[] EditorColors = new Color[7]
-        {
+        private static readonly Color[] EditorColors =
+        [
             Color.White,      // Default white
             new(0xFF5E73F6),  // Orange
             new(0xFF5EF685),  // Green
@@ -20,28 +19,28 @@ namespace Editor
             new(0xFFE36B37),  // Blue
             new(0xFFE337C3),  // Purple
             new(0xFF7337E3)   // Pink
-        };
+        ];
 
         public readonly LevelData LevelData;
-        public readonly List<Entity> Entities = new();
-        public readonly List<Trigger> Triggers = new();
-        public readonly List<Spinner> Spinners = new();
-        public readonly List<Spinner.BackgroundSpinner> BackgroundSpinners = new();
+        public readonly List<Entity> Entities = [];
+        public readonly List<Trigger> Triggers = [];
+        public readonly List<Spinner> Spinners = [];
+        public readonly List<Spinner.BackgroundSpinner> BackgroundSpinners = [];
         public readonly TileGrid ForegroundTiles;
         public readonly TileGrid BackgroundTiles;
-        public readonly List<Decal> ForegroundDecals = new();
-        public readonly List<Decal> BackgroundDecals = new();
+        public readonly List<Decal> ForegroundDecals = [];
+        public readonly List<Decal> BackgroundDecals = [];
         public readonly Color EditorColor;
 
-        public List<PlayerSpawn> PlayerSpawns { get; private set; } = new();
-        public Rectangle Bounds => LevelData.Bounds;
-        public Point Position => Bounds.Location;
-        public Point Size => Bounds.Size;
+        public List<PlayerSpawn> PlayerSpawns { get; } = [];
+        public RectangleF Bounds => LevelData.Bounds;
+        public Vector2 Position => Bounds.Position;
+        public Vector2 Size => Bounds.Size;
         public string Name => LevelData.Name;
 
         public bool Selected = false;
 
-        public Vector2 Center => Position.ToVector2() + Size.ToVector2() / 2;
+        public Vector2 Center => Position + Size * 0.5f;
         /// <summary>
         /// Whether the level is considered to be a room filler.
         /// </summary>
@@ -52,25 +51,23 @@ namespace Editor
             LevelData = data;
 
             foreach (Vector2 spawn in LevelData.PlayerSpawns)
-                PlayerSpawns.Add(new PlayerSpawn(this, spawn));
+                PlayerSpawns.Add(new(this, spawn));
 
             foreach (EntityData entityData in LevelData.Entities)
             {
-                Entity entity;
-
                 string shortName = entityData.Name.ToLower();
                 if (shortName.StartsWith("spikes"))
                     shortName = "spikes";
                 else if (shortName.Contains("spring"))
                     shortName = "spring";
 
-                entity = shortName switch
+                Entity entity = shortName switch
                 {
                     "spinner" => new Spinner(entityData, this),
                     "spikes" => new Spikes(entityData, this),
                     "jumpthru" => new JumpThru(entityData, this),
                     "spring" => new Spring(entityData, this),
-                    _ => new Entity(entityData, this)
+                    _ => new(entityData, this)
                 };
                 entity.UpdateTexture();
                 Entities.Add(entity);
@@ -84,7 +81,7 @@ namespace Editor
             }
 
             foreach (EntityData triggerData in LevelData.Triggers)
-                Triggers.Add(new Trigger(triggerData, this));
+                Triggers.Add(new(triggerData, this));
 
             foreach (Spinner spinner in Spinners)
             {
@@ -99,9 +96,9 @@ namespace Editor
             BackgroundTiles = Autotiler.BackgroundTiles.GenerateLevel(this, data.TileBounds.Width, data.TileBounds.Height, LevelData.BackgroundTiles);
 
             foreach (DecalData decalData in data.FgDecals)
-                ForegroundDecals.Add(new Decal(this, decalData));
+                ForegroundDecals.Add(new(this, decalData));
             foreach (DecalData decalData in data.BgDecals)
-                BackgroundDecals.Add(new Decal(this, decalData));
+                BackgroundDecals.Add(new(this, decalData));
 
             EditorColor = EditorColors[data.EditorColorIndex];
         }
@@ -120,7 +117,7 @@ namespace Editor
 
         public List<Tile> GetVisibleForegroundTiles(RectangleF cameraBounds)
         {
-            List<Tile> result = new();
+            List<Tile> result = [];
             foreach (Tile tile in ForegroundTiles.Tiles)
             {
                 if (tile == null)
@@ -135,7 +132,7 @@ namespace Editor
 
         public List<Tile> GetVisibleBackgroundTiles(RectangleF cameraBounds)
         {
-            List<Tile> result = new();
+            List<Tile> result = [];
             foreach (Tile tile in BackgroundTiles.Tiles)
             {
                 if (tile == null)
@@ -159,12 +156,15 @@ namespace Editor
                 case Entity entity:
                     Entities.Remove(entity);
                     break;
+                
                 case Trigger trigger:
                     Triggers.Remove(trigger);
                     break;
+                
                 case PlayerSpawn spawn:
                     PlayerSpawns.Remove(spawn);
                     break;
+                
                 case Tile tile:
                     switch (tile.TileType)
                     {
@@ -179,6 +179,7 @@ namespace Editor
                             break;
                     }
                     break;
+                
                 case Decal decal:
                     ForegroundDecals.Remove(decal);
                     BackgroundDecals.Remove(decal);

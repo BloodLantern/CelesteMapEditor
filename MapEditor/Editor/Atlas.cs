@@ -67,7 +67,7 @@ namespace Editor.Celeste
                     Point offset = new(-reader.ReadInt16(), -reader.ReadInt16());
                     Point textureSize = new(reader.ReadInt16(), reader.ReadInt16());
 
-                    result.Textures[texturePath] = new Texture(parentTexture, new Rectangle(clipPosition, clipSize), offset, textureSize);
+                    result.Textures[texturePath] = new(parentTexture, new(clipPosition, clipSize), offset, textureSize);
                     loading.Progress += progressFactor * atlasCountInverse * childCountInverse;
                 }
             }
@@ -86,7 +86,7 @@ namespace Editor.Celeste
 
             foreach (string file in Directory.EnumerateFiles(path, "*.png", SearchOption.AllDirectories))
             {
-                result.Textures[Path.ChangeExtension(file, string.Empty)] = new Texture(Path.GetDirectoryName(path), file);
+                result.Textures[Path.ChangeExtension(file, string.Empty)] = new(Path.GetDirectoryName(path), file);
             }
 
             return result;

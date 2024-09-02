@@ -1,11 +1,9 @@
-﻿using Assimp.Configs;
-using Editor.Logging;
+﻿using Editor.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
@@ -23,8 +21,8 @@ namespace Editor
 
         public string Dll;
 
-        public readonly List<CelesteMod> Dependencies = new();
-        public readonly List<CelesteMod> OptionalDependencies = new();
+        public readonly List<CelesteMod> Dependencies = [];
+        public readonly List<CelesteMod> OptionalDependencies = [];
 
         /// <summary>
         /// The location of the .zip file or the directory.
@@ -32,7 +30,7 @@ namespace Editor
         public string Location;
         public bool IsDirectory;
 
-        public int Index = -1;
+        public readonly int Index = -1;
 
         private bool enabled = false;
         public bool Enabled
@@ -48,9 +46,9 @@ namespace Editor
         public bool Preloaded = false;
         public bool Loaded = false;
 
-        public bool ForceEnabled = false;
+        public readonly bool ForceEnabled = false;
 
-        public Dictionary<string, Texture> GameplayAtlasEntries = new();
+        public readonly Dictionary<string, Texture> GameplayAtlasEntries = new();
 
         public CelesteMod()
         {
@@ -147,7 +145,7 @@ namespace Editor
 
         public void ReadYaml(Stream file)
         {
-            YamlStream everestYamlStream = new();
+            YamlStream everestYamlStream = [];
             everestYamlStream.Load(new Parser(new StreamReader(file)));
 
             YamlMappingNode node = (YamlMappingNode) ((YamlSequenceNode) everestYamlStream.Documents[0].RootNode).Children[0];
@@ -231,14 +229,14 @@ namespace Editor
             if (IsDirectory)
             {
                 foreach (string asset in GameplayAtlasEntries.Keys)
-                    GameplayAtlasEntries[asset] = new Texture(File.OpenRead(Path.Combine(Location, asset)), ".png", asset);
+                    GameplayAtlasEntries[asset] = new(File.OpenRead(Path.Combine(Location, asset)), ".png", asset);
             }
             else
             {
                 using ZipArchive archive = ZipFile.OpenRead(Location);
 
                 foreach (string asset in GameplayAtlasEntries.Keys)
-                    GameplayAtlasEntries[asset] = new Texture(archive.GetEntry("Graphics/Atlases/Gameplay/" + asset).Open(), ".png", asset);
+                    GameplayAtlasEntries[asset] = new(archive.GetEntry("Graphics/Atlases/Gameplay/" + asset).Open(), ".png", asset);
             }
 
             Loaded = true;
@@ -262,12 +260,12 @@ namespace Editor
             Logger.Log("Preloading Celeste mods...");
 
             // Getting a list instance here allows us to get the total number of entries
-            List<string> entries = new(Directory.EnumerateFileSystemEntries(session.CelesteModsDirectory));
+            List<string> entries = [..Directory.EnumerateFileSystemEntries(session.CelesteModsDirectory)];
             float entriesCountInverse = 1f / entries.Count;
 
             int index = 0;
-            session.CelesteMods.Add(new CelesteMod("Celeste", session.CelesteVersion, index++));
-            session.CelesteMods.Add(new CelesteMod("Everest", session.EverestVersion, index++));
+            session.CelesteMods.Add(new("Celeste", session.CelesteVersion, index++));
+            session.CelesteMods.Add(new("Everest", session.EverestVersion, index++));
             foreach (string path in entries)
             {
                 loading.CurrentSubText = Path.GetRelativePath(session.CelesteModsDirectory, path);

@@ -14,7 +14,6 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.ImGuiNet;
 using ImGuiNET;
 using System.Collections.Generic;
-using MonoGame;
 using Editor.Saved;
 using Editor.UI.Components;
 
@@ -36,7 +35,7 @@ namespace Editor
         private const int BaseWindowHeight = 720;
         public string WindowTitle => $"{BaseWindowTitle} v{Version.ToString(3)}";
 
-        public GraphicsDeviceManager Graphics;
+        public readonly GraphicsDeviceManager Graphics;
         public SpriteBatch SpriteBatch;
         public RenderTarget2D GlobalRenderTarget;
 
@@ -67,7 +66,7 @@ namespace Editor
         public float TotalGameTimeSeconds => (float) TotalGameTime.TotalSeconds;
         public float LastTotalGameTime;
 
-        private readonly List<(string, Stopwatch)> debugStrings = new();
+        private readonly List<(string, Stopwatch)> debugStrings = [];
 
         public Application()
         {
@@ -77,7 +76,7 @@ namespace Editor
 
             Logger.Log($"Starting {nameof(Application)} instance...");
 
-            Graphics = new GraphicsDeviceManager(this);
+            Graphics = new(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             
@@ -113,9 +112,9 @@ namespace Editor
 
             (Loading = new(
                 this,
-                (Loading loading) =>
+                loading =>
                 {
-                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    Stopwatch sw = Stopwatch.StartNew();
 
                     Logger.Log($"Beginning startup loading...");
 
@@ -124,15 +123,15 @@ namespace Editor
                         Exit();
                     loading.Progress += 0.1f;
 
-                    const float celesteModsPreLoadProgressFactor = 0.4f;
+                    const float CelesteModsPreLoadProgressFactor = 0.4f;
                     if (Session.EverestVersion != null)
                     {
                         loading.CurrentText = "Preloading Celeste mods";
-                        CelesteMod.PreLoadAll(Session, loading, celesteModsPreLoadProgressFactor);
+                        CelesteMod.PreLoadAll(Session, loading, CelesteModsPreLoadProgressFactor);
                     }
                     else
                     {
-                        loading.Progress += celesteModsPreLoadProgressFactor;
+                        loading.Progress += CelesteModsPreLoadProgressFactor;
                     }
 
                     loading.CurrentText = "Loading vanilla atlases";
@@ -146,15 +145,14 @@ namespace Editor
                     loading.Progress += 0.04f;
 
                     loading.CurrentText = "Loading UI";
-                    UiManager.AddRange(new UiComponent[]
-                        {
+                    UiManager.AddRange([
                             new ConfigurationEditor(this),
                             new ModDependencies(Session),
                             new LayerSelection(this),
                             new LeftPanel(this),
                             new MenuBar(this),
                             new PerformanceSummary(this)
-                        }
+                        ]
                     );
                     loading.Progress += 0.05f;
 
@@ -167,7 +165,7 @@ namespace Editor
                         MapViewer.CurrentMap = LoadMap(Path.GetFullPath(Session.Config.LastEditedFile));
                     loading.Progress += 0.05f;
 
-                    Logger.Log($"Startup loading complete. Took {stopwatch.ElapsedMilliseconds}ms");
+                    Logger.Log($"Startup loading complete. Took {sw.ElapsedMilliseconds}ms");
                 }
             )
             {
@@ -216,7 +214,7 @@ namespace Editor
                         Session.Config.DebugMode = !Session.Config.DebugMode;
 
                     // On loading state change
-                    if (Loading != null && Loading.Ended && Loading.DrawAlpha <= 0f)
+                    if (Loading is { Ended: true, DrawAlpha: <= 0f })
                     {
                         LeftPanel leftPanel = UiManager.GetComponent<LeftPanel>();
                         leftPanel.Visible = true;
@@ -290,7 +288,7 @@ namespace Editor
                 bool darkStyle = Session.Config.Ui.Style == ImGuiStyles.Style.Dark;
 
                 GraphicsDevice.SetRenderTarget(LoadingRenderTarget);
-                GraphicsDevice.Clear(darkStyle ? new Color(0xFF202020) : Color.Gray);
+                GraphicsDevice.Clear(darkStyle ? new(0xFF202020) : Color.Gray);
 
                 SpriteBatch.Begin();
                 Loading.Render(SpriteBatch, this, Session, time);
@@ -337,7 +335,7 @@ namespace Editor
             SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 
             for (int i = 0; i < debugStrings.Count; i++)
-                SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new Vector2(0f, i * 20f), Color.Magenta);
+                SpriteBatch.DrawString(Session.ConsolasFont, debugStrings[i].Item1, new(0f, i * 20f), Color.Magenta);
 
             SpriteBatch.End();
             
@@ -412,7 +410,7 @@ namespace Editor
         {
             Logger.Log($"Restarting {nameof(Application)}...");
 
-            Process.Start(Environment.ProcessPath);
+            Process.Start(Environment.ProcessPath!);
 
             Exit();
         }
@@ -429,12 +427,12 @@ namespace Editor
 
             if (config.RefreshRate != 0 && !config.Vsync)
             {
-                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, config.RefreshRate);
+                TargetElapsedTime = new(0, 0, 0, 0, config.RefreshRate);
                 IsFixedTimeStep = true;
             }
             else
             {
-                TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 16);
+                TargetElapsedTime = new(0, 0, 0, 0, 16);
                 IsFixedTimeStep = false;
             }
 

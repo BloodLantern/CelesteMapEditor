@@ -4,7 +4,7 @@
     {
         public const int TileSize = 8;
 
-        public Texture Texture { get; private set; }
+        public Texture Texture { get; }
 
         private readonly Texture[,] tiles;
 
@@ -18,7 +18,7 @@
             for (int x = 0; x < tileWidth; x++)
             {
                 for (int y = 0; y < tileHeight; y++)
-                    tiles[x, y] = new Texture(Texture, x * TileSize, y * TileSize);
+                    tiles[x, y] = new(Texture, x * TileSize, y * TileSize);
             }
         }
 

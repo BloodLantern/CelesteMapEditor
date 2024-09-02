@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
@@ -28,11 +28,6 @@
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Editor\ImGuiNet\**" />
-    <EmbeddedResource Remove="Editor\ImGuiNet\**" />
-    <None Remove="Editor\ImGuiNet\**" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>
@@ -57,12 +52,26 @@
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
+    <ProjectReference Include="..\MonoGame.ImGuiNet\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="dll\nfd.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MonoGame.ImGuiNet\ImGui.NET\deps\cimgui\linux-x64\cimgui.so">
+      <Link>cimgui.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.ImGuiNet\ImGui.NET\deps\cimgui\osx\cimgui.dylib">
+      <Link>cimgui.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.ImGuiNet\ImGui.NET\deps\cimgui\win-x64\cimgui.dll">
+      <Link>cimgui.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

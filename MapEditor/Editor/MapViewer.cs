@@ -28,21 +28,21 @@ namespace Editor
         public readonly MapViewerConfig Config;
         public readonly MapViewerKeybindsConfig Keybinds;
 
-        private List<Level> visibleLevels = new();
-        private List<Filler> visibleFillers = new();
-        private readonly List<MapObject> objects = new();
+        private List<Level> visibleLevels = [];
+        private List<Filler> visibleFillers = [];
+        private readonly List<MapObject> objects = [];
         public IEnumerable<MapObject> ObjectsEnumerator => objects;
-        private readonly List<MapObject> visibleObjects = new();
-        private readonly List<Entity> visibleEntities = new();
-        private readonly List<Trigger> visibleTriggers = new();
-        private readonly List<PlayerSpawn> visiblePlayerSpawns = new();
-        private readonly List<Spinner.BackgroundSpinner> visibleBackgroundSpinners = new();
-        private readonly List<Tile> visibleForegroundTiles = new();
-        private readonly List<Tile> visibleBackgroundTiles = new();
-        private readonly List<Decal> visibleForegroundDecals = new();
-        private readonly List<Decal> visibleBackgroundDecals = new();
+        private readonly List<MapObject> visibleObjects = [];
+        private readonly List<Entity> visibleEntities = [];
+        private readonly List<Trigger> visibleTriggers = [];
+        private readonly List<PlayerSpawn> visiblePlayerSpawns = [];
+        private readonly List<Spinner.BackgroundSpinner> visibleBackgroundSpinners = [];
+        private readonly List<Tile> visibleForegroundTiles = [];
+        private readonly List<Tile> visibleBackgroundTiles = [];
+        private readonly List<Decal> visibleForegroundDecals = [];
+        private readonly List<Decal> visibleBackgroundDecals = [];
 
-        private readonly List<Edit> edits = new();
+        private readonly List<Edit> edits = [];
 
         public Selection Selection { get; private set; }
 
@@ -214,7 +214,7 @@ namespace Editor
 
         public List<MapObject> GetObjectsAt(Vector2 mapPosition, Layers layers = Layers.All)
         {
-            List<MapObject> result = new();
+            List<MapObject> result = [];
             switch (layers)
             {
                 case Layers.All:
@@ -279,7 +279,7 @@ namespace Editor
 
         public List<MapObject> GetObjectsInArea(RectangleF mapArea, Layers layers = Layers.All)
         {
-            List<MapObject> result = new();
+            List<MapObject> result = [];
             switch (layers)
             {
                 case Layers.All:
@@ -427,18 +427,18 @@ namespace Editor
 
         public void RenderDebugFiller(SpriteBatch spriteBatch, Camera camera, Rectangle filler)
             => spriteBatch.DrawRectangle(
-                new RectangleF(Camera.MapPositionToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
+                new(Camera.MapPositionToWindow(filler.Location.ToVector2()), filler.Size.Mul(Camera.Zoom)),
                 Color.Brown,
                 Math.Max(camera.Zoom, 1f)
             );
 
-        private bool showImGuiDemoWindow = false;
+        private bool showImGuiDemoWindow;
         public void RenderDebug(GameTime time)
         {
             MouseStateExtended mouseState = MouseExtended.GetState();
-            Point mousePosition = mouseState.Position;
-            Point mouseMapPosition = Camera.WindowPositionToMap(mousePosition);
-            Level hoveredLevel = GetLevelAt(mouseMapPosition.ToVector2());
+            Vector2 mousePosition = mouseState.Position.ToVector2();
+            Vector2 mouseMapPosition = Camera.WindowPositionToMap(mousePosition);
+            Level hoveredLevel = GetLevelAt(mouseMapPosition);
 
             ImGui.Begin($"{nameof(MapViewer)} debug", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
             ImGui.Checkbox("Debug mode", ref Session.Config.DebugMode);
@@ -499,21 +499,22 @@ namespace Editor
                 for (int i = 0; i < visibleObjects.Count; i++)
                 {
                     MapObject obj = visibleObjects[i];
-                    if (ImGui.TreeNode($"{i}. {obj}"))
+                    
+                    if (!ImGui.TreeNode($"{i}. {obj}"))
+                        continue;
+                    
+                    if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                     {
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                        {
-                            if (Camera.Zoom == 3f)
-                                Camera.MoveTo(obj.Center);
-                            else
-                                Camera.ZoomTo(Camera.MapPositionToWindow(obj.Center), 3f);
-                            Selection.SelectOnly(obj);
-                        }
-
-                        obj.DebugInfo();
-
-                        ImGui.TreePop();
+                        if (Camera.Zoom == 3f)
+                            Camera.MoveTo(obj.Center);
+                        else
+                            Camera.ZoomTo(Camera.MapPositionToWindow(obj.Center), 3f);
+                        Selection.SelectOnly(obj);
                     }
+
+                    obj.DebugInfo();
+
+                    ImGui.TreePop();
                 }
 
                 ImGui.TreePop();

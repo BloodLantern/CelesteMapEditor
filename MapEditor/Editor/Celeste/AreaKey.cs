@@ -1,5 +1,4 @@
 ﻿using Editor.Logging;
-using System.Data;
 using System.IO;
 
 namespace Editor.Celeste

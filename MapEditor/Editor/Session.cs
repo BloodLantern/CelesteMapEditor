@@ -11,6 +11,7 @@ using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
@@ -22,8 +23,8 @@ namespace Editor
 
         private static readonly string OlympusConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Olympus", "config.json");
         
-        public Application App { get; private set; }
-        public Config Config { get; private set; }
+        public Application App { get; }
+        public Config Config { get; }
 
         public string CelesteDirectory { get; private set; }
         public string CelesteContentDirectory { get; private set; }
@@ -46,7 +47,7 @@ namespace Editor
         /// </summary>
         public SpriteFont PixelatedFont { get; private set; }
 
-        public List<CelesteMod> CelesteMods = new();
+        public readonly List<CelesteMod> CelesteMods = [];
 
         public Session(Application app)
         {
@@ -66,6 +67,7 @@ namespace Editor
         private void SetupImGuiContext(ImGuiRenderer renderer)
         {
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
             ImGuiStyles.Setup(Config.Ui.Style);
             ImGuiStyles.SetupFont(this, renderer);
         }
@@ -117,10 +119,9 @@ namespace Editor
         {
             activeCelesteDirectory = string.Empty;
 
-            JsonDocument doc = JsonDocument.Parse(File.OpenRead(OlympusConfigFilePath), new JsonDocumentOptions() { CommentHandling = JsonCommentHandling.Skip });
+            JsonDocument doc = JsonDocument.Parse(File.OpenRead(OlympusConfigFilePath), new() { CommentHandling = JsonCommentHandling.Skip });
 
-            int celesteInstallId = -1;
-            List<string> celesteInstalls = new();
+            List<string> celesteInstalls = [];
 
             JsonElement root = doc.RootElement;
 
@@ -130,7 +131,7 @@ namespace Editor
                 return false;
             }
 
-            if (!install.TryGetInt32(out celesteInstallId))
+            if (!install.TryGetInt32(out int celesteInstallId))
             {
                 Logger.Log($"Error while reading Olympus config file: {nameof(JsonElement)} 'install' is not of type {nameof(Int32)}.", LogLevel.Error);
                 return false;
@@ -213,7 +214,7 @@ namespace Editor
                     tCeleste.FindMethod("System.Void orig_ctor_Celeste()") ??
                     tCeleste.FindMethod("System.Void .ctor()");
 
-                if (cCeleste != null && cCeleste.HasBody)
+                if (cCeleste is { HasBody: true })
                 {
                     Mono.Collections.Generic.Collection<Instruction> instrs = cCeleste.Body.Instructions;
                     for (int instri = 0; instri < instrs.Count; instri++)
@@ -224,13 +225,7 @@ namespace Editor
                             continue;
 
                         // We're constructing a System.Version - check if all parameters are of type int.
-                        bool cVersionIntsOnly = true;
-                        foreach (ParameterReference param in cVersion.Parameters)
-                            if (param.ParameterType.MetadataType != MetadataType.Int32)
-                            {
-                                cVersionIntsOnly = false;
-                                break;
-                            }
+                        bool cVersionIntsOnly = cVersion.Parameters.Cast<ParameterReference>().All(param => param.ParameterType.MetadataType == MetadataType.Int32);
 
                         if (cVersionIntsOnly)
                         {
@@ -254,15 +249,22 @@ namespace Editor
                 // Construct the version from our gathered data.
                 Version version = new();
                 if (versionString != null)
-                    version = new Version(versionString);
+                    version = new(versionString);
+                
                 if (versionInts == null || versionInts.Length == 0)
-                    version = new Version();
-                else if (versionInts.Length == 2)
-                    version = new Version(versionInts[0], versionInts[1]);
-                else if (versionInts.Length == 3)
-                    version = new Version(versionInts[0], versionInts[1], versionInts[2]);
-                else if (versionInts.Length == 4)
-                    version = new Version(versionInts[0], versionInts[1], versionInts[2], versionInts[3]);
+                {
+                    version = new();
+                }
+                else
+                {
+                    version = versionInts.Length switch
+                    {
+                        2 => new(versionInts[0], versionInts[1]),
+                        3 => new(versionInts[0], versionInts[1], versionInts[2]),
+                        4 => new(versionInts[0], versionInts[1], versionInts[2], versionInts[3]),
+                        _ => version
+                    };
+                }
 
                 TypeDefinition tEverest = game.GetType("Celeste.Mod.Everest");
                 if (tEverest != null)

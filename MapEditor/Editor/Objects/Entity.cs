@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
 using Editor.Celeste;
 using System.Collections.Generic;
 using MonoGame.Extended;
@@ -61,10 +60,10 @@ namespace Editor.Objects
         }
         public override Vector2 Position
         {
-            get => EntityData.Position - Size.ToVector2() / 2f;
-            set => EntityData.Position = value + Size.ToVector2() / 2f;
+            get => EntityData.Position - Size / 2f;
+            set => EntityData.Position = value + Size / 2f;
         }
-        public override Point Size => Texture != null && EntityData.Size == Point.Zero ? Texture.Size : EntityData.Size;
+        public override Vector2 Size => Texture != null && EntityData.Size == Vector2.Zero ? Texture.Size.ToVector2() : EntityData.Size;
 
         public Entity(EntityData data, Level level)
             : base(level, MapObjectType.Entity)
@@ -75,9 +74,13 @@ namespace Editor.Objects
         public virtual void UpdateTexture()
         {
             if (Atlas.Gameplay.Textures.ContainsKey(Name))
+            {
                 Texture = Atlas.Gameplay[Name];
-            else if (TextureLookupTable.ContainsKey(Name))
-                Texture = TextureLookupTable[Name];
+            }
+            else if (TextureLookupTable.TryGetValue(Name, out Texture value))
+            {
+                Texture = value;
+            }
             else
             {
                 // TODO don't hardcode this
@@ -104,12 +107,13 @@ namespace Editor.Objects
             ImGui.Text($"Name: '{Name}'");
             int attributeCount = EntityData.Attributes.Count;
             ImGui.Text($"Attribute count: {attributeCount}");
-            if (attributeCount > 0 && ImGui.TreeNode("Attributes"))
-            {
-                foreach (KeyValuePair<string, object> attribute in EntityData.Attributes)
-                    ImGui.Text($"{attribute.Key}: {attribute.Value}");
-                ImGui.TreePop();
-            }
+            
+            if (attributeCount <= 0 || !ImGui.TreeNode("Attributes"))
+                return;
+            
+            foreach (KeyValuePair<string, object> attribute in EntityData.Attributes)
+                ImGui.Text($"{attribute.Key}: {attribute.Value}");
+            ImGui.TreePop();
         }
     }
 }

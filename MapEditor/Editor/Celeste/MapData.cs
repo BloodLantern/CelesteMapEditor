@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Editor.Logging;
-using Editor.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,12 +11,12 @@ namespace Editor.Celeste
     {
         public AreaKey Area = AreaKey.None;
         public AreaData Metadata;
-        public List<LevelData> Levels = new();
-        public List<Filler> Fillers = new();
+        public List<LevelData> Levels = [];
+        public List<Filler> Fillers = [];
         public Color BackgroundColor = Color.Black;
         public BinaryPacker.Element Foreground;
         public BinaryPacker.Element Background;
-        public string FilePath;
+        public readonly string FilePath;
 
         public MapData(string filePath)
         {
@@ -71,19 +70,19 @@ namespace Editor.Celeste
                 switch (data.Name)
                 {
                     case "levels":
-                        Levels = new List<LevelData>();
+                        Levels = [];
                         foreach (BinaryPacker.Element level in data.Children)
                             Levels.Add(new(level));
                         break;
 
                     case "Filler":
-                        Fillers = new List<Filler>();
+                        Fillers = [];
                         if (data.Children != null)
                         {
                             int index = 0;
                             foreach (BinaryPacker.Element filler in data.Children)
                                 Fillers.Add(
-                                    new Filler(
+                                    new(
                                         (int) filler.Attributes["x"] * Tileset.TileSize,
                                         (int) filler.Attributes["y"] * Tileset.TileSize,
                                         (int) filler.Attributes["w"] * Tileset.TileSize,

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Editor.UI
+﻿namespace Editor.UI
 {
     public enum RenderingCall
     {

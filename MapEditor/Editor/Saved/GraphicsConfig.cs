@@ -8,13 +8,13 @@ namespace Editor.Saved
         /// Refresh rate in milliseconds. Only effective if Vsync is off and value is not 0.
         /// </summary>
         [RequiresReload(ReloadType.Graphics)]
-        public int RefreshRate = 16;
+        public readonly int RefreshRate = 16;
 
         /// <summary>
         /// Whether to enable vertical synchronization. If enabled, this bypasses the refresh rate of MapViewerRefreshRate
         /// </summary>
         [RequiresReload(ReloadType.Graphics)]
-        public bool Vsync = false;
+        public readonly bool Vsync = false;
 
         public override object Clone() => Clone<GraphicsConfig>();
     }

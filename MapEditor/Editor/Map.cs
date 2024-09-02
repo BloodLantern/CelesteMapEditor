@@ -6,7 +6,7 @@ namespace Editor
 {
     public class Map
     {
-        public MapData MapData { get; private set; }
+        public MapData MapData { get; }
         public readonly List<Level> Levels = new();
         public List<Filler> Fillers => MapData.Fillers;
         public string FilePath => MapData.FilePath;

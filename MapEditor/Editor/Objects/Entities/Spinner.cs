@@ -9,12 +9,12 @@ namespace Editor.Objects.Entities
         public class BackgroundSpinner : Spinner
         {
             public override Vector2 Position => base.Position + Offset;
-            public Vector2 Offset = Vector2.Zero;
+            public Vector2 Offset;
             public readonly Spinner Spinner;
 
             public BackgroundSpinner(Spinner spinner, Vector2 offset) : base(spinner.EntityData, spinner.Level)
             {
-                Offset = offset - Size.ToVector2();
+                Offset = offset - Size;
                 Spinner = spinner;
                 Layer = "bg";
             }
@@ -22,12 +22,12 @@ namespace Editor.Objects.Entities
 
         public const string BasePath = "danger/crystal/{layer}_{color}";
 
-        public string Color = "Blue";
-        public bool Dust = false;
-        public bool AttachToSolid;
+        public string Color;
+        public readonly bool Dust = false;
+        public readonly bool AttachToSolid;
 
-        public readonly List<Spinner> Neighbors = new();
-        public readonly List<BackgroundSpinner> BackgroundSpinners = new();
+        public readonly List<Spinner> Neighbors = [];
+        public readonly List<BackgroundSpinner> BackgroundSpinners = [];
 
         protected string Layer;
 
@@ -61,14 +61,13 @@ namespace Editor.Objects.Entities
 
                 Vector2 thisToOther = otherSpinner.Position - Position;
 
-                if (thisToOther.Length() < 24f)
-                {
-                    Neighbors.Add(otherSpinner);
+                if (!(thisToOther.Length() < 24f))
+                    continue;
+                
+                Neighbors.Add(otherSpinner);
 
-                    if (AttachToSolid == otherSpinner.AttachToSolid && otherSpinner.Position.X >= Position.X)
-                        BackgroundSpinners.Add(new BackgroundSpinner(this, thisToOther / 2f));
-                }
-
+                if (AttachToSolid == otherSpinner.AttachToSolid && otherSpinner.Position.X >= Position.X)
+                    BackgroundSpinners.Add(new(this, thisToOther * 0.5f));
             }
         }
     }

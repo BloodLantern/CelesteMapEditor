@@ -5,7 +5,11 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapEditor", "MapEditor\MapEditor.csproj", "{9652F857-8444-429E-A073-82E35F4BDBA5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monogame.ImGuiNet", "MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj", "{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monogame.ImGuiNet", "MonoGame.ImGuiNet\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj", "{150FC5E5-2731-4EDC-A654-7BEBA586C691}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{344DB388-3BF3-40C4-8860-67CCBD914A62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImGui.NET", "MonoGame.ImGuiNet\ImGui.NET\src\ImGui.NET\ImGui.NET.csproj", "{872CE169-1091-4101-88E0-C46993FFE92D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,15 +21,23 @@ Global
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9652F857-8444-429E-A073-82E35F4BDBA5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83E4DB92-3C24-402A-8D97-BB03B5BA76C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{150FC5E5-2731-4EDC-A654-7BEBA586C691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{150FC5E5-2731-4EDC-A654-7BEBA586C691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{150FC5E5-2731-4EDC-A654-7BEBA586C691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{150FC5E5-2731-4EDC-A654-7BEBA586C691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{872CE169-1091-4101-88E0-C46993FFE92D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{872CE169-1091-4101-88E0-C46993FFE92D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{872CE169-1091-4101-88E0-C46993FFE92D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{872CE169-1091-4101-88E0-C46993FFE92D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CC14C0E5-C834-492C-8B3E-F1DA62F9C68D}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{150FC5E5-2731-4EDC-A654-7BEBA586C691} = {344DB388-3BF3-40C4-8860-67CCBD914A62}
+		{872CE169-1091-4101-88E0-C46993FFE92D} = {344DB388-3BF3-40C4-8860-67CCBD914A62}
 	EndGlobalSection
 EndGlobal

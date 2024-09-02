@@ -9,10 +9,10 @@ namespace Editor
     public class Decal : MapObject
     {
         public readonly DecalData DecalData;
-        public Texture Texture;
+        public readonly Texture Texture;
         public Vector2 Scale;
 
-        public override Point Size => (Texture.Size.ToVector2() * Scale).ToPoint();
+        public override Vector2 Size => Texture.Size.ToVector2() * Scale;
 
         public Decal(Level level, DecalData data)
             : base(level, MapObjectType.Decal)
@@ -24,6 +24,6 @@ namespace Editor
         }
 
         public void Render(SpriteBatch spriteBatch, Camera camera)
-            => Texture.Render(spriteBatch, camera, Position + Level.Position.ToVector2() - Texture.Size.ToVector2() * Scale / 2, Color.White, Scale);
+            => Texture.Render(spriteBatch, camera, Position + Level.Position - Texture.Size.ToVector2() * Scale * 0.5f, Color.White, Scale);
     }
 }

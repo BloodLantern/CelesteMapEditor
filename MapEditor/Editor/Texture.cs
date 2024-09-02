@@ -21,15 +21,15 @@ namespace Editor
 
         public Texture2D Image;
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public Point Size { get; private set; }
         public int Width => Size.X;
         public int Height => Size.Y;
 
-        public Rectangle ClipRect { get; private set; }
+        public Rectangle ClipRect { get; }
 
-        public Point DrawOffset { get; private set; }
+        public Point DrawOffset { get; }
 
         public Vector2 Origin = Vector2.Zero;
         public Vector2 Offset = Vector2.Zero;
@@ -42,7 +42,7 @@ namespace Editor
             Load(directory);
             if (Image != null)
                 Size = Image.Bounds.Size;
-            ClipRect = new Rectangle(Point.Zero, Size);
+            ClipRect = new(Point.Zero, Size);
         }
 
         public Texture(Stream stream, string extension, string name)
@@ -51,14 +51,14 @@ namespace Editor
             Load(stream, extension);
             if (Image != null)
                 Size = Image.Bounds.Size;
-            ClipRect = new Rectangle(Point.Zero, Size);
+            ClipRect = new(Point.Zero, Size);
         }
 
         public Texture(string directory, string name, Point size, Color color)
         {
             Name = name;
             Size = size;
-            ClipRect = new Rectangle(Point.Zero, Size);
+            ClipRect = new(Point.Zero, Size);
             Color = color;
             Load(directory);
         }
@@ -104,8 +104,8 @@ namespace Editor
         {
             Image = parent.Image;
             ClipRect = parent.GetRelativeRect(x, y, width, height);
-            DrawOffset = new Point(-Math.Min(x - parent.DrawOffset.X, 0), -Math.Min(y - parent.DrawOffset.Y, 0));
-            Size = new Point(width, height);
+            DrawOffset = new(-Math.Min(x - parent.DrawOffset.X, 0), -Math.Min(y - parent.DrawOffset.Y, 0));
+            Size = new(width, height);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Editor
                         }
                     }
 
-                    Size = new Point(width, height);
+                    Size = new(width, height);
                     Image = new(Application.Instance.GraphicsDevice, width, height);
                     Image.SetData(buffer, 0, totalSize);
                     break;
@@ -259,7 +259,7 @@ namespace Editor
             int resultW = Math.Max(0, Math.Min(relativeX + width, ClipRect.Right) - resultX);
             int resultH = Math.Max(0, Math.Min(relativeY + height, ClipRect.Bottom) - resultY);
 
-            return new Rectangle(resultX, resultY, resultW, resultH);
+            return new(resultX, resultY, resultW, resultH);
         }
 
         public void JustifyOrigin(float x, float y)

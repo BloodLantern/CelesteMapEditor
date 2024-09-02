@@ -6,7 +6,7 @@ namespace Editor.UI.Components
 {
     public class ModDependencies : UiComponent, ICloseable
     {
-        public Session Session;
+        public readonly Session Session;
 
         private readonly bool[] enabledMods;
         private string searchText = string.Empty;

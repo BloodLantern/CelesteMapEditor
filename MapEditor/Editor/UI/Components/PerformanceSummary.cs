@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended;
 
 namespace Editor.UI.Components
 {

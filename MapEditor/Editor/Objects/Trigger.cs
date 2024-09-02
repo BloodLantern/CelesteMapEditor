@@ -15,7 +15,7 @@ namespace Editor.Objects
         public readonly string DisplayName;
 
         public override Vector2 Position => EntityData.Position;
-        public override Point Size => EntityData.Size;
+        public override Vector2 Size => EntityData.Size;
 
         public Trigger(EntityData data, Level level)
             : base(level)

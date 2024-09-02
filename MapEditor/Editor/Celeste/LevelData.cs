@@ -7,21 +7,21 @@ namespace Editor.Celeste
 {
     public class LevelData
     {
-        public string Name;
-        public bool Dummy;
+        public readonly string Name;
+        public readonly bool Dummy;
         public int Strawberries;
         public bool HasGem;
         public bool HasHeartGem;
         public bool HasCheckpoint;
         public bool DisableDownTransition;
         public Rectangle Bounds;
-        public List<EntityData> Entities;
-        public List<EntityData> Triggers;
-        public List<Vector2> PlayerSpawns;
-        public List<DecalData> FgDecals;
-        public List<DecalData> BgDecals;
-        public string ForegroundTiles = "";
-        public string BackgroundTiles = "";
+        public readonly List<EntityData> Entities;
+        public readonly List<EntityData> Triggers;
+        public readonly List<Vector2> PlayerSpawns;
+        public readonly List<DecalData> FgDecals;
+        public readonly List<DecalData> BgDecals;
+        public readonly string ForegroundTiles = "";
+        public readonly string BackgroundTiles = "";
         public string FgTiles = "";
         public string BgTiles = "";
         public string ObjTiles = "";
@@ -33,17 +33,17 @@ namespace Editor.Celeste
         public string Music = "";
         public string AltMusic = "";
         public string Ambience = "";
-        public float[] MusicLayers = new float[4];
+        public readonly float[] MusicLayers = new float[4];
         public int MusicProgress = -1;
         public int AmbienceProgress = -1;
         public bool MusicWhispers;
         public bool DelayAltMusic;
         public int EnforceDashNumber;
-        public int EditorColorIndex;
+        public readonly int EditorColorIndex;
 
         public LevelData(BinaryPacker.Element data)
         {
-            Bounds = new Rectangle();
+            Bounds = new();
             foreach (KeyValuePair<string, object> attribute in data.Attributes)
             {
                 switch (attribute.Key)
@@ -143,11 +143,11 @@ namespace Editor.Celeste
                 }
             }
 
-            PlayerSpawns = new List<Vector2>();
-            Entities = new List<EntityData>();
-            Triggers = new List<EntityData>();
-            BgDecals = new List<DecalData>();
-            FgDecals = new List<DecalData>();
+            PlayerSpawns = [];
+            Entities = [];
+            Triggers = [];
+            BgDecals = [];
+            FgDecals = [];
 
             foreach (BinaryPacker.Element child in data.Children)
             {
@@ -157,7 +157,7 @@ namespace Editor.Celeste
                         foreach (BinaryPacker.Element entity in child.Children)
                         {
                             if (entity.Name == "player")
-                                PlayerSpawns.Add(new Vector2(Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
+                                PlayerSpawns.Add(new(Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
                             else if (entity.Name is "strawberry" or "snowberry")
                                 Strawberries++;
                             else if (entity.Name == "shard")
@@ -182,10 +182,10 @@ namespace Editor.Celeste
                     if (child.Children != null)
                         foreach (BinaryPacker.Element decal in child.Children)
                             BgDecals.Add(
-                                new DecalData()
+                                new()
                                 {
-                                    Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
-                                    Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                    Position = new(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
+                                    Scale = new(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
                                     Texture = (string) decal.Attributes["texture"]
                                 }
                             );
@@ -195,10 +195,10 @@ namespace Editor.Celeste
                     if (child.Children != null)
                         foreach (BinaryPacker.Element decal in child.Children)
                             FgDecals.Add(
-                                new DecalData()
+                                new()
                                 {
-                                    Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
-                                    Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                    Position = new(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
+                                    Scale = new(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
                                     Texture = (string) decal.Attributes["texture"]
                                 }
                             );
@@ -241,7 +241,7 @@ namespace Editor.Celeste
                         result.Origin.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else
                     {
-                        result.Attributes ??= new Dictionary<string, object>();
+                        result.Attributes ??= new();
                         result.Attributes.Add(attribute.Key, attribute.Value);
                     }
                 }
