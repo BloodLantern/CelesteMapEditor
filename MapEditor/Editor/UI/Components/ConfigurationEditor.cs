@@ -341,7 +341,7 @@ afterBeginDisabled:
             foreach (Attribute attribute in field.GetCustomAttributes())
             {
                 if (attribute is ConfigurationEditorAttribute configurationEditorAttribute)
-                    ImGui.SetItemTooltip(configurationEditorAttribute.Tooltip);
+                    ImGui.SetTooltip(configurationEditorAttribute.Tooltip);
             }
 
             return valueChanged;

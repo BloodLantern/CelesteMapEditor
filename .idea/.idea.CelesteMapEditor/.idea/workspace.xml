@@ -8,9 +8,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e022ef6b-7f52-4207-9921-fb42da50708f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/.gitmodules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/ImGui.NET" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CelesteMapEditor/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/Application.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/Application.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/MapViewer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/MapViewer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ConfigurationEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/ConfigurationEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/DebugConsole.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/DebugConsole.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LayerSelection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/Components/LayerSelection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MapEditor/Editor/UI/UiComponent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MapEditor/Editor/UI/UiComponent.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MonoGame.ImGuiNet" beforeDir="false" afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/ImGuiRenderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/ImGuiRenderer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -27,11 +34,15 @@
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/4c/c3cd6c96/IGameComponent.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/a3/476d9c9f/GameComponentCollection.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/ef/f30032d0/Game.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../Celeste/Monocle/StateMachine.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/MonoGame.ImGuiNet/ImGui.NET/src/ImGui.NET/Generated/ImGui.gen.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/777f4218e4a0469dbc075c5f54bf5f721c5a00/ec/5b8e241b/Game.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ImGui.NET/src/ImGui.NET/Generated/ImGui.gen.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/maxim/Code/Perso/CelesteMapEditor/MapEditor/Editor/Application.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/maxim/Code/Perso/CelesteMapEditor/MapEditor/Editor/Application.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MapEditor/Editor/Application.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MapEditor/Editor/Camera.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/maxim/Code/Perso/CelesteMapEditor/MapEditor/Editor/MapViewer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/maxim/Code/Perso/CelesteMapEditor/MapEditor/Editor/MapViewer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MapEditor/Editor/MapViewer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../Mountain/Mountain/include/Mountain/scene/component/state_machine.hpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -112,7 +123,6 @@
       <workItem from="1705620657813" duration="537000" />
       <workItem from="1724943099343" duration="8749000" />
       <workItem from="1725036599474" duration="4517000" />
-      <workItem from="1725303093548" duration="215000" />
     </task>
     <task id="LOCAL-00001" summary="Started to switch from MonoGame Extended to Nez">
       <option name="closed" value="true" />
@@ -146,7 +156,7 @@
     <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Started to switch from MonoGame Extended to Nez" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started to switch from MonoGame Extended to Nez" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
