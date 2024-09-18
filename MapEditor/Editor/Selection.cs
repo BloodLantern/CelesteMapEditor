@@ -68,7 +68,7 @@ namespace Editor
 
             hoveredObjectManager.UpdateObjects(mapViewer.GetObjectsAt(mouseMapPosition));
 
-            if (mouse.WasButtonJustDown(mapViewer.Keybinds.Select))
+            if (mouse.WasButtonPressed(mapViewer.Keybinds.Select))
             {
                 // If the click was on nothing, clear the selection
                 if (hoveredObjectManager.Count == 0)
@@ -90,7 +90,7 @@ namespace Editor
                 if (keyboard.IsShiftDown())
                 {
                     if (area.IsEmpty)
-                        area = new(mouse.Position, new());
+                        area = new(mouse.Position.ToVector2(), new());
                     else
                         area = new(Vector2.Min(clickStart, mousePos), Calc.Abs(mouseDragDelta));
 
@@ -123,7 +123,7 @@ namespace Editor
                 }
             }
 
-            if (mouse.WasButtonJustUp(mapViewer.Keybinds.Select))
+            if (mouse.WasButtonPressed(mapViewer.Keybinds.Select))
             {
                 area = new();
                 clickStartPositions.Clear();
@@ -139,10 +139,10 @@ namespace Editor
                 }
             }
 
-            if (keyboard.WasKeyJustUp(mapViewer.Keybinds.Deselect))
+            if (keyboard.WasKeyPressed(mapViewer.Keybinds.Deselect))
                 DeselectAll();
 
-            if (keyboard.WasKeyJustUp(mapViewer.Keybinds.Delete))
+            if (keyboard.WasKeyPressed(mapViewer.Keybinds.Delete))
             {
                 foreach (MapObject mapObject in list)
                     mapObject.RemoveFromMap();

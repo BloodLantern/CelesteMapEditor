@@ -117,13 +117,13 @@ namespace Editor
                 ReadYaml(everestYamlStream);
             }
 
-            const string gameplayPath = "Graphics/Atlases/Gameplay";
+            const string GameplayPath = "Graphics/Atlases/Gameplay";
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                if (!entry.FullName.StartsWith(gameplayPath) || Path.GetExtension(entry.Name) != ".png")
+                if (!entry.FullName.StartsWith(GameplayPath) || Path.GetExtension(entry.Name) != ".png")
                     continue;
 
-                GameplayAtlasEntries.Add(entry.FullName[(gameplayPath.Length + 1)..], null);
+                GameplayAtlasEntries.Add(entry.FullName[(GameplayPath.Length + 1)..], null);
             }
         }
 
@@ -266,6 +266,7 @@ namespace Editor
             int index = 0;
             session.CelesteMods.Add(new("Celeste", session.CelesteVersion, index++));
             session.CelesteMods.Add(new("Everest", session.EverestVersion, index++));
+            session.CelesteMods.Add(new("EverestCore", session.EverestVersion, index++));
             foreach (string path in entries)
             {
                 loading.CurrentSubText = Path.GetRelativePath(session.CelesteModsDirectory, path);

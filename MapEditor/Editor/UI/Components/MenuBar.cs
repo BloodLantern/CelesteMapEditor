@@ -13,66 +13,42 @@ namespace Editor.UI.Components
 {
     public class MenuBar : UiComponent
     {
-        private const float MoveInDuration = 0.5f;
-        private const float DefaultHeight = 30f;
-        private const string Title = "menuBar";
+        private const string Title = "Menu Bar";
 
-        public Vector2 Size { get; private set; } = Vector2.One;
-        public float CurrentY { get; private set; } = -DefaultHeight;
-
-        public bool Visible = false;
-
-        private readonly Application app;
-        private readonly MapViewer mapViewer;
-        private ModDependencies modDependencies;
-        private LayerSelection layerSelection;
-
-        private const ImGuiWindowFlags WindowFlags =
-            ImGuiWindowFlags.NoDecoration |
-            ImGuiWindowFlags.NoMove |
-            ImGuiWindowFlags.NoScrollWithMouse |
-            ImGuiWindowFlags.NoSavedSettings |
-            ImGuiWindowFlags.NoBringToFrontOnFocus |
-            ImGuiWindowFlags.NoBackground |
-            ImGuiWindowFlags.MenuBar;
+        private Application App { get; }
+        private MapViewer MapViewer { get; }
+        private ModDependencies ModDependencies { get; set; }
+        private LayerSelection LayerSelection { get; set; }
 
         public MenuBar(Application app)
-            : base(RenderingCall.StateEditor)
+            : base(RenderingCall.First)
         {
-            this.app = app;
-            mapViewer = app.MapViewer;
+            App = app;
+            MapViewer = app.MapViewer;
         }
 
         internal override void Initialize(UiManager manager)
         {
-            modDependencies = manager.GetComponent<ModDependencies>();
-            layerSelection = manager.GetComponent<LayerSelection>();
+            ModDependencies = manager.GetComponent<ModDependencies>();
+            LayerSelection = manager.GetComponent<LayerSelection>();
 
             base.Initialize(manager);
         }
 
         public override void Render()
         {
-            if (!Visible)
+            if (!ImGui.BeginMainMenuBar())
                 return;
-
-            ImGui.SetNextWindowPos(new(0, CurrentY));
-            ImGui.SetNextWindowSize(new(ImGui.GetMainViewport().Size.X, ImGui.GetFrameHeight()));
-
-            ImGui.Begin(Title, WindowFlags);
-            Size = ImGui.GetWindowSize();
-
-            ImGui.BeginMenuBar();
-            FileMenu(app.Session.Config);
+            
+            FileMenu(App.Session.Config);
             EditMenu();
             ViewMenu();
             ModMenu();
             MapMenu();
             RoomMenu();
             HelpMenu();
-            ImGui.EndMenuBar();
-
-            ImGui.End();
+            
+            ImGui.EndMainMenuBar();
         }
 
         private void FileMenu(Config config)
@@ -123,10 +99,10 @@ namespace Editor.UI.Components
                     switch (Path.GetExtension(result.Path).ToLower())
                     {
                         case ".bin":
-                            app.LoadMap(result.Path);
+                            App.LoadMap(result.Path);
                             break;
                         case ".zip":
-                            app.LoadModZip(result.Path);
+                            App.LoadModZip(result.Path);
                             break;
                     }
                     break;
@@ -151,7 +127,7 @@ namespace Editor.UI.Components
             }
 
             if (mapToLoad != string.Empty)
-                app.LoadMap(mapToLoad);
+                App.LoadMap(mapToLoad);
 
             ImGui.EndMenu();
         }
@@ -179,7 +155,7 @@ namespace Editor.UI.Components
             if (!ImGui.MenuItem("Restart"))
                 return;
             
-            app.Restart();
+            App.Restart();
         }
 
         private void FileMenuExit()
@@ -187,7 +163,7 @@ namespace Editor.UI.Components
             if (!ImGui.MenuItem("Exit"))
                 return;
             
-            app.Exit();
+            App.Exit();
         }
 
         private void EditMenu()
@@ -250,7 +226,7 @@ namespace Editor.UI.Components
             if (!ImGui.MenuItem("Select All"))
                 return;
             
-            mapViewer.Selection.SelectAll();
+            MapViewer.Selection.SelectAll();
         }
 
         private void EditMenuConfiguration()
@@ -264,7 +240,7 @@ namespace Editor.UI.Components
             if (!ImGui.BeginMenu("View"))
                 return;
             
-            foreach (UiComponent component in app.UiManager)
+            foreach (UiComponent component in App.UiManager)
             {
                 if (component is ICloseable closeable)
                 {
@@ -292,7 +268,7 @@ namespace Editor.UI.Components
             if (!ImGui.MenuItem("Show dependencies"))
                 return;
             
-            modDependencies.WindowOpen = true;
+            ModDependencies.WindowOpen = true;
         }
 
         private void MapMenu()
@@ -399,22 +375,6 @@ namespace Editor.UI.Components
         {
             if (!ImGui.MenuItem("About"))
                 return;
-        }
-
-        public void StartMoveInRoutine() => Coroutine.Start(MoveInRoutine(-DefaultHeight, 0f, MoveInDuration));
-
-        private IEnumerator MoveInRoutine(float startingY, float endingY, float duration)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            for (float timer = 0f; timer < duration; timer = stopwatch.GetElapsedSeconds())
-            {
-                CurrentY = Calc.EaseLerp(startingY, endingY, timer, duration, Ease.CubeOut);
-
-                yield return null;
-            }
-
-            CurrentY = endingY;
         }
     }
 }

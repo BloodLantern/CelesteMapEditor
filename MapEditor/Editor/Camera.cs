@@ -39,7 +39,7 @@ namespace Editor
         }
 
         private Vector2? cameraStartPosition;
-        private Point? cameraMoveClickStartPosition;
+        private Vector2? cameraMoveClickStartPosition;
         private bool Dragging => cameraStartPosition.HasValue && cameraMoveClickStartPosition.HasValue;
         private Vector2 dragDelta;
 
@@ -135,6 +135,7 @@ namespace Editor
 
         public void HandleInputs(MouseStateExtended mouse, KeyboardStateExtended keyboard)
         {
+            Vector2 mousePos = mouse.Position.ToVector2();
             if (mouse.IsButtonUp(mapViewer.Keybinds.CameraMove))
             {
                 cameraStartPosition = null;
@@ -143,21 +144,21 @@ namespace Editor
             else if (!Dragging)
             {
                 cameraStartPosition = Position;
-                cameraMoveClickStartPosition = mouse.Position;
+                cameraMoveClickStartPosition = mousePos;
             }
 
             // If the click started inside the window
-            if (cameraMoveClickStartPosition.HasValue && new RectangleF(Point.Zero, app.WindowSize).Contains(cameraMoveClickStartPosition.Value))
+            if (cameraMoveClickStartPosition.HasValue && new RectangleF(Vector2.Zero, app.WindowSize).Contains(cameraMoveClickStartPosition.Value))
             {
                 if (Dragging)
-                    dragDelta = (mouse.Position - cameraMoveClickStartPosition.Value).ToVector2() / Zoom;
+                    dragDelta = (mousePos - cameraMoveClickStartPosition.Value) / Zoom;
 
                 if (cameraStartPosition.HasValue)
                     Position = cameraStartPosition.Value - dragDelta;
             }
 
             if (mouse.DeltaScrollWheelValue != 0)
-                ZoomTo(mouse.Position.ToVector2(), TargetZoom * MathF.Pow(mapViewer.Config.ZoomFactor, -mouse.GetDeltaScrollWheel()));
+                ZoomTo(mousePos, TargetZoom * MathF.Pow(mapViewer.Config.ZoomFactor, -mouse.GetDeltaScrollWheel()));
         }
 
         public void OnResize()
@@ -177,8 +178,6 @@ namespace Editor
 
         public Vector2 MapOffsetToWindow(Vector2 offset) => offset * Zoom;
 
-        public Size2 MapOffsetToWindow(Size2 offset) => offset * Zoom;
-
         public RectangleF MapAreaToWindow(RectangleF bounds) => new(MapPositionToWindow((Vector2) bounds.Position), MapOffsetToWindow(bounds.Size));
 
         public Vector2 WindowPositionToMap(Vector2 position) => position / Zoom + Position;
@@ -186,8 +185,6 @@ namespace Editor
         public Point WindowPositionToMap(Point position) => position.Div(Zoom) + Position.ToPoint();
 
         public Vector2 WindowOffsetToMap(Vector2 offset) => offset / Zoom;
-
-        public Size2 WindowOffsetToMap(Size2 offset) => offset / Zoom;
 
         public RectangleF WindowAreaToMap(RectangleF bounds) => new(WindowPositionToMap((Vector2) bounds.Position), WindowOffsetToMap(bounds.Size));
 

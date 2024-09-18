@@ -3,9 +3,10 @@
     public enum RenderingCall
     {
         None,
-        BeforeEverything,
+        First,
+        AfterDockspace,
         StateEditor,
         StateLoading,
-        AfterEverything
+        Last,
     }
 }

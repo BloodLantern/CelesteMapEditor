@@ -6,11 +6,13 @@ namespace Editor.UI.Components
     {
         private Application app;
 
-        public ModExplorer(Application app) : base(RenderingCall.None) => this.app = app;
+        public ModExplorer(Application app) : base(RenderingCall.StateEditor) => this.app = app;
 
         public override void Render()
         {
+            ImGui.Begin("Mod Explorer");
             ImGui.Text("Not implemented yet");
+            ImGui.End();
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Editor.UI.Components
     {
         private MapViewer mapViewer;
 
-        public LevelList(MapViewer mapViewer) : base(RenderingCall.None) => this.mapViewer = mapViewer;
+        public LevelList(MapViewer mapViewer) : base(RenderingCall.StateEditor) => this.mapViewer = mapViewer;
 
         private bool roomsCheckbox = true;
         private bool fillersCheckbox = true;
@@ -22,6 +22,8 @@ namespace Editor.UI.Components
             List<Filler> fillers = GetFillers();
             List<Level> fillerLevels = GetLevels(true);
 
+            ImGui.Begin("Room List");
+            
             if (levels.Count > 0)
                 ImGui.Checkbox("Rooms", ref roomsCheckbox);
             if (fillers.Count > 0)
@@ -85,6 +87,8 @@ namespace Editor.UI.Components
                         mapViewer.Camera.MoveTo(filler.Center.ToVector2());
                 }
             }
+            
+            ImGui.End();
         }
 
         private List<Level> GetLevels(bool filler) => mapViewer.CurrentMap.Levels.FindAll(l => l.Filler == filler);

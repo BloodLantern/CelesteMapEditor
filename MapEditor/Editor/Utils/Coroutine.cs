@@ -6,60 +6,61 @@ using System.Collections.Generic;
 
 namespace Editor.Utils
 {
-    public static class Coroutine
+    public class Coroutine
     {
-        private class Routine
+        public delegate IEnumerator Action();
+        
+        public readonly IEnumerator Enumerator;
+
+        private float timer = 0f;
+        private bool timerInvalidated = true;
+
+        public readonly Guid Guid;
+        public bool Finished = false;
+
+        private object Current => Enumerator.Current;
+
+        public Coroutine(IEnumerator routine) => Enumerator = routine;
+
+        public Coroutine(IEnumerator routine, Guid guid)
         {
-            public readonly IEnumerator Enumerator;
-
-            private float timer = 0f;
-            private bool timerInvalidated = true;
-
-            public readonly Guid Guid;
-            public bool Finished = false;
-
-            private object Current => Enumerator.Current;
-
-            public Routine(Guid guid, IEnumerator routine)
-            {
-                Guid = guid;
-                Enumerator = routine;
-            }
-
-            private void Next()
-            {
-                Finished = !Enumerator.MoveNext();
-                timerInvalidated = true;
-            }
-
-            public void Update(GameTime time)
-            {
-                if (Finished)
-                    return;
-
-                if (Current == null)
-                {
-                    Next();
-                    return;
-                }
-
-                if (Current is not float)
-                    throw new ArgumentException("Coroutines can only return null and float values");
-
-                if (timerInvalidated)
-                {
-                    timer += (float) Current;
-                    timerInvalidated = false;
-                }
-
-                timer -= time.GetElapsedSeconds();
-
-                if (timer <= 0f)
-                    Next();
-            }
+            Enumerator = routine;
+            Guid = guid;
         }
 
-        private static readonly Dictionary<Guid, Routine> RunningRoutines = new();
+        private void Next()
+        {
+            Finished = !Enumerator.MoveNext();
+            timerInvalidated = true;
+        }
+
+        public void Update(GameTime time)
+        {
+            if (Finished)
+                return;
+
+            if (Current == null)
+            {
+                Next();
+                return;
+            }
+
+            if (Current is not float)
+                throw new ArgumentException("Coroutines can only return null and float values");
+
+            if (timerInvalidated)
+            {
+                timer += (float) Current;
+                timerInvalidated = false;
+            }
+
+            timer -= time.GetElapsedSeconds();
+
+            if (timer <= 0f)
+                Next();
+        }
+
+        private static readonly Dictionary<Guid, Coroutine> RunningRoutines = new();
 
         public static int RunningCount => RunningRoutines.Count;
 
@@ -72,7 +73,7 @@ namespace Editor.Utils
         public static Guid Start(IEnumerator routine)
         {
             Guid guid = Guid.NewGuid();
-            RunningRoutines.Add(guid, new(guid, routine));
+            RunningRoutines.Add(guid, new(routine, guid));
             return guid;
         }
 
@@ -92,7 +93,7 @@ namespace Editor.Utils
         internal static void UpdateAll(GameTime time)
         {
             List<Guid> finishedRoutines = new();
-            foreach (Routine routine in RunningRoutines.Values)
+            foreach (Coroutine routine in RunningRoutines.Values)
             {
                 routine.Update(time);
                 if (routine.Finished)

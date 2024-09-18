@@ -1,21 +1,21 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Editor.Celeste;
 using Editor.Extensions;
-using System.IO;
 using Editor.Logging;
-using MonoGame.Extended.Input;
-using Editor.Utils;
-using MonoGame.Extended;
-using System.Diagnostics;
-using Editor.UI;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.ImGuiNet;
-using ImGuiNET;
-using System.Collections.Generic;
 using Editor.Saved;
+using Editor.UI;
 using Editor.UI.Components;
+using Editor.Utils;
+using ImGuiNET;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Input;
+using MonoGame.ImGuiNet;
 
 namespace Editor;
 
@@ -145,11 +145,13 @@ public class Application : Game
                 loading.Progress += 0.04f;
 
                 loading.CurrentText = "Loading UI";
-                UiManager.AddRange([
+                UiManager.AddRange(
+                    [
                         new ConfigurationEditor(this),
                         new ModDependencies(Session),
                         new LayerSelection(this),
-                        new LeftPanel(this),
+                        new LevelList(MapViewer),
+                        new ModExplorer(this),
                         new MenuBar(this),
                         new PerformanceSummary(this)
                     ]
@@ -210,22 +212,12 @@ public class Application : Game
                 MapViewer.Update(time, MouseExtended.GetState(), keyboardState);
 
                 // Toggle debug mode with F3
-                if (keyboardState.WasKeyJustUp(Keys.F3))
+                if (keyboardState.WasKeyPressed(Keys.F3))
                     Session.Config.DebugMode = !Session.Config.DebugMode;
 
                 // On loading state change
                 if (Loading is { Ended: true, DrawAlpha: <= 0f })
-                {
-                    LeftPanel leftPanel = UiManager.GetComponent<LeftPanel>();
-                    leftPanel.Visible = true;
-                    leftPanel.StartMoveInRoutine();
-
-                    MenuBar menuBar = UiManager.GetComponent<MenuBar>();
-                    menuBar.Visible = true;
-                    menuBar.StartMoveInRoutine();
-
                     Loading = null;
-                }
 
                 break;
         }
@@ -257,7 +249,16 @@ public class Application : Game
         GraphicsDevice.Clear(Color.Transparent);
         ImGuiRenderer.BeginLayout(time);
 
-        UiManager.RenderComponents(RenderingCall.BeforeEverything);
+        UiManager.RenderComponents(RenderingCall.First);
+        
+        // Dockspace
+        ImGui.PushStyleColor(ImGuiCol.DockingEmptyBg, Color.Transparent.PackedValue);
+        ImGui.PushStyleColor(ImGuiCol.WindowBg, Color.Transparent.PackedValue);
+        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport().ID);
+        ImGui.PopStyleColor();
+        ImGui.PopStyleColor();
+
+        UiManager.RenderComponents(RenderingCall.AfterDockspace);
 
         if (Loading != null)
             ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 1f - Loading.DrawAlpha);
@@ -266,10 +267,10 @@ public class Application : Game
         {
             case State.Editor:
                 UiManager.RenderComponents(RenderingCall.StateEditor);
-
                 if (Session.Config.DebugMode)
                     MapViewer.RenderDebug(time);
                 break;
+
             case State.Loading:
                 UiManager.RenderComponents(RenderingCall.StateLoading);
                 break;
@@ -278,7 +279,7 @@ public class Application : Game
         if (Loading != null)
             ImGui.PopStyleVar();
 
-        UiManager.RenderComponents(RenderingCall.AfterEverything);
+        UiManager.RenderComponents(RenderingCall.Last);
 
         ImGuiRenderer.EndLayout();
 
@@ -302,7 +303,7 @@ public class Application : Game
         if (CurrentState == State.Editor)
         {
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            MapViewer.Render(time, SpriteBatch);
+            MapViewer.Draw(time, SpriteBatch);
             SpriteBatch.End();
         }
 
@@ -316,21 +317,6 @@ public class Application : Game
 
         if (Loading != null)
             SpriteBatch.Draw(LoadingRenderTarget, Vector2.Zero, Color.White * Loading.DrawAlpha);
-
-        if (Session.Config.ShowAverageFps)
-        {
-            Vector2 position = new(10f, 0f);
-
-            LeftPanel leftPanel = UiManager.GetComponent<LeftPanel>();
-            if (leftPanel != null)
-                position.X += leftPanel.CurrentX + leftPanel.Size.X;
-
-            MenuBar menuBar = UiManager.GetComponent<MenuBar>();
-            if (menuBar != null)
-                position.Y += menuBar.CurrentY + menuBar.Size.Y;
-
-            SpriteBatch.DrawString(Session.UbuntuRegularFont, $"FPS: {Fps}", position, Color.White);
-        }
 
         SpriteBatch.Draw(ImGuiRenderTarget, Vector2.Zero, Color.White);
 

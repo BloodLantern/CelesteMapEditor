@@ -10,8 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\..\..\..\..\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
-/reference:..\..\..\..\..\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\lib\net6.0\MonoGame.Framework.Content.Pipeline.dll
+/reference:PipelineReferences\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 

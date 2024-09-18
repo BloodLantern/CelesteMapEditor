@@ -342,7 +342,7 @@ public class MapViewer
         return result;
     }
 
-    public void Render(GameTime time, SpriteBatch spriteBatch)
+    public void Draw(GameTime time, SpriteBatch spriteBatch)
     {
         if (CurrentMap == null)
             return;
