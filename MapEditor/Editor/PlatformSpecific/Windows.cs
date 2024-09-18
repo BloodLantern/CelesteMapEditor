@@ -1,12 +1,12 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Editor.PlatformSpecific
+namespace Editor.PlatformSpecific;
+
+public static class Windows
 {
-    public class Windows
-    {
 #if WINDOWS
-        [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
-        public static extern bool ShouldSystemUseDarkMode();
+    [LibraryImport("UXTheme.dll", EntryPoint = "#138", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ShouldSystemUseDarkMode();
 #endif
-    }
 }
